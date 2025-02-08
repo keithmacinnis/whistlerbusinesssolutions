@@ -1,0 +1,26 @@
+[
+  {
+    "id": "2",
+    "name": "Tech Solutions",
+    "shortDescription": "From IT infrastructure to custom software.",
+    "description": "Our Tech Solutions encompass everything from setting up robust IT infrastructures to developing custom software solutions. We cater to businesses needing scalable, secure, and efficient tech environments. Our services include cloud computing, data security, network design, and software development, all tailored to enhance your business operations in Whistler."
+  },
+  {
+    "id": "3",
+    "name": "SaaS",
+    "shortDescription": "Scheduling and AI-powered solutions.",
+    "description": "Dive into our SaaS offerings where we specialize in providing scheduling software and AI-driven solutions. These tools are designed to optimize your workflow, automate repetitive tasks, and provide insightful analytics to improve decision-making processes. Perfect for businesses looking to streamline operations and leverage technology for competitive advantage."
+  },
+  {
+    "id": "4",
+    "name": "API Integration",
+    "shortDescription": "Connecting your software and org with critical applications.",
+    "description": "API Integration services at Whistler Business Solutions help you connect disparate systems, allowing seamless data flow between your software and external applications. We specialize in custom integrations that enhance your business processes, offering solutions that can scale with your growth, ensuring all parts of your tech ecosystem work together efficiently."
+  },
+  {
+    "id": "5",
+    "name": "AI Integration",
+    "shortDescription": "Endless options to enhance your business.",
+    "description": "Our AI Integration services aim to revolutionize how you operate by embedding artificial intelligence into your business processes. From customer service bots to predictive analytics for market trends, we customize AI solutions to address your specific business needs, making your operations smarter, more responsive, and forward-thinking."
+  }
+]
