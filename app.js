@@ -175,6 +175,26 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+
+  // Add theme toggle functionality
+ 
+  const themeToggle = document.getElementById('theme-toggle');
+  const body = document.body;
+
+  function toggleTheme() {
+    if (body.classList.contains('dark-mode')) {
+      body.classList.remove('dark-mode');
+      body.classList.add('light-mode');
+    } else {
+      body.classList.remove('light-mode');
+      body.classList.add('dark-mode');
+    }
+  }
+
+  themeToggle.addEventListener('click', toggleTheme);
+
+  // Add click event listener to the theme toggle button
+  themeToggle.addEventListener('click', toggleTheme);
   // Function to handle background image rotation
   function rotateBackground() {
     const heroBackground = document.getElementById('hero-background');
