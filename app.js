@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loader').style.display = 'none';
   }, 1000); // Simulate loading time
 
-  // Lazy Loading Images
-  const lazyImages = [].slice.call(document.querySelectorAll("img[data-src]"));
+  // Lazy Loading Images - exclude the hero background
+  const lazyImages = document.querySelectorAll("img[data-src]:not(#hero-background img)");
   if ("IntersectionObserver" in window) {
     let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
       entries.forEach(function(entry) {
@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
+
     lazyImages.forEach(function(lazyImage) {
       lazyImageObserver.observe(lazyImage);
     });
@@ -81,48 +82,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Real-time form validation for contact form
-  const contactForm = document.getElementById('contact-form');
-  contactForm.addEventListener('input', function(event) {
-    const target = event.target;
-    const errorSpan = target.nextElementSibling;
+  // // Real-time form validation for contact form
+  // const contactForm = document.getElementById('contact-form');
+  // contactForm.addEventListener('input', function(event) {
+  //   const target = event.target;
+  //   const errorSpan = target.nextElementSibling;
     
-    if (target.validity.valid) {
-      errorSpan.textContent = '';
-      errorSpan.style.display = 'none';
-    } else {
-      if (target.id === 'name' && target.validity.valueMissing) {
-        errorSpan.textContent = 'Please enter your name.';
-      } else if (target.id === 'email') {
-        if (target.validity.valueMissing) {
-          errorSpan.textContent = 'Please enter your email address.';
-        } else if (target.validity.typeMismatch) {
-          errorSpan.textContent = 'Please enter a valid email address.';
-        }
-      } else if (target.id === 'message' && target.validity.valueMissing) {
-        errorSpan.textContent = 'Please enter a message.';
-      }
-      errorSpan.style.display = 'block';
-    }
-  });
+  //   if (target.validity.valid) {
+  //     errorSpan.textContent = '';
+  //     errorSpan.style.display = 'none';
+  //   } else {
+  //     if (target.id === 'name' && target.validity.valueMissing) {
+  //       errorSpan.textContent = 'Please enter your name.';
+  //     } else if (target.id === 'email') {
+  //       if (target.validity.valueMissing) {
+  //         errorSpan.textContent = 'Please enter your email address.';
+  //       } else if (target.validity.typeMismatch) {
+  //         errorSpan.textContent = 'Please enter a valid email address.';
+  //       }
+  //     } else if (target.id === 'message' && target.validity.valueMissing) {
+  //       errorSpan.textContent = 'Please enter a message.';
+  //     }
+  //     errorSpan.style.display = 'block';
+  //   }
+  // });
 
-  // Contact form submission
-  contactForm.addEventListener('submit', function(event) {
-    event.preventDefault();
-    let isValid = true;
+  // // Contact form submission
+  // contactForm.addEventListener('submit', function(event) {
+  //   event.preventDefault();
+  //   let isValid = true;
     
-    ['name', 'email', 'message'].forEach(field => {
-      if (!document.getElementById(field).validity.valid) {
-        isValid = false;
-        document.getElementById(field).dispatchEvent(new Event('input'));
-      }
-    });
+  //   ['name', 'email', 'message'].forEach(field => {
+  //     if (!document.getElementById(field).validity.valid) {
+  //       isValid = false;
+  //       document.getElementById(field).dispatchEvent(new Event('input'));
+  //     }
+  //   });
 
-    if (isValid) {
-      alert('Thank you for your message! We will get back to you soon.');
-      this.reset();
-    }
-  });
+  //   if (isValid) {
+  //     alert('Thank you for your message! We will get back to you soon.');
+  //     this.reset();
+  //   }
+  // });
 
   // Feedback form
   document.getElementById('submit-feedback').addEventListener('click', function() {
@@ -173,4 +174,40 @@ document.addEventListener('DOMContentLoaded', () => {
         serviceGrid.appendChild(card);
       });
     });
+
+  // Function to handle background image rotation
+  function rotateBackground() {
+    const heroBackground = document.getElementById('hero-background');
+    const currentImage = parseInt(heroBackground.dataset.currentImage);
+    const nextImage = currentImage < 4 ? currentImage + 1 : 1;
+    
+    // Direct URL setting without lazy loading
+    heroBackground.style.backgroundImage = `url('whistler-mountain-hd${nextImage}.jpg')`;
+    
+    heroBackground.dataset.currentImage = nextImage.toString();
+    // Force a repaint to ensure the change is visible immediately
+    heroBackground.style.opacity = '0';
+    void heroBackground.offsetWidth;  // Trigger reflow
+    heroBackground.style.opacity = '1';
+  }
+
+  // Add click event listener to the hero section for background rotation
+  document.querySelector('.hero').addEventListener('click', function(event) {
+    if (!event.target.closest('a, button')) {
+      rotateBackground();
+    }
+  });
+
+  // Initial setup to ensure the first image is set
+  document.getElementById('hero-background').style.backgroundImage = "url('whistler-mountain-hd5.jpg')";
+  document.getElementById('hero-background').dataset.currentImage = '1';
+
+  // Ensure that the hero background images are not lazy loaded
+  const heroImages = document.querySelectorAll('#hero-background');
+  heroImages.forEach(img => {
+    if (img.dataset.src) {
+      img.style.backgroundImage = `url(${img.dataset.src})`;
+      delete img.dataset.src; // Remove data-src attribute to prevent lazy loading
+    }
+  });
 });
