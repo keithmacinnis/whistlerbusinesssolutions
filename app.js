@@ -152,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="card-front">
               <h3>${service.name}</h3>
               <p>${service.shortDescription}</p>
+              <button class="learn-more">Learn More</button> 
             </div>
             <div class="card-back">
               <h3>${service.name}</h3>
@@ -181,17 +182,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = document.getElementById('theme-toggle');
   const body = document.body;
 
+
   function toggleTheme() {
-    if (body.classList.contains('dark-mode')) {
-      body.classList.remove('dark-mode');
-      body.classList.add('light-mode');
-    } else {
+    if (body.classList.contains('light-mode')) {
       body.classList.remove('light-mode');
       body.classList.add('dark-mode');
+    } else {
+      body.classList.remove('dark-mode');
+      body.classList.add('light-mode');
     }
+  
+    // Update icons
+    const lightIcon = themeToggle.querySelector('.light-mode-icon');
+    const darkIcon = themeToggle.querySelector('.dark-mode-icon');
+    lightIcon.classList.toggle('hidden');
+    darkIcon.classList.toggle('hidden');
   }
 
-  themeToggle.addEventListener('click', toggleTheme);
 
   // Add click event listener to the theme toggle button
   themeToggle.addEventListener('click', toggleTheme);

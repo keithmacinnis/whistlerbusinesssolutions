@@ -248,6 +248,8 @@ header h1 span {
   height: 100%;
   position: absolute;
   -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+
   backface-visibility: hidden;
   border-radius: 10px;
   overflow: hidden;
@@ -621,13 +623,7 @@ footer {
   display: none;
 }
 
-.light-mode-icon {
-  color: #FFD700; /* Gold color for sun */
-}
 
-.dark-mode-icon {
-  color: #F8F8FF; /* Ghost White for moon */
-}
 header.light-mode {
   h1 {
     color: #000;
@@ -743,4 +739,36 @@ body.light-mode .service-card .back-content {
 }
 body.light-mode .service-card .back-to-front {
   color: white;
+}
+
+.service-card .learn-more {
+  background: #3a8e3c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 10px; /* Space from the short description */
+}
+
+.service-card .learn-more:hover, .service-card .learn-more:focus {
+  background: #2e7d32;
+  outline: none;
+}
+
+body.light-mode .service-card .learn-more {
+  background: #2980B9; /* Adjust for light mode */
+}
+
+body.dark-mode .service-card .learn-more {
+  background: #3a8e3c; /* Adjust for dark mode */
+}
+
+body.light-mode .service-card .back-to-front {
+  background: #2980B9; /* Adjust for light mode */
+}
+
+body.dark-mode .service-card .back-to-front {
+  background: #3a8e3c; /* Adjust for dark mode */
 }
