@@ -1,134 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Whistler Business Solutions - Leading business strategy and tech services in Whistler, BC">
-    <meta name="keywords" content="Whistler, business solutions, consulting, technology services, marketing, IT">
-    <title>Whistler Business Solutions</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Montserrat:700">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Whistler Business Solutions - Leading business strategy and tech services in Whistler, BC">
+  <meta name="keywords" content="Whistler, business solutions, consulting, technology services, marketing, IT">
+  <title>Whistler Business Solutions</title>
+  <link rel="stylesheet" href="styles.css?v=1.2">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Montserrat:700">
 </head>
+
 <body class="light-mode">
-    <div id="loader" class="loader"></div>
-    <header>
-        <div class="container">
-            <h1><span aria-label="Whistler Business Solutions">WBS</span></h1>
-            <nav aria-label="Main Navigation">
-                <ul id="main-nav">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#portfolio">Portfolio</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav>
-            <button id="theme-toggle" aria-label="Toggle theme">
-              <span class="theme-icon dark-mode-icon" aria-hidden="true">&#x1F319;</span> <!-- Sun icon -->
-              <span class="theme-icon light-mode-icon" aria-hidden="true">&#x2600;</span> <!-- Moon icon -->
-            </button>
-        </div>
-        
-    </header>
-
-    <main>
-        <section id="home " class="hero" tabindex="-1">
-            <div class="hero-content container">
-                <h2>Whistler Business Solutions</h2>
-                <p>Expert solutions tailored for the Sea to Sky community</p>
-                <a href="#services" class="cta-button" data-scroll-to="services">Discover Our Services</a>
-            </div>
-            <div id="hero-background" class="hero-background" data-current-image="1"></div>
-        </section>
-
-        <section id="about" class="section" tabindex="-1">
-            <div class="container">
-              <h2>About Us</h2>
-                <p>Established in the vibrant heart of Whistler, our mission is to empower local businesses with cutting-edge digital solutions that drive growth, enhance efficiency, and build lasting customer relationships.</p>
-                <p>Founded by a team with deep roots in both technology and the unique business landscape of Whistler, we're  a small startup. Our journey began with a vision to bridge the gap between traditional business practices and modern digital advancements. </p>
-                <p> Our team combines local knowledge with global expertise, ensuring that every solution we provide is not just effective but also culturally resonant. Whether you're a café on the village stroll or a burgeoning tech startup, we tailor our services to meet your specific needs.</p>
-            </div>
-            
-        </section>
-
-        <div class="section-divider"></div>
-
-        <section id="services" class="section" tabindex="-1">
-            <div class="container">
-                <h2>Our Services</h2>
-                <div id="service-grid" class="service-grid"></div>
-            </div>
-        </section>
-
-        <div class="section-divider"></div>
-
-        <section id="portfolio" class="section" tabindex="-1">
-            <div class="container">
-                <h2>Our Work</h2>
-                <p>Explore our portfolio here:</p>
-                <div class="portfolio-grid">
-                    <div class="portfolio-item" data-bg="project1.jpg" aria-label="Project 1: Innovative Business Solutions">
-                        <img src="placeholder.jpg" data-src="project1.jpg" alt="Project 1" loading="lazy">
-                        <div class="portfolio-text">Onramp Academy</div>
-                    </div>
-                    <div class="portfolio-item" data-bg="project2.jpg" aria-label="Project 2: Tech Infrastructure Upgrade">
-                        <img src="placeholder.jpg" data-src="project2.jpg" alt="Project 2" loading="lazy">
-                        <div class="portfolio-text">Crypto Platform</div>
-                    </div>
-                    <div class="portfolio-item" data-bg="project3.jpg" aria-label="Project 3: Peak Pressure ">
-                        <img src="placeholder.jpg" data-src="project3.jpg" alt="Project 3" loading="lazy">
-                        <div class="portfolio-text">Peak Pressure</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div class="section-divider"></div>
-
-        <section id="contact" class="section" tabindex="-1">
-            <div class="container">
-              <h2>Contact Us</h2>
-                <div style="text-align: center;"  data-tf-live="01JKKSXT71JR1NWCR7KPF70VME"></div><script src="//embed.typeform.com/next/embed.js"></script>
-            </div>
-        </section>
-
-  
-
-        <div class="section-divider"></div>
-        <section id="feedback" class="section" tabindex="-1">
-            <div class="feedback-form" >
-                <h2>Your Feedback</h2>
-                <p>Help us improve. What did you think of our services?</p>
-                <div class="feedback-form">
-                    <select id="satisfaction">
-                        <option value="5">Very Satisfied</option>
-                        <option value="4">Satisfied</option>
-                        <option value="3">Neutral</option>
-                        <option value="2">Dissatisfied</option>
-                        <option value="1">Very Dissatisfied</option>
-                    </select>
-                    <button id="submit-feedback">Submit Feedback</button>
-                    <p id="feedback-message" aria-live="polite" style="display: none;"></p>
-                </div>
-            </div>
-        </section>
-
-        <div class="section-divider"></div>
-        <div class="container">
-          <p style="text-align: center;">Thank you for your visit. Email <a href="mailto:keith@whistlerbusinesssolutions.com">us here.</a></p>
-      </div>
-    </main>
-
-
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close">×</span>
-            <h3 id="modal-title"></h3>
-            <img id="modal-image" src="" alt="" class="modal-img">
-            <p id="modal-description"></p>
-        </div>
+  <div id="loader" class="loader"></div>
+  <header>
+    <div class="container">
+      <h1><span aria-label="Whistler Business Solutions">WBS</span></h1>
+      <nav aria-label="Main Navigation">
+        <ul id="main-nav">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <button id="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon dark-mode-icon" aria-hidden="true">&#x1F319;</span> <!-- Sun icon -->
+        <span class="theme-icon light-mode-icon" aria-hidden="true">&#x2600;</span> <!-- Moon icon -->
+      </button>
     </div>
 
-    <script src="app.js"></script>
+  </header>
+
+  <main>
+    <section id="home " class="hero" tabindex="-1">
+      <div class="hero-content container">
+        <h2>Whistler Business Solutions</h2>
+        <p>Expert solutions tailored for the Sea to Sky community</p>
+        <a href="#services" class="cta-button" data-scroll-to="services">Discover Our Services</a>
+      </div>
+      <div id="hero-background" class="hero-background" data-current-image="1"></div>
+    </section>
+
+    <section id="about" class="section" tabindex="-1">
+      <div class="container">
+        <h2>About Us</h2>
+        <p>Established in the vibrant heart of Whistler, our mission is to empower local businesses with cutting-edge
+          digital solutions that drive growth, enhance efficiency, and build lasting customer relationships.</p>
+        <p>Founded by a team with deep roots in both technology and the unique business landscape of Whistler, we're a
+          small startup. Our journey began with a vision to bridge the gap between traditional business practices and
+          modern digital advancements. </p>
+        <p> Our team combines local knowledge with global expertise, ensuring that every solution we provide is not just
+          effective but also culturally resonant. Whether you're a café on the village stroll or a burgeoning tech
+          startup, we tailor our services to meet your specific needs.</p>
+      </div>
+
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section id="services" class="section" tabindex="-1">
+      <div class="container">
+        <h2>Our Services</h2>
+        <div id="service-grid" class="service-grid"></div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section id="portfolio" class="section" tabindex="-1">
+      <div class="container">
+        <h2>Our Work</h2>
+        <p>Explore our portfolio here:</p>
+        <div class="portfolio-grid">
+          <div class="portfolio-item" data-bg="projectM.jpg" aria-label="Project M: A shopify app store app for turning products into bookable events and services with easy time slots. In testing and development.">
+            <img src="placeholder.jpg" data-src="projectM.jpg" alt="Project 1" loading="lazy">
+            <div class="portfolio-text">Maisie Schedules</div>
+          </div>
+
+          <div class="portfolio-item"  data-bg="project3.jpg" aria-label="Peak Pressure is a Whistler run company that provides a range of services from drive-way restoration to cedar roof cleaning and restoration. Peakpressure.ca for more information.">
+            <img src="placeholder.jpg" data-src="project3.jpg" alt="Project 3" loading="lazy">
+            <div class="portfolio-text">Peak Pressure</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section id="contact" class="section" tabindex="-1">
+      <div class="container">
+        <h2>Contact Us</h2>
+        <div style="text-align: center;" data-tf-live="01JKKSXT71JR1NWCR7KPF70VME"></div>
+        <script src="//embed.typeform.com/next/embed.js"></script>
+      </div>
+    </section>
+
+
+
+    <div class="section-divider"></div>
+    <section id="feedback" class="section" tabindex="-1">
+      <div class="feedback-form">
+        <h2>Your Feedback</h2>
+        <p>Help us improve. What did you think of our services?</p>
+        <div class="feedback-form">
+          <select id="satisfaction">
+            <option value="5">Very Satisfied</option>
+            <option value="4">Satisfied</option>
+            <option value="3">Neutral</option>
+            <option value="2">Dissatisfied</option>
+            <option value="1">Very Dissatisfied</option>
+          </select>
+          <button id="submit-feedback">Submit Feedback</button>
+          <p id="feedback-message" aria-live="polite" style="display: none;"></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+    <div class="container">
+      <p style="text-align: center;">Thank you for your visit. Email <a
+          href="mailto:keith@whistlerbusinesssolutions.com">us here.</a></p>
+    </div>
+  </main>
+
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close">×</span>
+      <h3 id="modal-title"></h3>
+      <img id="modal-image" src="" alt="" class="modal-img">
+      <p id="modal-description"></p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
+
 </html>
