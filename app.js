@@ -1,14 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Apply saved theme from localStorage
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  const body = document.body;
+  if (savedTheme === 'dark') {
+    body.classList.add('dark-mode');
+    body.classList.remove('light-mode');
+  } else {
+    body.classList.add('light-mode');
+    body.classList.remove('dark-mode');
+  }
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    const lightIcon = themeToggle.querySelector('.light-mode-icon');
+    const darkIcon = themeToggle.querySelector('.dark-mode-icon');
+    lightIcon.classList.toggle('hidden', savedTheme !== 'light');
+    darkIcon.classList.toggle('hidden', savedTheme !== 'dark');
+  }
+
   // Remove loader once the page is loaded
   setTimeout(() => {
     document.getElementById('loader').style.display = 'none';
-  }, 1000); // Simulate loading time
+  }, 1000);
 
-  // Lazy Loading Images - exclude the hero background
+  // Services menu hover and touch handling
+  document.querySelectorAll('.services-menu').forEach(menu => {
+    menu.addEventListener('mouseenter', () => {
+      menu.classList.add('active');
+    });
+    menu.addEventListener('mouseleave', () => {
+      menu.classList.remove('active');
+    });
+    menu.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      menu.classList.toggle('active');
+    });
+    document.addEventListener('touchstart', (e) => {
+      if (!menu.contains(e.target)) {
+        menu.classList.remove('active');
+      }
+    });
+  });
+
+  // Lazy Loading Images
   const lazyImages = document.querySelectorAll("img[data-src]:not(#hero-background img)");
   if ("IntersectionObserver" in window) {
-    let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
-      entries.forEach(function(entry) {
+    let lazyImageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
         if (entry.isIntersecting) {
           let lazyImage = entry.target;
           lazyImage.src = lazyImage.dataset.src;
@@ -17,224 +54,238 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
-
-    lazyImages.forEach(function(lazyImage) {
-      lazyImageObserver.observe(lazyImage);
-    });
+    lazyImages.forEach(lazyImage => lazyImageObserver.observe(lazyImage));
   } else {
-    // Fallback for browsers that don't support IntersectionObserver
-    lazyImages.forEach(function(lazyImage) {
+    lazyImages.forEach(lazyImage => {
       lazyImage.src = lazyImage.dataset.src;
       lazyImage.removeAttribute("data-src");
     });
   }
 
-  // Smooth scrolling for internal links
+  // Smooth scrolling
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
+    anchor.addEventListener('click', e => {
       e.preventDefault();
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth'
-      });
+      document.querySelector(anchor.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
     });
   });
 
-  // Scroll reveal for sections
+  // Scroll reveal
   function reveal() {
     const reveals = document.querySelectorAll('.section');
-    for (let i = 0; i < reveals.length; i++) {
+    reveals.forEach(reveal => {
       const windowHeight = window.innerHeight;
-      const elementTop = reveals[i].getBoundingClientRect().top;
-      const elementVisible = 150;
-
-      if (elementTop < windowHeight - elementVisible) {
-        reveals[i].classList.add('reveal');
+      const elementTop = reveal.getBoundingClientRect().top;
+      if (elementTop < windowHeight - 150) {
+        reveal.classList.add('reveal');
       }
-    }
+    });
   }
   window.addEventListener('scroll', reveal);
 
   // Modal for Portfolio Items
   document.querySelectorAll('.portfolio-item').forEach(item => {
-    item.addEventListener('click', function() {
+    item.addEventListener('click', () => {
       const modal = document.getElementById('modal');
       const modalTitle = document.getElementById('modal-title');
       const modalImage = document.getElementById('modal-image');
       const modalDescription = document.getElementById('modal-description');
-      
-      modalTitle.textContent = this.querySelector('.portfolio-text').textContent;
-      modalImage.src = this.querySelector('img').dataset.src; // Use dataset.src to get the actual image URL
-      modalDescription.textContent = this.getAttribute('aria-label');
-      
+      const modalLink = document.getElementById('modal-link');
+
+      modalTitle.textContent = item.querySelector('.portfolio-text').textContent;
+      modalImage.src = item.querySelector('img').dataset.src;
+      modalDescription.textContent = item.getAttribute('aria-label');
+
+      if (item.querySelector('.portfolio-text').textContent === 'Maisie Schedules') {
+        modalLink.href = 'https://maisie-prod.whistlerbusinesssolutions.com/';
+        modalLink.style.display = 'block';
+      } else {
+        modalLink.style.display = 'none';
+      }
       modal.style.display = "block";
     });
   });
 
   // Close Modal
-  document.querySelector('.close').addEventListener('click', function() {
-    document.getElementById('modal').style.display = "none";
-  });
-
-  // Close Modal if clicked outside
-  window.addEventListener('click', function(event) {
-    if (event.target == document.getElementById('modal')) {
+  const closeButton = document.querySelector('.close');
+  if (closeButton) {
+    closeButton.addEventListener('click', () => {
       document.getElementById('modal').style.display = "none";
-    }
-  });
+    });
+  }
 
-  // // Real-time form validation for contact form
-  // const contactForm = document.getElementById('contact-form');
-  // contactForm.addEventListener('input', function(event) {
-  //   const target = event.target;
-  //   const errorSpan = target.nextElementSibling;
-    
-  //   if (target.validity.valid) {
-  //     errorSpan.textContent = '';
-  //     errorSpan.style.display = 'none';
-  //   } else {
-  //     if (target.id === 'name' && target.validity.valueMissing) {
-  //       errorSpan.textContent = 'Please enter your name.';
-  //     } else if (target.id === 'email') {
-  //       if (target.validity.valueMissing) {
-  //         errorSpan.textContent = 'Please enter your email address.';
-  //       } else if (target.validity.typeMismatch) {
-  //         errorSpan.textContent = 'Please enter a valid email address.';
-  //       }
-  //     } else if (target.id === 'message' && target.validity.valueMissing) {
-  //       errorSpan.textContent = 'Please enter a message.';
-  //     }
-  //     errorSpan.style.display = 'block';
-  //   }
-  // });
+  const modal = document.getElementById('modal');
+  if (modal) {
+    window.addEventListener('click', event => {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    });
+  }
 
-  // // Contact form submission
-  // contactForm.addEventListener('submit', function(event) {
-  //   event.preventDefault();
-  //   let isValid = true;
-    
-  //   ['name', 'email', 'message'].forEach(field => {
-  //     if (!document.getElementById(field).validity.valid) {
-  //       isValid = false;
-  //       document.getElementById(field).dispatchEvent(new Event('input'));
-  //     }
-  //   });
+  // Function to attach event listeners to service cards
+  function attachCardListeners(card) {
+    card.addEventListener('click', function(e) {
+      // Check if click is on a link
+      const link = e.target.closest('a');
+      if (link) {
+        console.log('Link clicked:', link.href);
+        return; // Allow default link navigation
+      }
 
-  //   if (isValid) {
-  //     alert('Thank you for your message! We will get back to you soon.');
-  //     this.reset();
-  //   }
-  // });
+      // Prevent default only for non-link clicks
+      e.preventDefault();
 
-  // Feedback form
-  document.getElementById('submit-feedback').addEventListener('click', function() {
-    const feedbackMessage = document.getElementById('feedback-message');
-    const satisfactionLevel = document.getElementById('satisfaction').value;
-    
-    feedbackMessage.textContent = `Thank you for your feedback. You rated us ${satisfactionLevel}/5.`;
-    feedbackMessage.style.display = 'block';
-    feedbackMessage.setAttribute('aria-live', 'assertive');
+      // Handle back button click
+      if (e.target.closest('.back-to-front')) {
+        const cardInner = card.querySelector('.card-inner');
+        if (cardInner) {
+          cardInner.classList.remove('is-flipped');
+          console.log('Back button clicked, unflipped card');
+        }
+        return;
+      }
 
-    setTimeout(() => {
-      feedbackMessage.style.display = 'none';
-    }, 5000); // Hide message after 5 seconds
-  });
+      // Navigate if data-url exists and card is not flipped
+      const url = this.getAttribute('data-url');
+      const isFlipped = card.querySelector('.card-inner').classList.contains('is-flipped');
+      if (url && !isFlipped) {
+        console.log('Navigating to data-url:', url);
+        window.location.href = url;
+        return;
+      }
 
-  // Load services from JSON
-  fetch('services.json')
-    .then(response => response.json())
-    .then(data => {
-      const serviceGrid = document.getElementById('service-grid');
-      data.forEach(service => {
-        const card = document.createElement('div');
-        card.className = 'service-card';
-        card.innerHTML = `
-          <div class="card-inner">
-            <div class="card-front">
-              <h3>${service.name}</h3>
-              <p>${service.shortDescription}</p>
-              <button class="learn-more">Learn More</button> 
-            </div>
-            <div class="card-back">
-              <h3>${service.name}</h3>
-              <div class="back-content">${service.description}</div>
-              <button class="back-to-front">Back</button>
-            </div>
-          </div>
-        `;
-        // Flip card on click
-        card.addEventListener('click', function(e) {
-          if (!e.target.closest('.back-to-front')) { // Prevent flip on back button click
-            this.querySelector('.card-inner').classList.toggle('is-flipped');
-          }
-        });
-        // Toggle back to front on "Back" button click
-        card.querySelector('.back-to-front').addEventListener('click', function(event) {
-          event.stopPropagation(); // Prevent the card flip event from firing
-          this.closest('.card-inner').classList.remove('is-flipped');
-        });
-        serviceGrid.appendChild(card);
-      });
+      // Flip card for non-link, non-back-button clicks
+      const cardInner = this.querySelector('.card-inner');
+      if (cardInner) {
+        cardInner.classList.toggle('is-flipped');
+        console.log('Flipped card:', cardInner.classList.contains('is-flipped'));
+      } else {
+        console.warn('No .card-inner found in card:', this);
+      }
     });
 
-
-  // Add theme toggle functionality
- 
-  const themeToggle = document.getElementById('theme-toggle');
-  const body = document.body;
-
-
-  function toggleTheme() {
-    if (body.classList.contains('light-mode')) {
-      body.classList.remove('light-mode');
-      body.classList.add('dark-mode');
-    } else {
-      body.classList.remove('dark-mode');
-      body.classList.add('light-mode');
+    // Handle "Learn More" button to trigger flip
+    const learnMore = card.querySelector('.learn-more');
+    if (learnMore) {
+      learnMore.addEventListener('click', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        const cardInner = card.querySelector('.card-inner');
+        if (cardInner) {
+          cardInner.classList.toggle('is-flipped');
+          console.log('Learn More clicked, flipped card:', cardInner.classList.contains('is-flipped'));
+        }
+      });
     }
-  
-    // Update icons
+
+    // Handle back button
+    const backButton = card.querySelector('.back-to-front');
+    if (backButton) {
+      backButton.addEventListener('click', e => {
+        e.stopPropagation();
+        e.preventDefault();
+        const cardInner = card.querySelector('.card-inner');
+        if (cardInner) {
+          cardInner.classList.remove('is-flipped');
+          console.log('Back button clicked, unflipped card');
+        }
+      });
+    }
+  }
+
+  // Attach listeners to service cards
+  function initializeCardListeners() {
+    document.querySelectorAll('.service-card').forEach(card => {
+      if (!card.dataset.listenerAttached) {
+        attachCardListeners(card);
+        card.dataset.listenerAttached = 'true';
+        console.log('Attached listener to card:', card.querySelector('h3').textContent);
+      }
+    });
+  }
+
+  initializeCardListeners();
+  const observer = new MutationObserver(() => initializeCardListeners());
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Load services from JSON
+  const serviceGrid = document.getElementById('service-grid');
+  if (serviceGrid && serviceGrid.children.length === 0) {
+    fetch('services.json')
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(service => {
+          const card = document.createElement('div');
+          card.className = 'service-card';
+          if (service.url) {
+            card.setAttribute('data-url', service.url);
+            console.log('Set data-url to', service.url);
+          }
+          card.innerHTML = `
+            <div class="card-inner">
+              <div class="card-front">
+                <h3>${service.name}</h3>
+                <p>${service.shortDescription}</p>
+                <button class="learn-more">Learn More</button>
+              </div>
+              <div class="card-back">
+                <h3>${service.name}</h3>
+                <div class="back-content">${service.description}</div>
+                <button class="back-to-front">Back</button>
+              </div>
+            </div>
+          `;
+          serviceGrid.appendChild(card);
+          attachCardListeners(card);
+        });
+      })
+      .catch(error => console.error('Error loading services:', error));
+  }
+
+  // Theme toggle
+  function toggleTheme() {
+    body.classList.toggle('light-mode');
+    body.classList.toggle('dark-mode');
     const lightIcon = themeToggle.querySelector('.light-mode-icon');
     const darkIcon = themeToggle.querySelector('.dark-mode-icon');
     lightIcon.classList.toggle('hidden');
     darkIcon.classList.toggle('hidden');
+    const newTheme = body.classList.contains('light-mode') ? 'light' : 'dark';
+    localStorage.setItem('theme', newTheme);
+    console.log('Theme set to:', newTheme);
   }
 
+  if (themeToggle) {
+    themeToggle.addEventListener('click', toggleTheme);
+  }
 
-  // Add click event listener to the theme toggle button
-  themeToggle.addEventListener('click', toggleTheme);
-  // Function to handle background image rotation
+  // Background image rotation
   function rotateBackground() {
     const heroBackground = document.getElementById('hero-background');
     const currentImage = parseInt(heroBackground.dataset.currentImage);
     const nextImage = currentImage < 4 ? currentImage + 1 : 1;
-    
-    // Direct URL setting without lazy loading
     heroBackground.style.backgroundImage = `url('whistler-mountain-hd${nextImage}.jpg')`;
-    
     heroBackground.dataset.currentImage = nextImage.toString();
-    // Force a repaint to ensure the change is visible immediately
     heroBackground.style.opacity = '0';
-    void heroBackground.offsetWidth;  // Trigger reflow
+    void heroBackground.offsetWidth;
     heroBackground.style.opacity = '1';
   }
 
-  // Add click event listener to the hero section for background rotation
-  document.querySelector('.hero').addEventListener('click', function(event) {
+  document.querySelector('.hero').addEventListener('click', event => {
     if (!event.target.closest('a, button')) {
       rotateBackground();
     }
   });
 
-  // Initial setup to ensure the first image is set
   document.getElementById('hero-background').style.backgroundImage = "url('whistler-mountain-hd5.jpg')";
   document.getElementById('hero-background').dataset.currentImage = '1';
 
-  // Ensure that the hero background images are not lazy loaded
   const heroImages = document.querySelectorAll('#hero-background');
   heroImages.forEach(img => {
     if (img.dataset.src) {
       img.style.backgroundImage = `url(${img.dataset.src})`;
-      delete img.dataset.src; // Remove data-src attribute to prevent lazy loading
+      delete img.dataset.src;
     }
   });
 });

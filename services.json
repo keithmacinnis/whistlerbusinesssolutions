@@ -1,15 +1,10 @@
 [
   {
     "id": "2",
-    "name": "Tech Solutions",
-    "shortDescription": "From IT infrastructure to custom software.",
-    "description": "Our Tech Solutions encompass everything from setting up robust IT infrastructures to developing custom software solutions. We cater to businesses needing scalable, secure, and efficient tech environments. Our services include cloud computing, data security, network design, and software development, all tailored to enhance your business operations in Whistler."
-  },
-  {
-    "id": "3",
-    "name": "SaaS",
-    "shortDescription": "Scheduling and AI-powered solutions.",
-    "description": "Dive into our SaaS offerings where we specialize in providing scheduling software and AI-driven solutions. These tools are designed to optimize your workflow, automate repetitive tasks, and provide insightful analytics to improve decision-making processes. Perfect for businesses looking to streamline operations and leverage technology for competitive advantage."
+    "name": "Therapist Special",
+    "shortDescription": "Shopify Store and Scheduling Integration.",
+    "description": "The Therapist Special is a unique offering designed for therapists and wellness professionals. This package includes a fully integrated Shopify store that allows you to sell products and services online, along with a scheduling system that makes it easy for clients to book appointments. We understand the importance of a seamless client experience, and our solution is tailored to meet the specific needs of your practice.",
+    "url": "./therapists-services.html"
   },
   {
     "id": "4",
