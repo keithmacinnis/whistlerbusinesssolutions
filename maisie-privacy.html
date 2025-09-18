@@ -7,8 +7,17 @@
   <meta name="description" content="Maisie Schedules Privacy Policy - Whistler Business Solutions">
   <meta name="keywords" content="Maisie Schedules, privacy policy, data protection, Shopify app, Whistler Business Solutions">
   <title>Maisie Schedules Privacy Policy</title>
-  <link rel="stylesheet" href="styles.css?v=2.5">
+  <link rel="stylesheet" href="styles.css?v=3.2">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Montserrat:700">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNSRY1HCJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-RNSRY1HCJE');
+  </script>
   
 </head>
 
@@ -16,19 +25,52 @@
   <div id="loader" class="loader"></div>
   <header>
     <div class="container">
-      <h1 class="wbslogotext"></a><span aria-label="Whistler Business Solutions"><a href="https://whistlerbusinesssolutions.com/">WBS</span></a></h1>
+      <h1 class="wbslogotext"><span aria-label="Whistler Business Solutions"><a href="https://whistlerbusinesssolutions.com/">WBS</a></span></h1>
       <nav aria-label="Main Navigation">
         <ul id="main-nav">
-          <liHome</a></li>
-          <li><a href="#">Maisie Schedules Privacy Policy (Draft)</a></li>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li class="services-menu">
+            <a href="index.html#services">Services</a>
+            <ul class="sub-menu">
+              <li><a href="therapists-services.html">Therapists' Special</a></li>
+            </ul>
+          </li>
+          <li><a href="index.html#portfolio">Software</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
         </ul>
       </nav>
       <button id="theme-toggle" aria-label="Toggle theme">
         <span class="theme-icon dark-mode-icon" aria-hidden="true">&#x1F319;</span>
         <span class="theme-icon light-mode-icon" aria-hidden="true">&#x2600;</span>
       </button>
+      <button class="hamburger-menu" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav-overlay"></div>
+  
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-close" aria-label="Close mobile menu">×</button>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li class="services-menu">
+        <button class="services-toggle">Services</button>
+        <ul class="sub-menu">
+          <li><a href="therapists-services.html">Therapists' Special</a></li>
+        </ul>
+      </li>
+      <li><a href="index.html#portfolio">Software</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
 <style>
   .wbslogotext,
   .wbslogotext a {

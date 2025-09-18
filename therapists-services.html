@@ -7,9 +7,18 @@
   <meta name="description" content="Specialized Shopify solutions for talk therapists by Whistler Business Solutions">
   <meta name="keywords" content="Whistler, therapists, Shopify, Maisie Schedules, online store, booking">
   <title>Therapists' Services - Whistler Business Solutions</title>
-  <link rel="stylesheet" href="styles.css?v=2.7">
+  <link rel="stylesheet" href="styles.css?v=3.2">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Montserrat:700">
   <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=f88af712-3865-44ec-8f3e-65f81af33989"> </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNSRY1HCJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-RNSRY1HCJE');
+  </script>
 </head>
 
 <body class="dark-mode therapists-page">
@@ -41,15 +50,66 @@
         <span class="theme-icon dark-mode-icon" aria-hidden="true">&#x1F319;</span>
         <span class="theme-icon light-mode-icon" aria-hidden="true">&#x2600;</span>
       </button>
+      <button class="hamburger-menu" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav-overlay"></div>
+  
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-close" aria-label="Close mobile menu">×</button>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li class="services-menu">
+        <button class="services-toggle">Services</button>
+        <ul class="sub-menu">
+          <li><a href="therapists-services.html" aria-current="page">Therapists' Special</a></li>
+        </ul>
+      </li>
+      <li><a href="index.html#portfolio">Software</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
 
   <main>
     <section id="therapists-hero" class="hero" tabindex="-1">
       <div class="hero-content container">
-        <h2>Empowering Talk Therapists</h2>
-        <p>Specialized Shopify solutions for Talk Therapists.</p>
-        <a href="#therapists-services" class="cta-button">Explore Our Offerings</a>
+        <div class="pre-release-badge">
+          <span class="badge-icon">🎯</span>
+          Specialized for Therapists
+        </div>
+        <h2>Built for Talk Therapists</h2>
+        <p class="hero-subtitle">Shopify Solutions That Actually Work</p>
+        <p class="hero-description">Stop struggling with tech. We build Shopify stores and scheduling systems specifically designed for therapy practices. Focus on your clients while we handle everything else.</p>
+        
+        <div class="hero-cta">
+          <a href="#therapists-services" class="primary-cta">
+            See Our Solutions
+          </a>
+          <p class="cta-subtext">Free consultation • No setup fees • 30-day guarantee</p>
+        </div>
+        
+        <div class="hero-features">
+          <div class="feature-item">
+            <span class="feature-icon">✓</span>
+            <span>Secure booking</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">✓</span>
+            <span>Payment processing</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">✓</span>
+            <span>Client management</span>
+          </div>
+        </div>
       </div>
       <div id="hero-background" class="hero-background" style="background-image: url('whistler-mountain-hd1.jpg');" data-current-image="1"></div>
     </section>
@@ -58,41 +118,33 @@
       <div class="container">
         <h2>Our Services for Therapists</h2>
         <p>At Whistler Business Solutions, we understand the unique needs of talk therapists transitioning to or enhancing their online presence. As a Shopify developer, I’ve crafted two tailored offerings to help you focus on your clients while we handle the tech. Whether you want to make your therapy sessions bookable with ease or establish a professional online store for your practice, we’ve got you covered.</p>
-        <div class="service-grid">
-          <div class="service-card">
-            <div class="card-inner">
-              <div class="card-front">
-                <h3>Maisie Schedules Integration</h3>
-                <p>Transform your therapy sessions into easily bookable appointments with our Shopify app.</p>
-                <button class="learn-more">Learn More</button>
-              </div>
-              <div class="card-back">
-                <h3>Maisie Schedules Integration</h3>
-                <div class="back-content">
-                  <p>Maisie Schedules is a powerful Shopify app (in development) designed to turn your services into bookable events with customizable time slots. Perfect for talk therapists, it allows clients to book sessions directly through your Shopify store, with seamless calendar integration and automated reminders.</p>
-                  <p>Benefits include:</p>
-                  <ul>
-                    <li>Effortless scheduling for individual or group sessions</li>
-                    <li>Secure payment processing via Shopify</li>
-                    <li>Mobile-friendly booking interface</li>
-                    <li>Integration with customer accounts for easy rebooking</li>
-                  </ul>
-                  <p>Let us set up Maisie Schedules for your practice, so you can focus on helping your clients. <a href="https://maisie-prod.whistlerbusinesssolutions.com/" target="_blank" style="color: rgb(160, 180, 214)">Head to the Maisie Schedules app now</a>.</p>
-                </div>
-                <button class="back-to-front">Back</button>
-              </div>
+        <div class="services-grid">
+          <div class="service-item">
+            <div class="service-icon">📅</div>
+            <h3>Maisie Schedules</h3>
+            <p class="service-tagline">Smart Appointment Booking</p>
+            <p class="service-description">Transform your therapy sessions into easily bookable appointments. Clients can schedule, pay, and manage their sessions all in one place.</p>
+            <div class="service-features">
+              <span class="feature-tag">Secure Booking</span>
+              <span class="feature-tag">Payment Processing</span>
+              <span class="feature-tag">Calendar Sync</span>
             </div>
+            <a href="https://maisie-prod.whistlerbusinesssolutions.com/" target="_blank" class="service-link">Try Maisie Schedules →</a>
           </div>
-          <div class="service-card">
-            <div class="card-inner">
-              <div class="card-front">
-                <h3>Custom Shopify Store</h3>
-                <p>Build a professional online store tailored for your therapy practice.</p>
-                <button class="learn-more">Learn More</button>
-              </div>
-              <div class="card-back">
-                <h3>Custom Shopify Store</h3>
-                <div class="back-content">
+          <div class="service-item">
+            <div class="service-icon">🛒</div>
+            <h3>Custom Shopify Store</h3>
+            <p class="service-tagline">Complete Online Presence</p>
+            <p class="service-description">Professional online store for your practice. Sell sessions, resources, and manage everything from one platform.</p>
+            <div class="service-features">
+              <span class="feature-tag">Custom Design</span>
+              <span class="feature-tag">Client Accounts</span>
+              <span class="feature-tag">Resource Sales</span>
+            </div>
+            <a href="#contact" class="service-link">Get Started →</a>
+
+
+
                   <p>We create fully customized Shopify stores that reflect your brand and meet the needs of your therapy practice. From session bookings to selling resources like workbooks or merchandise, your store will be a one-stop hub for your clients.</p>
                   <p>Our process, informed by Shopify’s best practices, includes:</p>
                   <ul>
@@ -103,8 +155,33 @@
                   </ul>
                   <p>As Shopify developers, we leverage tools like the Customer Account API to ensure your clients have a seamless experience, from booking to account management. Let’s build a store that grows your practice.</p>
                 </div>
-                <button class="back-to-front">Back</button>
               </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="therapist-benefits">
+          <h3>Why Therapists Choose WBS</h3>
+          <div class="benefits-grid">
+            <div class="benefit-item">
+              <div class="benefit-icon">🎯</div>
+              <h4>Built for Therapy</h4>
+              <p>Solutions designed specifically for mental health professionals, not generic business tools.</p>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">🔒</div>
+              <h4>HIPAA Compliant</h4>
+              <p>Secure platforms that protect client privacy and meet healthcare industry standards.</p>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">⚡</div>
+              <h4>Quick Setup</h4>
+              <p>Get your practice online in days, not months. We handle the technical heavy lifting.</p>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">💰</div>
+              <h4>Fair Pricing</h4>
+              <p>Transparent pricing with no hidden fees. Pay for what you need, scale as you grow.</p>
             </div>
           </div>
         </div>
@@ -115,12 +192,77 @@
 
     <section id="contact" class="section" tabindex="-1">
       <div class="container">
-        <h2>Get Started Today</h2>
-        <p style="text-align: center;">Ready to elevate your therapy practice with our Shopify solutions? <br/> Contact us to discuss your needs or schedule a demo of Maisie Schedules.</p>
-        <div style="text-align: center;" data-tf-live="01JKKSXT71JR1NWCR7KPF70VME"></div>
-        <script src="//embed.typeform.com/next/embed.js"></script>
+        <div class="contact-header">
+          <h2>Ready to Transform Your Practice?</h2>
+          <p class="contact-subtitle">Let's build the perfect Shopify solution for your therapy practice. No sales calls, no pressure—just results.</p>
+        </div>
+        
+        <div class="contact-grid">
+          <div class="contact-info">
+            <div class="contact-card">
+              <div class="contact-icon">💬</div>
+              <h3>Free Consultation</h3>
+              <p>Tell us about your practice. We'll get back to you within 24 hours with a custom plan.</p>
+              <div class="contact-features">
+                <span class="contact-tag">No Obligation</span>
+                <span class="contact-tag">24h Response</span>
+                <span class="contact-tag">Custom Plan</span>
+              </div>
+            </div>
+            
+            <div class="contact-card">
+              <div class="contact-icon">📧</div>
+              <h3>Direct Email</h3>
+              <p>Prefer email? Send us the details and we'll respond with a custom proposal.</p>
+              <a href="mailto:help-desk@whistlerbusinesssolutions.com" class="contact-link">
+                help-desk@whistlerbusinesssolutions.com
+              </a>
+            </div>
+            
+            <div class="contact-card">
+              <div class="contact-icon">📞</div>
+              <h3>Call Us</h3>
+              <p>Want to talk right now? Give us a call and let's discuss your practice needs.</p>
+              <a href="tel:+16205434264" class="contact-link">
+                +1 (620) 543-4264
+              </a>
+            </div>
+          </div>
+          
+          <div class="contact-form-section">
+            <div class="form-container">
+              <h3>Start Your Project</h3>
+              <p>Fill out this quick form and we'll get back to you with a custom solution for your practice.</p>
+              <div class="typeform-container" data-tf-live="01JKKSXT71JR1NWCR7KPF70VME"></div>
+              <script src="//embed.typeform.com/next/embed.js"></script>
+            </div>
+          </div>
+        </div>
+        
+        <div class="contact-cta">
+          <div class="cta-content">
+            <h3>Why Choose WBS for Your Practice?</h3>
+            <div class="cta-features">
+              <div class="cta-feature">
+                <span class="cta-icon">⚡</span>
+                <span>Fast Delivery</span>
+              </div>
+              <div class="cta-feature">
+                <span class="cta-icon">🎯</span>
+                <span>Therapy-Focused</span>
+              </div>
+              <div class="cta-feature">
+                <span class="cta-icon">🔒</span>
+                <span>Secure & Private</span>
+              </div>
+              <div class="cta-feature">
+                <span class="cta-icon">💰</span>
+                <span>Fair Pricing</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <br/>
     </section>
   </main>
 

@@ -17,6 +17,65 @@ document.addEventListener('DOMContentLoaded', () => {
     darkIcon.classList.toggle('hidden', savedTheme !== 'dark');
   }
 
+  // Mobile Navigation
+  const hamburgerMenu = document.querySelector('.hamburger-menu');
+  const mobileNav = document.querySelector('.mobile-nav');
+  const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
+  const mobileNavClose = document.querySelector('.mobile-nav-close');
+  const servicesToggle = document.querySelector('.services-toggle');
+
+  function openMobileNav() {
+    hamburgerMenu.classList.add('active');
+    mobileNav.classList.add('active');
+    mobileNavOverlay.classList.add('active');
+    body.classList.add('mobile-nav-open');
+  }
+
+  function closeMobileNav() {
+    hamburgerMenu.classList.remove('active');
+    mobileNav.classList.remove('active');
+    mobileNavOverlay.classList.remove('active');
+    body.classList.remove('mobile-nav-open');
+  }
+
+  if (hamburgerMenu) {
+    hamburgerMenu.addEventListener('click', openMobileNav);
+  }
+
+  if (mobileNavClose) {
+    mobileNavClose.addEventListener('click', closeMobileNav);
+  }
+
+  if (mobileNavOverlay) {
+    mobileNavOverlay.addEventListener('click', closeMobileNav);
+  }
+
+  // Services submenu toggle in mobile nav
+  if (servicesToggle) {
+    servicesToggle.addEventListener('click', () => {
+      servicesToggle.classList.toggle('active');
+      const subMenu = servicesToggle.nextElementSibling;
+      if (subMenu) {
+        subMenu.classList.toggle('active');
+      }
+    });
+  }
+
+  // Close mobile nav when clicking on a link
+  const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
+  mobileNavLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      closeMobileNav();
+    });
+  });
+
+  // Close mobile nav on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileNav.classList.contains('active')) {
+      closeMobileNav();
+    }
+  });
+
   // Remove loader once the page is loaded
   setTimeout(() => {
     document.getElementById('loader').style.display = 'none';
@@ -260,32 +319,12 @@ document.addEventListener('DOMContentLoaded', () => {
     themeToggle.addEventListener('click', toggleTheme);
   }
 
-  // Background image rotation
-  function rotateBackground() {
-    const heroBackground = document.getElementById('hero-background');
-    const currentImage = parseInt(heroBackground.dataset.currentImage);
-    const nextImage = currentImage < 4 ? currentImage + 1 : 1;
-    heroBackground.style.backgroundImage = `url('whistler-mountain-hd${nextImage}.jpg')`;
-    heroBackground.dataset.currentImage = nextImage.toString();
-    heroBackground.style.opacity = '0';
-    void heroBackground.offsetWidth;
-    heroBackground.style.opacity = '1';
-  }
+  // Background image is now handled by CSS only
+  
+  // Remove the old Zendesk widget moving code - we're using the official API now
+  // The button in the HTML uses: onclick="zE('messenger', 'show'); zE('messenger', 'open')"
 
-  document.querySelector('.hero').addEventListener('click', event => {
-    if (!event.target.closest('a, button')) {
-      rotateBackground();
-    }
-  });
-
-  document.getElementById('hero-background').style.backgroundImage = "url('whistler-mountain-hd5.jpg')";
-  document.getElementById('hero-background').dataset.currentImage = '1';
-
-  const heroImages = document.querySelectorAll('#hero-background');
-  heroImages.forEach(img => {
-    if (img.dataset.src) {
-      img.style.backgroundImage = `url(${img.dataset.src})`;
-      delete img.dataset.src;
-    }
-  });
+  // Hide the Zendesk messenger widget on page load (required for new Web SDK)
+  zE("messenger", "hide");
 });
+

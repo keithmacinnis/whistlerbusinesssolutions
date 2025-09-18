@@ -8,19 +8,30 @@
     content="Whistler Business Solutions - Leading business strategy and tech services in Whistler, BC">
   <meta name="keywords" content="Whistler, business solutions, consulting, technology services, marketing, IT">
   <title>Whistler Business Solutions</title>
-  <link rel="stylesheet" href="styles.css?v=2.7">
+  <link rel="stylesheet" href="newstyles.css?v=1.0">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Montserrat:700">
   <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=f88af712-3865-44ec-8f3e-65f81af33989"> </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNSRY1HCJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-RNSRY1HCJE');
+  </script>
 </head>
 
 <body class="light-mode">
   <div id="loader" class="loader"></div>
   <header>
-    <div class="container">
+    <div class="theme-container">
       <h1>
-
-        <span aria-label="Whistler Business Solutions">WBS</span>
+        <span aria-label="Whistler Business Solutions" style="position: relative; top: -12px;">WBS</span>
+        <br>
+ 
       </h1>
+      
       <nav aria-label="Main Navigation">
         <ul id="main-nav">
           <li><a href="#home">Home</a></li>
@@ -31,7 +42,7 @@
               <li><a href="therapists-services.html">Therapists' Special</a></li>
             </ul>
           </li>
-          <li><a href="#portfolio">Software</a></li>
+          <li><a href="#products">Products</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
       </nav>
@@ -39,74 +50,375 @@
         <span class="theme-icon dark-mode-icon" aria-hidden="true">&#x1F319;</span>
         <span class="theme-icon light-mode-icon" aria-hidden="true">&#x2600;</span>
       </button>
+      <button class="hamburger-menu" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
 
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav-overlay"></div>
+  
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-close" aria-label="Close mobile menu">×</button>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li class="services-menu">
+        <button class="services-toggle">Services</button>
+        <ul class="sub-menu">
+          <li><a href="therapists-services.html">Therapists' Special</a></li>
+        </ul>
+      </li>
+      <li><a href="#products">Products</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
   <main>
     <section id="home" class="hero" tabindex="-1">
-      <div class="hero-content container">
-        <h2>Whistler Business Solutions</h2>
-        <p>Expert solutions tailored for the Sea to Sky community</p>
-        <div style="text-align: center;" data-tf-live="01JKKSXT71JR1NWCR7KPF70VME"></div>
+      <div class="hero-content theme-container">
+         
+  
+        <img src="Gemini_Generated_Image_8lqoww8lqoww8lqo.png" alt="birdNest Logo" style="max-width: 420px; margin-bottom: 1.5rem; display: block; margin-left: auto; margin-right: auto;">
+      
+      
+
+        <p class="hero-description">We build software that brings people together. Whether you're managing a family or leading a team, our birdNest platform provides the tools you need to stay organized, connected, and productive.</p>
+        
+        <div class="hero-cta">
+          <a href="#products" class="theme-btn primary">
+            Explore Our Products
+          </a>
+      
+        </div>
+        
+        <div class="hero-features">
+          <div class="feature-item">
+            <span class="feature-icon">👨‍👩‍👧‍👦</span>
+            <span>Family-Focused</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🏢</span>
+            <span>Business-Ready</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🔒</span>
+            <span>Secure & Private</span>
+          </div>
+        </div>
       </div>
       <div id="hero-background" class="hero-background" data-current-image="1"></div>
     </section>
 
-    <section id="about" class="section" tabindex="-1">
-      <div class="container">
-        <h2>About Us</h2>
-        <p>Established in the vibrant heart of Whistler, our mission is to empower local businesses with cutting-edge
-          digital solutions that drive growth, enhance efficiency, and build lasting customer relationships.</p>
-        <p>Founded by a team with deep roots in both technology and the unique business landscape of Whistler, we're a
-          small startup. Our journey began with a vision to bridge the gap between traditional business practices and
-          modern digital advancements. </p>
-        <p> Our team combines local knowledge with global expertise, ensuring that every solution we provide is not just
-          effective but also culturally resonant. Whether you're a café on the village stroll or a burgeoning tech
-          startup, we tailor our services to meet your specific needs.</p>
-      </div>
-    </section>
-
-    <div class="section-divider"></div>
-
-    <section id="services" class="section" tabindex="-1">
-      <div class="container">
-        <h2>Our Services</h2>
-        <div id="service-grid" class="service-grid"></div>
-      </div>
-    </section>
-
-    <div class="section-divider"></div>
-
-    <section id="portfolio" class="section" tabindex="-1">
-      <div class="container">
-        <h2>Our Software</h2>
-        <div class="portfolio-grid">
-          <div class="portfolio-item" data-bg="projectM.jpg" aria-label="Project M: A shopify app store app for turning products into bookable events and services with easy time slots. In testing and development.">
-            <img src="placeholder.jpg" data-src="projectM.jpg" alt="Project 1" loading="lazy">
-            <div class="portfolio-text">Maisie Schedules</div>
+    <section id="about" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <h2 class="theme-heading h2">About Us</h2>
+        <div class="about-content">
+          <div class="about-intro text-center mb-4">
+            <h3 class="theme-heading h3">We Build Software That Actually Works</h3>
+            <p class="theme-text">No corporate buzzwords. No endless meetings. Just solid, reliable software that solves real problems.</p>
+          </div>
+          
+          <div class="theme-grid auto-fit">
+            <div class="theme-card">
+              <div class="theme-icon">💻</div>
+              <h4 class="theme-heading h4">Small Team, Big Impact</h4>
+              <p class="theme-text">We're a lean team of developers who actually write code. No middlemen, no bureaucracy—just direct communication and fast delivery.</p>
+            </div>
+            
+            <div class="theme-card">
+              <div class="theme-icon">🎯</div>
+              <h4 class="theme-heading h4">Focus on What Matters</h4>
+              <p class="theme-text">We don't build features you don't need. Every line of code serves a purpose, every feature solves a real problem.</p>
+            </div>
+            
+            <div class="theme-card">
+              <div class="theme-icon">🚀</div>
+              <h4 class="theme-heading h4">Built for Growth</h4>
+              <p class="theme-text">Our solutions scale with your business. Start small, grow big—we've got you covered every step of the way.</p>
+            </div>
+          </div>
+          
+          <div class="theme-cta">
+            <p class="theme-text"><strong>Ready to stop talking and start building?</strong></p>
+            <a href="#contact" class="theme-btn success">Let's Build Something</a>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="section-divider"></div>
+    <div class="theme-divider"></div>
 
-    <section id="contact" class="section" tabindex="-1">
+    <!-- Products Section -->
+    <section id="products" class="section reveal" tabindex="-1">
       <div class="container">
-        <h2>Get Started Today</h2>
-        <p style="text-align: center;">Ready to elevate your business with Whistler Business Solutions?</p>
-        <div style="text-align: center;" data-tf-live="01JKKSXT71JR1NWCR7KPF70VME"></div>
-        <script src="//embed.typeform.com/next/embed.js"></script>
+        <div class="products-header">
+          <h2>Our Products</h2>
+          <p class="products-subtitle">Modern software solutions for families and teams</p>
+        </div>
+        
+        <div class="products-grid">
+          <div class="product-card featured">
+            <div class="product-badge">New</div>
+            <div class="product-icon">👨‍👩‍👧‍👦</div>
+            <h3>BirdNest Families</h3>
+            <p class="product-tagline">Your Family's Digital Nest</p>
+            <p class="product-description">Track activities, manage schedules, share memories, and coordinate with caregivers. Everything your family needs in one beautiful, secure platform.</p>
+            <div class="product-features">
+              <span class="feature-tag">Activity Tracking</span>
+              <span class="feature-tag">Family Calendar</span>
+              <span class="feature-tag">Memory Vault</span>
+              <span class="feature-tag">Caregiver Access</span>
+            </div>
+            <div class="product-cta">
+              <a href="https://birdnestfamilies.com" target="_blank" rel="noopener noreferrer" class="product-link primary">
+                Launch BirdNest Families →
+              </a>
+            </div>
+          </div>
+          
+          <div class="product-card">
+            <div class="product-badge coming-soon">Coming Soon</div>
+            <div class="product-icon">🏢</div>
+            <h3>BirdNest Teams</h3>
+            <p class="product-tagline">Professional Team Collaboration</p>
+            <p class="product-description">Streamline team communication, project management, and workflow coordination. Built for modern businesses that value efficiency and collaboration.</p>
+            <div class="product-features">
+              <span class="feature-tag">Team Chat</span>
+              <span class="feature-tag">Project Management</span>
+              <span class="feature-tag">File Sharing</span>
+              <span class="feature-tag">Analytics</span>
+            </div>
+            <div class="product-cta">
+              <a href="#contact" class="product-link secondary">
+                Get Early Access →
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="products-cta">
+          <p><strong>Need something custom?</strong> We build solutions that fit your exact needs.</p>
+          <a href="#contact" class="btn-primary">Let's Build Together</a>
+        </div>
       </div>
-      <br/>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="services" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <h2 class="theme-heading h2">What We Build</h2>
+          <p class="theme-text">Custom software solutions that solve real business problems</p>
+        </div>
+        
+        <div class="theme-grid auto-fit">
+          <div class="theme-card">
+            <div class="theme-icon">🛒</div>
+            <h3 class="theme-heading h3">Therapist Special</h3>
+            <p class="theme-text muted">Shopify Store + Scheduling Integration</p>
+            <p class="theme-text">Complete e-commerce solution with integrated booking system. Sell products and services while managing appointments seamlessly.</p>
+            <div class="service-features">
+              <span class="theme-tag">Shopify Store</span>
+              <span class="theme-tag">Appointment Booking</span>
+              <span class="theme-tag">Client Management</span>
+            </div>
+            <a href="./therapists-services.html" class="theme-btn secondary">Learn More →</a>
+          </div>
+          
+          <div class="theme-card">
+            <div class="theme-icon">🔗</div>
+            <h3 class="theme-heading h3">API Integration</h3>
+            <p class="theme-text muted">Connect Your Systems</p>
+            <p class="theme-text">Seamlessly connect your software with critical applications. Custom integrations that scale with your business.</p>
+            <div class="service-features">
+              <span class="theme-tag">Custom APIs</span>
+              <span class="theme-tag">Data Sync</span>
+              <span class="theme-tag">Scalable</span>
+            </div>
+            <a href="#contact" class="theme-btn secondary">Get Started →</a>
+          </div>
+          
+          <div class="theme-card">
+            <div class="theme-icon">🤖</div>
+            <h3 class="theme-heading h3">AI Integration</h3>
+            <p class="theme-text muted">Smart Business Solutions</p>
+            <p class="theme-text">Embed AI into your business processes. From chatbots to predictive analytics, make your operations smarter.</p>
+            <div class="service-features">
+              <span class="theme-tag">Chatbots</span>
+              <span class="theme-tag">Analytics</span>
+              <span class="theme-tag">Automation</span>
+            </div>
+            <a href="#contact" class="theme-btn secondary">Explore AI →</a>
+          </div>
+        </div>
+        
+        <div class="theme-cta">
+          <p class="theme-text"><strong>Need something custom?</strong> We build solutions that fit your exact needs.</p>
+          <a href="#contact" class="theme-btn primary">Let's Talk</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="portfolio" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <h2 class="theme-heading h2">Featured Project</h2>
+        <div class="project">
+            <h3>BirdNest Families</h3>
+            <p><strong>Executive Summary:</strong> BirdNest Families is a comprehensive family management platform designed to help parents and caregivers track children's activities, manage schedules, store memories, and collaborate on childcare. The app combines several powerful features in a unified, beautiful platform.</p>
+            <div class="project-screenshots">
+                <img src="ActivityScreenshot.png" alt="BirdNest Families Activity Tracking" loading="lazy">
+                <img src="CalendarScreenshot2.png" alt="BirdNest Families Calendar" loading="lazy">
+            </div>
+            <h4>Core Features</h4>
+            <ul>
+                <li><strong>Activity Tracking:</strong> Log and monitor daily activities including feedings, diaper changes, sleep patterns, and milestones.</li>
+                <li><strong>Growth Monitoring:</strong> Track and visualize growth metrics with percentile charts and historical data.</li>
+                <li><strong>Care Coordination:</strong> Manage multiple caregivers with role-based access and permissions.</li>
+                <li><strong>Scheduling:</strong> Create and manage parenting schedules, appointments, and routines.</li>
+                <li><strong>Memory Vault:</strong> Securely store and share photos and important family moments.</li>
+                <li><strong>Knowledge Base:</strong> Access expert-curated articles on child development and parenting.</li>
+            </ul>
+            <h4>Technical Highlights</h4>
+            <ul>
+                <li><strong>Real-time Updates:</strong> Live synchronization across devices for instant updates.</li>
+                <li><strong>Progressive Web App (PWA):</strong> Installable on mobile and desktop for offline access.</li>
+                <li><strong>Cross-platform Compatibility:</strong> Responsive design works on all devices.</li>
+                <li><strong>Secure Authentication:</strong> Role-based access control and secure data storage.</li>
+                <li><strong>Data Privacy:</strong> GDPR-compliant with export and account management tools.</li>
+            </ul>
+            <h4>Family Collaboration</h4>
+            <ul>
+                <li>Family sharing with customizable access levels.</li>
+                <li>Real-time activity feed and notifications.</li>
+                <li>Caregiver handoff notes and communication.</li>
+                <li>Shared calendar and scheduling.</li>
+            </ul>
+            <h4>Premium Features</h4>
+            <ul>
+                <li>Advanced growth tracking with velocity charts.</li>
+                <li>Customizable reports and data exports.</li>
+                <li>Priority support.</li>
+                <li>Expanded storage for photos and documents.</li>
+            </ul>
+            <p>Built with modern web technologies ensuring a smooth, responsive user experience with enterprise-grade security and reliability.</p>
+            <p>BirdNest Families represents a comprehensive solution for modern family coordination, combining robust backend services with an intuitive Progressive Web App interface, real-time collaboration features, and secure multi-tenant architecture. The system is designed for scalability, offline functionality, and seamless user experience across all devices.</p>
+            <div class="theme-cta highlight">
+                <p class="theme-text">Experience the future of family management with <strong>BirdNest Families</strong></p>
+                <a href="https://birdnestfamilies.com" target="_blank" rel="noopener noreferrer" class="theme-btn primary">Launch BirdNest Families</a>
+            </div>
+        </div>
+        <div class="project">
+            <a href="https://maisie-prod.whistlerbusinesssolutions.com/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+                <h3>Maisie Schedules</h3>
+            </a>
+            <p><strong>Executive Summary:</strong> Maisie Schedules is a Shopify embedded application that extends the standard e-commerce product model to support time-based bookings. The application transforms traditional inventory-based products into schedulable offerings with specific time slots, capacity limits, and location-based availability.</p>
+            <div class="project-screenshots">
+                <a href="https://maisie-prod.whistlerbusinesssolutions.com/" target="_blank" rel="noopener noreferrer">
+                    <img src="projectM.jpg" alt="Maisie Schedules Screenshot" loading="lazy">
+                </a>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="contact" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="contact-header text-center mb-4">
+          <h2 class="theme-heading h2">Ready to Build Something Amazing?</h2>
+          <p class="theme-text">Let's turn your ideas into reality. No sales calls, no pressure—just results.</p>
+        </div>
+        
+        <div class="theme-grid two-col">
+          <div class="contact-info">
+            <div class="theme-card">
+              <div class="theme-icon small">💬</div>
+              <h3 class="theme-heading h3">Quick Chat</h3>
+              <p class="theme-text">Tell us about your project. We'll get back to you within 24 hours with a clear plan.</p>
+              <div class="contact-features">
+                <span class="theme-tag">Free Consultation</span>
+                <span class="theme-tag">No Obligation</span>
+                <span class="theme-tag">24h Response</span>
+              </div>
+              <button class="zendesk-chat-button" onclick="zE('messenger', 'show'); zE('messenger', 'open')">Start Chat</button>
+            </div>
+            
+            <div class="theme-card">
+              <div class="theme-icon small">📧</div>
+              <h3 class="theme-heading h3">Direct Email</h3>
+              <p class="theme-text">Prefer email? Send us the details and we'll respond with a custom proposal.</p>
+              <a href="mailto:help-desk@whistlerbusinesssolutions.com" class="theme-btn secondary">
+                help-desk@whistlerbusinesssolutions.com
+              </a>
+            </div>
+            
+            <div class="theme-card">
+              <div class="theme-icon small">📞</div>
+              <h3 class="theme-heading h3">Call Us</h3>
+              <p class="theme-text">Want to talk right now? Give us a call and let's discuss your project.</p>
+              <a href="tel:+16205434264" class="theme-btn secondary">
+                +1 (620) 543-4264
+              </a>
+            </div>
+          </div>
+          
+          <div class="contact-form-section">
+            <div class="form-container">
+              <h3 class="theme-heading h3">Start Your Project</h3>
+              <p class="theme-text">Fill out this quick form and we'll get back to you with a custom solution.</p>
+              <div class="typeform-container" data-tf-live="01JKKSXT71JR1NWCR7KPF70VME"></div>
+              <script src="//embed.typeform.com/next/embed.js"></script>
+            </div>
+          </div>
+        </div>
+        
+        <div class="theme-cta">
+          <div class="cta-content">
+            <h3 class="theme-heading h3">🚀 Boost your LinkedIn with ReachifyMe AI</h3>
+            <p class="theme-text mb-2">Transform your LinkedIn presence with AI-powered content creation and engagement tools.</p>
+            <div class="cta-features">
+              <div class="cta-feature">
+                <span class="cta-icon">🤖</span>
+                <span>AI Content Creation</span>
+              </div>
+              <div class="cta-feature">
+                <span class="cta-icon">📈</span>
+                <span>Boost Engagement</span>
+              </div>
+              <div class="cta-feature">
+                <span class="cta-icon">⚡</span>
+                <span>Save Time</span>
+              </div>
+              <div class="cta-feature">
+                <span class="cta-icon">🎯</span>
+                <span>Grow Your Network</span>
+              </div>
+            </div>
+            <div class="mt-3">
+              <a href="https://app.reachifyme.com/login/?aff=Zynpdq" target="_blank" rel="noopener noreferrer" class="theme-btn primary">
+                Try ReachifyMe AI Free
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   <footer>
-    <div class="container">
-      <p style="text-align: center;">
+    <div class="theme-container">
+      <p class="text-center">
         <a href="mailto:help-desk@whistlerbusinesssolutions.com">help-desk@whistlerbusinesssolutions.com</a> |
         +1 (620) 543-4264
       </p>
-    </div>
+     
   </footer>
   <div id="modal" class="modal">
     <div class="modal-content">
@@ -119,7 +431,7 @@
   </div>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-  <script src="app.js?v=2.8"></script>
+  <script src="app.js?v=3.2"></script>
 </body>
 
 </html>
