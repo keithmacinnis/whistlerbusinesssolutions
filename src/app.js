@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load services from JSON
   const serviceGrid = document.getElementById('service-grid');
   if (serviceGrid && serviceGrid.children.length === 0) {
-    fetch('services.json')
+    fetch('/services.json')
       .then(response => response.json())
       .then(data => {
         data.forEach(service => {

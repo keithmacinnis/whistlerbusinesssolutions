@@ -542,7 +542,7 @@ body.light-mode #theme-toggle .light-mode-icon {
    ======================================== */
 .hero {
   background-color: #1a1a1a; /* Fallback color */
-  background-image: url('whistler-mountain-hd6.jpg?v=1.1');
+  background-image: url('/whistler-mountain-hd6.jpg');
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
