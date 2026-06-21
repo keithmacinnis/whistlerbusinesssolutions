@@ -1,7 +1,7 @@
 // Whistler storefront: loads products from the standalone commerce service and
 // starts Stripe Checkout on "Buy Now". No on-site payment handling — Stripe hosts it.
-// Update this URL after the commerce service's first Railway deploy.
-const API_BASE = 'https://commerce-server-production.up.railway.app';
+// Reads VITE_COMMERCE_API_URL at build time; falls back to the API domain.
+const API_BASE = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com';
 const STORE = 'whistler';
 
 const formatPrice = (cents, currency) =>
