@@ -8,7 +8,10 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         therapists: resolve(__dirname, 'therapists-services.html'),
-        privacy: resolve(__dirname, 'maisie-privacy.html')
+        privacy: resolve(__dirname, 'maisie-privacy.html'),
+        shop: resolve(__dirname, 'shop.html'),
+        shopSuccess: resolve(__dirname, 'shop-success.html'),
+        shopCancel: resolve(__dirname, 'shop-cancel.html')
       }
     },
     // Output directory for Vercel

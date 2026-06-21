@@ -1,4 +1,25 @@
+// Where every call-to-action button points. Change these in one place.
+const CONTACT_EMAIL = 'keith@whistlerbusinesssolutions.com';
+const REFERRAL_URL = 'https://www.whistler.com/'; // swap for the affiliate booking link once approved
+// Button state: 'email' collects inquiries by email; switch to 'referral' when the
+// Whistler.com affiliate booking link goes live.
+const BUTTON_MODE = 'email';
+
 document.addEventListener('DOMContentLoaded', () => {
+  // Point every CTA at the current destination based on the button state
+  const mailto = `mailto:${CONTACT_EMAIL}?subject=Whistler%20Retreat%20Inquiry`;
+  document.querySelectorAll('a[data-referral]').forEach(link => {
+    if (BUTTON_MODE === 'referral') {
+      link.href = REFERRAL_URL;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    } else {
+      link.href = mailto;
+      link.removeAttribute('target');
+      link.removeAttribute('rel');
+    }
+  });
+
   // Apply saved theme from localStorage
   const savedTheme = localStorage.getItem('theme') || 'light';
   const body = document.body;
@@ -142,166 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   window.addEventListener('scroll', reveal);
 
-  // Modal for Portfolio Items
-  document.querySelectorAll('.portfolio-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const modal = document.getElementById('modal');
-      const modalTitle = document.getElementById('modal-title');
-      const modalImage = document.getElementById('modal-image');
-      const modalDescription = document.getElementById('modal-description');
-      const modalLink = document.getElementById('modal-link');
-
-      modalTitle.textContent = item.querySelector('.portfolio-text').textContent;
-      modalImage.src = item.querySelector('img').dataset.src;
-      modalDescription.textContent = item.getAttribute('aria-label');
-
-      if (item.querySelector('.portfolio-text').textContent === 'Maisie Schedules') {
-        modalLink.href = 'https://maisie-prod.whistlerbusinesssolutions.com/';
-        modalLink.style.display = 'block';
-      } else {
-        modalLink.style.display = 'none';
-      }
-      modal.style.display = "block";
-    });
-  });
-
-  // Close Modal
-  const closeButton = document.querySelector('.close');
-  if (closeButton) {
-    closeButton.addEventListener('click', () => {
-      document.getElementById('modal').style.display = "none";
-    });
-  }
-
-  const modal = document.getElementById('modal');
-  if (modal) {
-    window.addEventListener('click', event => {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    });
-  }
-
-  // Function to attach event listeners to service cards
-  function attachCardListeners(card) {
-    card.addEventListener('click', function(e) {
-      // Check if click is on a link
-      const link = e.target.closest('a');
-      if (link) {
-        console.log('Link clicked:', link.href);
-        return; // Allow default link navigation
-      }
-
-      // Prevent default only for non-link clicks
-      e.preventDefault();
-
-      // Handle back button click
-      if (e.target.closest('.back-to-front')) {
-        const cardInner = card.querySelector('.card-inner');
-        if (cardInner) {
-          cardInner.classList.remove('is-flipped');
-          console.log('Back button clicked, unflipped card');
-        }
-        return;
-      }
-
-      // Navigate if data-url exists and card is not flipped
-      const url = this.getAttribute('data-url');
-      const isFlipped = card.querySelector('.card-inner').classList.contains('is-flipped');
-      if (url && !isFlipped) {
-        console.log('Navigating to data-url:', url);
-        window.location.href = url;
-        return;
-      }
-
-      // Flip card for non-link, non-back-button clicks
-      const cardInner = this.querySelector('.card-inner');
-      if (cardInner) {
-        cardInner.classList.toggle('is-flipped');
-        console.log('Flipped card:', cardInner.classList.contains('is-flipped'));
-      } else {
-        console.warn('No .card-inner found in card:', this);
-      }
-    });
-
-    // Handle "Learn More" button to trigger flip
-    const learnMore = card.querySelector('.learn-more');
-    if (learnMore) {
-      learnMore.addEventListener('click', e => {
-        e.stopPropagation();
-        e.preventDefault();
-        const cardInner = card.querySelector('.card-inner');
-        if (cardInner) {
-          cardInner.classList.toggle('is-flipped');
-          console.log('Learn More clicked, flipped card:', cardInner.classList.contains('is-flipped'));
-        }
-      });
-    }
-
-    // Handle back button
-    const backButton = card.querySelector('.back-to-front');
-    if (backButton) {
-      backButton.addEventListener('click', e => {
-        e.stopPropagation();
-        e.preventDefault();
-        const cardInner = card.querySelector('.card-inner');
-        if (cardInner) {
-          cardInner.classList.remove('is-flipped');
-          console.log('Back button clicked, unflipped card');
-        }
-      });
-    }
-  }
-
-  // Attach listeners to service cards
-  function initializeCardListeners() {
-    document.querySelectorAll('.service-card').forEach(card => {
-      if (!card.dataset.listenerAttached) {
-        attachCardListeners(card);
-        card.dataset.listenerAttached = 'true';
-        console.log('Attached listener to card:', card.querySelector('h3').textContent);
-      }
-    });
-  }
-
-  initializeCardListeners();
-  const observer = new MutationObserver(() => initializeCardListeners());
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  // Load services from JSON
-  const serviceGrid = document.getElementById('service-grid');
-  if (serviceGrid && serviceGrid.children.length === 0) {
-    fetch('/services.json')
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(service => {
-          const card = document.createElement('div');
-          card.className = 'service-card';
-          if (service.url) {
-            card.setAttribute('data-url', service.url);
-            console.log('Set data-url to', service.url);
-          }
-          card.innerHTML = `
-            <div class="card-inner">
-              <div class="card-front">
-                <h3>${service.name}</h3>
-                <p>${service.shortDescription}</p>
-                <button class="learn-more">Learn More</button>
-              </div>
-              <div class="card-back">
-                <h3>${service.name}</h3>
-                <div class="back-content">${service.description}</div>
-                <button class="back-to-front">Back</button>
-              </div>
-            </div>
-          `;
-          serviceGrid.appendChild(card);
-          attachCardListeners(card);
-        });
-      })
-      .catch(error => console.error('Error loading services:', error));
-  }
-
   // Theme toggle
   function toggleTheme() {
     body.classList.toggle('light-mode');
@@ -318,13 +179,5 @@ document.addEventListener('DOMContentLoaded', () => {
   if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme);
   }
-
-  // Background image is now handled by CSS only
-  
-  // Remove the old Zendesk widget moving code - we're using the official API now
-  // The button in the HTML uses: onclick="zE('messenger', 'show'); zE('messenger', 'open')"
-
-  // Hide the Zendesk messenger widget on page load (required for new Web SDK)
-  zE("messenger", "hide");
 });
 
