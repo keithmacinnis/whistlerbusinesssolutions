@@ -1,6 +1,8 @@
 // Fetch wrapper for the commerce-server API. Same base-URL convention as
 // src/shop.js; attaches the dashboard JWT and normalizes errors.
-const API_BASE = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com'
+const RAW_BASE = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com'
+// Tolerate a protocol-less env value ("api.example.com") — new URL() rejects it.
+const API_BASE = /^https?:\/\//.test(RAW_BASE) ? RAW_BASE : `https://${RAW_BASE}`
 
 export const TOKEN_KEY = 'wbs_dash_token'
 

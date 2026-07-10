@@ -1,7 +1,10 @@
 // Whistler storefront: loads products from the standalone commerce service and
 // starts Stripe Checkout on "Buy Now". No on-site payment handling — Stripe hosts it.
 // Reads VITE_COMMERCE_API_URL at build time; falls back to the API domain.
-const API_BASE = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com';
+const RAW_API_BASE = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com';
+// Tolerate a protocol-less env value ("api.example.com") — without this the
+// fetch URL is treated as a relative path and requests silently 404.
+const API_BASE = /^https?:\/\//.test(RAW_API_BASE) ? RAW_API_BASE : `https://${RAW_API_BASE}`;
 const STORE = 'whistler';
 
 const formatPrice = (cents, currency) =>
