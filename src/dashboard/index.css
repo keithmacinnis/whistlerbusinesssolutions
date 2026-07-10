@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Dashboard theme tokens — echoes the marketing site palette (newstyles.css)
+   so the dashboard feels like part of WBS without importing its stylesheet. */
+@theme {
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --font-sans: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+}

@@ -12,6 +12,14 @@
     {
       "source": "/maisie-privacy",
       "destination": "/maisie-privacy.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/dashboard/:path*",
+      "destination": "/dashboard.html"
     }
   ],
   "headers": [
