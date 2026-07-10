@@ -11,15 +11,25 @@ const formatPrice = (cents, currency) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: (currency || 'usd').toUpperCase() })
     .format((cents || 0) / 100);
 
+// Voice-platform referral: /r/CODE links land here with ?ref=CODE. Keep it
+// for the session so the eventual purchase gets attributed to that call.
+const REF_KEY = 'wbs_ref';
+try {
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  if (ref) sessionStorage.setItem(REF_KEY, ref.slice(0, 32));
+} catch { /* storage unavailable — attribution is best-effort */ }
+
 const buyNow = async (productId, button) => {
   button.disabled = true;
   const original = button.textContent;
   button.textContent = 'Starting checkout…';
   try {
+    let ref;
+    try { ref = sessionStorage.getItem(REF_KEY) || undefined; } catch { /* ignore */ }
     const res = await fetch(`${API_BASE}/api/commerce/checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ store: STORE, productId }),
+      body: JSON.stringify({ store: STORE, productId, ...(ref && { ref }) }),
     });
     if (!res.ok) throw new Error(`Checkout failed (${res.status})`);
     const { url } = await res.json();

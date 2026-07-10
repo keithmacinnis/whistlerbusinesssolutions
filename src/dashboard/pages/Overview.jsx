@@ -11,12 +11,39 @@ export default function Overview() {
   const { user } = useAuth()
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const [syncing, setSyncing] = useState(false)
+  const [syncNote, setSyncNote] = useState('')
 
-  useEffect(() => {
+  const load = () =>
     api('/api/voice/analytics/overview')
       .then(setData)
       .catch((err) => setError(err.message))
+
+  useEffect(() => {
+    load()
   }, [])
+
+  const syncAffiliates = async () => {
+    setSyncing(true)
+    setSyncNote('')
+    try {
+      const { synced, configured } = await api('/api/voice/affiliate/sync', { method: 'POST' })
+      if (!configured.length) {
+        setSyncNote('No affiliate networks configured yet (set AWIN_API_TOKEN + AWIN_PUBLISHER_ID).')
+      } else {
+        setSyncNote(
+          synced
+            .map((s) => s.error || `${s.network}: ${s.imported} new, ${s.updated} updated, ${s.unmatched} unmatched`)
+            .join(' · ')
+        )
+        load()
+      }
+    } catch (err) {
+      setSyncNote(err.message)
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   const totals = data?.businesses?.reduce(
     (acc, b) => ({
@@ -30,10 +57,24 @@ export default function Overview() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900">
-        Welcome back{user?.name ? `, ${user.name}` : ''}
-      </h1>
-      <p className="mt-1 text-sm text-gray-500">Last 30 days across your voice businesses.</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome back{user?.name ? `, ${user.name}` : ''}
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">Last 30 days across your voice businesses.</p>
+        </div>
+        {user?.role === 'super_admin' && (
+          <button
+            onClick={syncAffiliates}
+            disabled={syncing}
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            {syncing ? 'Syncing…' : '↻ Sync affiliate networks'}
+          </button>
+        )}
+      </div>
+      {syncNote && <div className="mt-2 rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-700">{syncNote}</div>}
 
       {error && <div className="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
       {!data && !error && <div className="mt-6 text-gray-500">Loading…</div>}
@@ -43,7 +84,7 @@ export default function Overview() {
           <StatCard label="Calls" value={totals.calls} />
           <StatCard label="Referral clicks" value={totals.clicks} />
           <StatCard label="Conversions" value={totals.conversions} />
-          <StatCard label="Commission" value={dollars(totals.commissionCents)} />
+          <StatCard label="Earnings" value={dollars(totals.commissionCents)} />
         </div>
       )}
 
@@ -68,7 +109,7 @@ export default function Overview() {
                 <th className="px-4 py-3">Clicks</th>
                 <th className="px-4 py-3">Conv.</th>
                 <th className="px-4 py-3">Rate</th>
-                <th className="px-4 py-3">Commission</th>
+                <th className="px-4 py-3">Earnings</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">

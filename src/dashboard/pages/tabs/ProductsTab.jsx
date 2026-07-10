@@ -3,7 +3,18 @@ import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { parseProductCsv } from '../../csv'
 
-const EMPTY = { name: '', description: '', category: '', partnerName: '', partnerUrl: '', priceCents: '', commissionPct: '' }
+const EMPTY = { name: '', description: '', category: '', partnerName: '', partnerUrl: '', priceCents: '', commissionPct: '', kind: 'affiliate', network: '' }
+
+const KINDS = [
+  { value: 'affiliate', label: 'Affiliate', badge: 'bg-purple-100 text-purple-700' },
+  { value: 'own_store', label: 'Our store', badge: 'bg-green-100 text-green-700' },
+  { value: 'dropship', label: 'Dropship', badge: 'bg-blue-100 text-blue-700' },
+]
+const NETWORKS = ['', 'awin']
+const STORE_URLS = {
+  whistler: 'https://whistlerbusinesssolutions.com/shop.html',
+  birdnest: 'https://birdnestfamilies.com/shop',
+}
 
 const dollars = (cents) => (cents == null ? '—' : `$${(cents / 100).toFixed(2)}`)
 
@@ -13,6 +24,7 @@ export default function ProductsTab({ business }) {
   const [editing, setEditing] = useState(null) // null | 'new' | product
   const [form, setForm] = useState(EMPTY)
   const [csvPreview, setCsvPreview] = useState(null) // { products, errors }
+  const [storePicker, setStorePicker] = useState(null) // null | { store, items }
   const fileRef = useRef()
 
   const reload = useCallback(() => {
@@ -36,6 +48,8 @@ export default function ProductsTab({ business }) {
             partnerUrl: product.partnerUrl || '',
             priceCents: product.priceCents != null ? (product.priceCents / 100).toFixed(2) : '',
             commissionPct: product.commissionPct != null ? String(product.commissionPct) : '',
+            kind: product.kind || 'affiliate',
+            network: product.network || '',
           }
         : EMPTY
     )
@@ -51,6 +65,8 @@ export default function ProductsTab({ business }) {
       partnerUrl: form.partnerUrl,
       priceCents: form.priceCents === '' ? null : Math.round(parseFloat(form.priceCents) * 100),
       commissionPct: form.commissionPct === '' ? null : parseFloat(form.commissionPct),
+      kind: form.kind,
+      network: form.kind === 'affiliate' && form.network ? form.network : null,
     }
     try {
       if (editing === 'new') {
@@ -78,6 +94,38 @@ export default function ProductsTab({ business }) {
   const onCsvPicked = async (file) => {
     const text = await file.text()
     setCsvPreview(parseProductCsv(text))
+  }
+
+  const openStorePicker = async (store) => {
+    setError('')
+    try {
+      const { products: items } = await api('/api/commerce/products', { params: { store } })
+      setStorePicker({ store, items })
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const addFromStore = async (item, store) => {
+    try {
+      await api(`/api/voice/businesses/${business.id}/products`, {
+        method: 'POST',
+        body: {
+          name: item.title,
+          description: item.description,
+          imageUrl: item.imageUrl,
+          partnerName: store === 'whistler' ? 'WBS Shop' : 'BirdNest Shop',
+          partnerUrl: STORE_URLS[store],
+          priceCents: item.priceCents,
+          kind: 'own_store',
+          merchProductId: item.id,
+        },
+      })
+      setStorePicker(null)
+      reload()
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   const importCsv = async () => {
@@ -116,6 +164,17 @@ export default function ProductsTab({ business }) {
           >
             Import CSV
           </button>
+          <div className="relative">
+            <select
+              value=""
+              onChange={(e) => e.target.value && openStorePicker(e.target.value)}
+              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <option value="">Add from my store…</option>
+              <option value="whistler">Whistler shop</option>
+              <option value="birdnest">BirdNest shop</option>
+            </select>
+          </div>
           <button
             onClick={() => openEditor(null)}
             className="rounded-md bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700"
@@ -139,6 +198,7 @@ export default function ProductsTab({ business }) {
             <thead className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
               <tr>
                 <th className="px-4 py-3">Product</th>
+                <th className="px-4 py-3">Type</th>
                 <th className="px-4 py-3">Partner</th>
                 <th className="px-4 py-3">Price</th>
                 <th className="px-4 py-3">Commission</th>
@@ -151,6 +211,16 @@ export default function ProductsTab({ business }) {
                   <td className="px-4 py-3">
                     <div className="font-medium text-gray-900">{p.name}</div>
                     {p.category && <div className="text-xs text-gray-400">{p.category}</div>}
+                  </td>
+                  <td className="px-4 py-3">
+                    {(() => {
+                      const k = KINDS.find((x) => x.value === (p.kind || 'affiliate')) || KINDS[0]
+                      return (
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${k.badge}`}>
+                          {k.label}{p.network ? ` · ${p.network}` : ''}
+                        </span>
+                      )
+                    })()}
                   </td>
                   <td className="px-4 py-3 text-gray-600">{p.partnerName || '—'}</td>
                   <td className="px-4 py-3 text-gray-600">{dollars(p.priceCents)}</td>
@@ -169,6 +239,34 @@ export default function ProductsTab({ business }) {
       {editing && (
         <Modal title={editing === 'new' ? 'Add product' : 'Edit product'} onClose={() => setEditing(null)}>
           <div className="space-y-3">
+            <div className="flex gap-3">
+              <label className="block flex-1 text-sm font-medium text-gray-700">
+                Type
+                <select
+                  value={form.kind}
+                  onChange={(e) => setForm({ ...form, kind: e.target.value })}
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+                >
+                  {KINDS.map((k) => (
+                    <option key={k.value} value={k.value}>{k.label}</option>
+                  ))}
+                </select>
+              </label>
+              {form.kind === 'affiliate' && (
+                <label className="block flex-1 text-sm font-medium text-gray-700">
+                  Network
+                  <select
+                    value={form.network}
+                    onChange={(e) => setForm({ ...form, network: e.target.value })}
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+                  >
+                    {NETWORKS.map((n) => (
+                      <option key={n} value={n}>{n || 'direct / other'}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </div>
             {[
               ['name', 'Name *'],
               ['partnerUrl', 'Partner / affiliate URL *'],
@@ -194,6 +292,37 @@ export default function ProductsTab({ business }) {
             >
               Save
             </button>
+          </div>
+        </Modal>
+      )}
+
+      {storePicker && (
+        <Modal
+          title={`Add from ${storePicker.store === 'whistler' ? 'Whistler' : 'BirdNest'} shop`}
+          onClose={() => setStorePicker(null)}
+          wide
+        >
+          {storePicker.items.length === 0 && (
+            <div className="text-sm text-gray-500">No active products in this store.</div>
+          )}
+          <div className="space-y-2">
+            {storePicker.items.map((item) => (
+              <div key={item.id} className="flex items-center justify-between rounded-md border border-gray-200 p-3">
+                <div className="flex items-center gap-3">
+                  {item.imageUrl && <img src={item.imageUrl} alt="" className="h-10 w-10 rounded object-cover" />}
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{item.title}</div>
+                    <div className="text-xs text-gray-400">{dollars(item.priceCents)}</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => addFromStore(item, storePicker.store)}
+                  className="rounded-md bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700"
+                >
+                  Add
+                </button>
+              </div>
+            ))}
           </div>
         </Modal>
       )}

@@ -36,7 +36,7 @@ export default function OverviewTab({ business }) {
         />
         <StatCard label="Referral clicks" value={summary.referralClicks} />
         <StatCard label="Conversions" value={summary.conversions} hint={`${summary.conversionRate}% of clicks`} />
-        <StatCard label="Commission" value={dollars(summary.commissionCents)} />
+        <StatCard label="Earnings" value={dollars(summary.commissionCents)} />
       </div>
 
       <section className="rounded-lg bg-white p-5 shadow-sm">
