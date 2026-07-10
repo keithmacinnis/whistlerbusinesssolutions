@@ -50,7 +50,9 @@ export default function BusinessDetail() {
         {TABS.map((t) => (
           <NavLink
             key={t.path}
-            to={t.path}
+            // Absolute path: relative links under a splat route resolve against
+            // the current tab segment and double up (…/overview/overview).
+            to={`/businesses/${id}/${t.path}`}
             className={({ isActive }) =>
               `-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
                 isActive
