@@ -14,6 +14,10 @@
       "destination": "/maisie-privacy.html"
     },
     {
+      "source": "/sms-consent",
+      "destination": "/sms-consent.html"
+    },
+    {
       "source": "/dashboard",
       "destination": "/dashboard.html"
     },

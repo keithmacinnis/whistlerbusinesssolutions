@@ -30,6 +30,7 @@ export default defineConfig({
         shop: resolve(__dirname, 'shop.html'),
         shopSuccess: resolve(__dirname, 'shop-success.html'),
         shopCancel: resolve(__dirname, 'shop-cancel.html'),
+        smsConsent: resolve(__dirname, 'sms-consent.html'),
         dashboard: resolve(__dirname, 'dashboard.html')
       }
     },
