@@ -62,7 +62,7 @@ export default function Overview() {
           <h1 className="text-2xl font-bold text-gray-900">
             Welcome back{user?.name ? `, ${user.name}` : ''}
           </h1>
-          <p className="mt-1 text-sm text-gray-500">Last 30 days across your voice businesses.</p>
+          <p className="mt-1 text-sm text-gray-500">Last 30 days across your call centres.</p>
         </div>
         {user?.role === 'super_admin' && (
           <button
@@ -90,7 +90,7 @@ export default function Overview() {
 
       {data?.businesses?.length === 0 && (
         <div className="mt-8 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-          <p className="text-gray-600">No voice businesses yet.</p>
+          <p className="text-gray-600">No call centres yet.</p>
           <Link to="/businesses/new" className="mt-2 inline-block text-brand-600 hover:underline">
             Create your first one →
           </Link>

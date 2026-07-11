@@ -18,7 +18,7 @@ export default function Layout() {
         </div>
         <nav className="flex flex-1 flex-col gap-1">
           <NavLink to="/" end className={navLinkClass}>Overview</NavLink>
-          <NavLink to="/businesses" className={navLinkClass}>Businesses</NavLink>
+          <NavLink to="/businesses" className={navLinkClass}>Call Centres</NavLink>
           <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
             Merch Shop
           </div>

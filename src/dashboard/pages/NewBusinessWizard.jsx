@@ -75,7 +75,7 @@ export default function NewBusinessWizard() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-bold text-gray-900">Add New Business</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Add Call Centre</h1>
 
       <div className="mt-4 mb-8 flex items-center gap-1">
         {STEPS.map((label, i) => (
