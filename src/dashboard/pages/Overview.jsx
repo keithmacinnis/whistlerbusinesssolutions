@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../api'
 import StatCard from '../components/StatCard'
 import StatusPill from '../components/StatusPill'
+import BarChart from '../components/BarChart'
 import { useAuth } from '../auth'
 
 const dollars = (cents) => `$${((cents || 0) / 100).toFixed(2)}`
@@ -13,6 +14,8 @@ export default function Overview() {
   const [error, setError] = useState('')
   const [syncing, setSyncing] = useState(false)
   const [syncNote, setSyncNote] = useState('')
+  const [traffic, setTraffic] = useState(null)
+  const isAdmin = user?.role === 'super_admin'
 
   const load = () =>
     api('/api/voice/analytics/overview')
@@ -22,6 +25,13 @@ export default function Overview() {
   useEffect(() => {
     load()
   }, [])
+
+  useEffect(() => {
+    if (!isAdmin) return
+    api('/api/site/analytics', { params: { days: 7 } })
+      .then(setTraffic)
+      .catch(() => setTraffic({ configured: false }))
+  }, [isAdmin])
 
   const syncAffiliates = async () => {
     setSyncing(true)
@@ -95,6 +105,71 @@ export default function Overview() {
             Create your first one →
           </Link>
         </div>
+      )}
+
+      {isAdmin && traffic && (
+        <section className="mt-8 rounded-lg bg-white p-5 shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-semibold text-gray-900">Site traffic (last 7 days)</h2>
+            <span className="text-xs text-gray-400">via Cloudflare</span>
+          </div>
+          {!traffic.configured ? (
+            <p className="text-sm text-gray-400">
+              Not connected yet — set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID on the server to see
+              visitors and traffic sources here.
+            </p>
+          ) : (
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <div className="mb-2 text-sm text-gray-500">
+                  {traffic.days.reduce((a, d) => a + d.uniques, 0).toLocaleString()} unique visitors ·{' '}
+                  {traffic.days.reduce((a, d) => a + d.pageviews, 0).toLocaleString()} pageviews
+                </div>
+                <BarChart
+                  points={traffic.days.map((d) => ({ day: d.date, count: d.uniques }))}
+                  label="unique visitors"
+                />
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700">Top countries</h3>
+                  <div className="mt-1 space-y-1">
+                    {traffic.topCountries.slice(0, 5).map((c) => (
+                      <div key={c.country} className="flex justify-between text-sm">
+                        <span className="text-gray-600">{c.country}</span>
+                        <span className="text-gray-900">{c.requests.toLocaleString()}</span>
+                      </div>
+                    ))}
+                    {traffic.topCountries.length === 0 && (
+                      <div className="text-sm text-gray-400">No data yet.</div>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700">Sources</h3>
+                  {traffic.referers === null ? (
+                    <p className="mt-1 text-xs text-gray-400">
+                      Enable Cloudflare Web Analytics (RUM) and set CLOUDFLARE_ACCOUNT_ID +
+                      CLOUDFLARE_RUM_SITE_TAG for referrer sources.
+                    </p>
+                  ) : (
+                    <div className="mt-1 space-y-1">
+                      {traffic.referers.slice(0, 5).map((r) => (
+                        <div key={r.referer} className="flex justify-between text-sm">
+                          <span className="truncate text-gray-600">{r.referer}</span>
+                          <span className="text-gray-900">{r.visits.toLocaleString()}</span>
+                        </div>
+                      ))}
+                      {traffic.referers.length === 0 && (
+                        <div className="text-sm text-gray-400">No referrer data yet.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
       )}
 
       {data?.businesses?.length > 0 && (
