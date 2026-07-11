@@ -4,6 +4,7 @@ import { api } from '../api'
 import StatCard from '../components/StatCard'
 import StatusPill from '../components/StatusPill'
 import BarChart from '../components/BarChart'
+import ActionItems from '../components/ActionItems'
 import { useAuth } from '../auth'
 
 const dollars = (cents) => `$${((cents || 0) / 100).toFixed(2)}`
@@ -106,6 +107,8 @@ export default function Overview() {
           </Link>
         </div>
       )}
+
+      {isAdmin && <ActionItems />}
 
       {isAdmin && traffic && (
         <section className="mt-8 rounded-lg bg-white p-5 shadow-sm">
