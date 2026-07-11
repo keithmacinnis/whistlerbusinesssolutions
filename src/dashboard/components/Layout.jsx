@@ -20,8 +20,9 @@ export default function Layout() {
           <NavLink to="/" end className={navLinkClass}>Overview</NavLink>
           <NavLink to="/businesses" className={navLinkClass}>Call Centres</NavLink>
           <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-            Merch Shop
+            Commerce
           </div>
+          <NavLink to="/merch/stores" className={navLinkClass}>Online Stores</NavLink>
           <NavLink to="/merch/products" className={navLinkClass}>Products</NavLink>
           <NavLink to="/merch/orders" className={navLinkClass}>Orders</NavLink>
           {user?.role === 'super_admin' && (

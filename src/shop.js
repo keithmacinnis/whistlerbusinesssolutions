@@ -49,14 +49,20 @@ const renderProducts = (products) => {
   products.forEach((p) => {
     const card = document.createElement('div');
     card.className = 'theme-card';
+    const isAffiliate = p.kind === 'affiliate';
     card.innerHTML = `
       ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy" style="width:100%;border-radius:8px;margin-bottom:1rem;">` : ''}
       <h3 class="theme-heading h3">${p.title}</h3>
       ${p.description ? `<p class="theme-text">${p.description}</p>` : ''}
-      <p class="theme-text"><strong>${formatPrice(p.priceCents, p.currency)}</strong></p>
-      <button class="theme-btn primary" type="button">Buy Now</button>
+      ${p.priceCents != null ? `<p class="theme-text"><strong>${formatPrice(p.priceCents, p.currency)}</strong></p>` : ''}
+      ${isAffiliate
+        ? `<a class="theme-btn primary" href="${p.buyUrl}" target="_blank" rel="noopener sponsored">Buy Direct</a>
+           ${p.partnerName ? `<p class="theme-text" style="font-size:0.8rem;opacity:0.7;margin-top:0.5rem;">Sold by ${p.partnerName}</p>` : ''}`
+        : `<button class="theme-btn primary" type="button">Buy Now</button>`}
     `;
-    card.querySelector('button').addEventListener('click', (e) => buyNow(p.id, e.currentTarget));
+    if (!isAffiliate) {
+      card.querySelector('button').addEventListener('click', (e) => buyNow(p.id, e.currentTarget));
+    }
     grid.appendChild(card);
   });
 };

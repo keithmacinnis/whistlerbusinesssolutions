@@ -9,6 +9,7 @@ import NewBusinessWizard from './pages/NewBusinessWizard'
 import Users from './pages/Users'
 import MerchProducts from './pages/merch/MerchProducts'
 import MerchOrders from './pages/merch/MerchOrders'
+import OnlineStores from './pages/merch/OnlineStores'
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="businesses" element={<BusinessList />} />
           <Route path="businesses/new" element={<NewBusinessWizard />} />
           <Route path="businesses/:id/*" element={<BusinessDetail />} />
+          <Route path="merch/stores" element={<OnlineStores />} />
           <Route path="merch/products" element={<MerchProducts />} />
           <Route path="merch/orders" element={<MerchOrders />} />
           <Route path="users" element={<Users />} />
