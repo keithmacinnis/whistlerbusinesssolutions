@@ -79,6 +79,7 @@ export default function CallLogsTab({ business }) {
                 <th className="px-4 py-3">When</th>
                 <th className="px-4 py-3">Caller</th>
                 <th className="px-4 py-3">Duration</th>
+                <th className="px-4 py-3">Cost</th>
                 <th className="px-4 py-3">Outcome</th>
                 <th className="px-4 py-3">Summary</th>
               </tr>
@@ -89,6 +90,9 @@ export default function CallLogsTab({ business }) {
                   <td className="whitespace-nowrap px-4 py-3 text-gray-600">{fmtDate(c.startedAt || c.createdAt)}</td>
                   <td className="px-4 py-3 text-gray-600">{c.callerPhone || 'Unknown'}</td>
                   <td className="px-4 py-3 text-gray-600">{fmtDuration(c.durationSeconds)}</td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {c.costCents != null ? `$${(c.costCents / 100).toFixed(2)}` : '—'}
+                  </td>
                   <td className="px-4 py-3">
                     {c.outcome ? (
                       <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700">

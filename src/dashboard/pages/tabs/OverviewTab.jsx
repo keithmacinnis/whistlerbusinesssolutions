@@ -28,7 +28,7 @@ export default function OverviewTab({ business }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Calls (30d)" value={summary.calls} />
         <StatCard
           label="Avg call length"
@@ -37,6 +37,12 @@ export default function OverviewTab({ business }) {
         <StatCard label="Referral clicks" value={summary.referralClicks} />
         <StatCard label="Conversions" value={summary.conversions} hint={`${summary.conversionRate}% of clicks`} />
         <StatCard label="Earnings" value={dollars(summary.commissionCents)} />
+        <StatCard label="Call costs" value={dollars(summary.callCostCents)} />
+        <StatCard
+          label="Net"
+          value={dollars(summary.netCents)}
+          hint={summary.netCents >= 0 ? 'earning' : 'costing more than it earns'}
+        />
       </div>
 
       <section className="rounded-lg bg-white p-5 shadow-sm">
