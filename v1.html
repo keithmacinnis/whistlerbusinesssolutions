@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Tell us your dates, group size, and budget — get a complete Whistler trip plan back within one business day. Stays, transfers, dining, and activities, all handled.">
+  <meta name="keywords" content="Whistler trip planner, Whistler retreats, family getaways Whistler, corporate incentive trips Whistler, plan a Whistler trip">
+  <title>Get Your Whistler Trip Plan | Whistler Business Solutions</title>
+  <link rel="stylesheet" href="/src/newstyles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Montserrat:700">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNSRY1HCJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-RNSRY1HCJE');
+  </script>
+  <style>
+    /* ===== V1: Lead-form funnel — page-specific styles ===== */
+    .trust-bar {
+      background: var(--color-bg-secondary);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-md) 0;
+    }
+    .trust-bar .theme-container {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-2xl);
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      font-weight: 600;
+    }
+    .trust-item .tick { color: var(--color-accent-success); font-weight: 700; }
+
+    .brief-form-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-2xl);
+    }
+    .brief-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+    .form-field label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      margin-bottom: var(--spacing-xs);
+      color: var(--color-text-primary);
+      font-family: var(--font-family-heading);
+    }
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      width: 100%;
+      padding: 0.85rem var(--spacing-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-base);
+      font-family: var(--font-family-primary);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      min-height: 48px; /* thumb-friendly tap target */
+    }
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      outline: 2px solid var(--color-accent-primary);
+      outline-offset: 1px;
+    }
+    .brief-form-more { display: none; }
+    .brief-form-more.open { display: block; }
+    .brief-form-card .theme-btn.primary {
+      width: 100%;
+      text-align: center;
+      font-size: var(--font-size-lg);
+      padding: var(--spacing-md) var(--spacing-xl);
+    }
+    .form-reassurance {
+      text-align: center;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--spacing-md);
+    }
+
+    .itinerary-card {
+      overflow: hidden;
+      padding: 0;
+    }
+    .itinerary-photo {
+      height: 180px;
+      background-size: cover;
+      background-position: center;
+    }
+    .itinerary-body { padding: var(--spacing-xl); }
+    .itinerary-body ul {
+      list-style: none;
+      padding: 0;
+      margin: var(--spacing-md) 0;
+    }
+    .itinerary-body li {
+      padding: var(--spacing-xs) 0;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+    }
+    .itinerary-body li::before {
+      content: '›';
+      color: var(--color-accent-primary);
+      font-weight: 700;
+      margin-right: var(--spacing-sm);
+    }
+
+    .testimonial-card {
+      border-left: 4px solid var(--color-accent-primary);
+    }
+    .testimonial-quote {
+      font-style: italic;
+      font-size: var(--font-size-lg);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-md);
+    }
+    .testimonial-who {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+    .stars { color: var(--color-accent-warning); letter-spacing: 2px; }
+
+    .faq-item {
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-lg) 0;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .faq-item h3 {
+      font-family: var(--font-family-heading);
+      font-size: var(--font-size-lg);
+      margin-bottom: var(--spacing-sm);
+      color: var(--color-text-primary);
+    }
+    .faq-item p { color: var(--color-text-secondary); }
+
+    /* Sticky mobile CTA bar */
+    .sticky-cta {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--color-bg-primary);
+      border-top: 1px solid var(--color-border);
+      padding: var(--spacing-md);
+      z-index: 90;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    }
+    .sticky-cta a {
+      display: block;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+      .sticky-cta { display: block; }
+      body { padding-bottom: 80px; }
+    }
+  </style>
+</head>
+
+<body class="light-mode">
+  <div id="loader" class="loader"></div>
+  <header>
+    <div class="theme-container">
+      <h1>
+        <span aria-label="Whistler Business Solutions" style="position: relative; top: -12px;">WBS</span>
+        <br>
+
+      </h1>
+
+      <nav aria-label="Main Navigation">
+        <ul id="main-nav">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#itineraries">Trip Ideas</a></li>
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#reviews">Reviews</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#brief">Get My Trip Plan</a></li>
+        </ul>
+      </nav>
+      <button id="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon dark-mode-icon" aria-hidden="true">&#x1F319;</span>
+        <span class="theme-icon light-mode-icon" aria-hidden="true">&#x2600;</span>
+      </button>
+      <button class="hamburger-menu" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav-overlay"></div>
+
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-close" aria-label="Close mobile menu">×</button>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#itineraries">Trip Ideas</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#reviews">Reviews</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#brief">Get My Trip Plan</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section id="home" class="hero" tabindex="-1">
+      <div class="hero-content theme-container">
+        <div class="hero-badge">Whistler Retreats &amp; Outings</div>
+
+        <p class="hero-subtitle">Your Whistler Getaway, Thoughtfully Planned</p>
+
+        <p class="hero-description">We help families and teams plan unforgettable retreats and outings in Whistler, BC — from where to stay to what to do. Tell us what you're dreaming up, and we'll help you put the whole trip together.</p>
+
+        <div class="hero-cta">
+          <a href="#brief" class="theme-btn primary">
+            Get My Free Trip Plan
+          </a>
+        </div>
+
+        <div class="hero-features">
+          <div class="feature-item">
+            <span class="feature-icon">👨‍👩‍👧‍👦</span>
+            <span>Family Getaways</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🏆</span>
+            <span>Corporate Rewards</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🏔️</span>
+            <span>Year-Round in Whistler</span>
+          </div>
+        </div>
+      </div>
+      <div id="hero-background" class="hero-background" data-current-image="1"></div>
+    </section>
+
+    <div class="trust-bar">
+      <div class="theme-container">
+        <span class="trust-item"><span class="tick">✓</span> Whistler locals, on the ground</span>
+        <span class="trust-item"><span class="tick">✓</span> Free plan within 1 business day</span>
+        <span class="trust-item"><span class="tick">✓</span> No booking fees, no obligation</span>
+        <span class="trust-item"><span class="tick">✓</span> One contact for the whole trip</span>
+      </div>
+    </div>
+
+    <section id="brief" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">Free · No Obligation · 1 Business Day</span>
+          <h2 class="theme-heading h2">Get Your Whistler Trip Plan</h2>
+          <p class="theme-text">Three quick answers is all it takes. We'll reply with stays, activities, and a rough budget matched to your group.</p>
+        </div>
+
+        <form class="brief-form-card" id="trip-brief-form">
+          <div class="brief-form-grid">
+            <div class="form-field">
+              <label for="tb-dates">When are you thinking?</label>
+              <input type="text" id="tb-dates" name="dates" placeholder="e.g. mid-February, or flexible" required>
+            </div>
+            <div class="form-field">
+              <label for="tb-guests">How many people?</label>
+              <select id="tb-guests" name="guests" required>
+                <option value="" disabled selected>Select group size</option>
+                <option>2–4</option>
+                <option>5–8</option>
+                <option>9–15</option>
+                <option>16–30</option>
+                <option>30+</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="tb-type">What kind of trip?</label>
+              <select id="tb-type" name="type" required>
+                <option value="" disabled selected>Select trip type</option>
+                <option>Family getaway / reunion</option>
+                <option>Corporate reward / offsite</option>
+                <option>Celebration (birthday, anniversary…)</option>
+                <option>Something else</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="brief-form-more" id="brief-more">
+            <div class="brief-form-grid">
+              <div class="form-field">
+                <label for="tb-budget">Budget range (optional)</label>
+                <input type="text" id="tb-budget" name="budget" placeholder="Per person or total — a rough range is fine">
+              </div>
+              <div class="form-field">
+                <label for="tb-email">Your email</label>
+                <input type="email" id="tb-email" name="email" placeholder="you@example.com">
+              </div>
+            </div>
+            <div class="form-field" style="margin-bottom: var(--spacing-lg);">
+              <label for="tb-notes">Anything else? (optional)</label>
+              <textarea id="tb-notes" name="notes" rows="3" placeholder="Must-haves, occasion, energy level of the group…"></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="theme-btn primary">Get My Free Trip Plan →</button>
+          <p class="form-reassurance">No spam, no commitment — just a real plan from a real person within one business day.</p>
+        </form>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="how" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">How It Works</span>
+          <h2 class="theme-heading h2">Three Steps, Zero Stress</h2>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <h3 class="theme-heading h3">Tell us the basics</h3>
+            <p class="theme-text">Dates, group size, trip type — the form above takes under a minute. We'll ask if we need more.</p>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <h3 class="theme-heading h3">Get your plan in 1 business day</h3>
+            <p class="theme-text">Stays, transfers, dining, and activities matched to your group and budget — one tidy proposal, ready to share.</p>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <h3 class="theme-heading h3">Approve it — we handle the rest</h3>
+            <p class="theme-text">Once you sign off, we coordinate every booking with our Whistler partners. You just show up.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="itineraries" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">Trip Ideas</span>
+          <h2 class="theme-heading h2">What a Planned Whistler Trip Looks Like</h2>
+          <p class="theme-text">Every plan is built from scratch, but here's the shape of trips we put together.</p>
+        </div>
+
+        <div class="theme-grid auto-fit">
+          <div class="theme-card itinerary-card">
+            <div class="itinerary-photo" style="background-image: url('/whistler-mountain-hd1.jpg');"></div>
+            <div class="itinerary-body">
+              <h3 class="theme-heading h3">The Family Winter Week</h3>
+              <ul>
+                <li>Ski-in/ski-out condos for every branch of the family</li>
+                <li>Lessons for the kids, powder mornings for the keeners</li>
+                <li>Tubing, s'mores, and one big celebration dinner</li>
+                <li>Private airport shuttle — no mountain driving</li>
+              </ul>
+              <a href="#brief" class="theme-btn secondary">Plan Something Like This →</a>
+            </div>
+          </div>
+
+          <div class="theme-card itinerary-card">
+            <div class="itinerary-photo" style="background-image: url('/whistler-mountain-hd2.jpg');"></div>
+            <div class="itinerary-body">
+              <h3 class="theme-heading h3">The Corporate Reward Weekend</h3>
+              <ul>
+                <li>Slopeside hotel block, welcome drinks on arrival</li>
+                <li>Peak 2 Peak sightseeing + guided group activity</li>
+                <li>Private dining room for the awards dinner</li>
+                <li>One itemized invoice, ready for expensing</li>
+              </ul>
+              <a href="#brief" class="theme-btn secondary">Plan Something Like This →</a>
+            </div>
+          </div>
+
+          <div class="theme-card itinerary-card">
+            <div class="itinerary-photo" style="background-image: url('/whistler-mountain-hd3.jpg');"></div>
+            <div class="itinerary-body">
+              <h3 class="theme-heading h3">The Summer Reunion</h3>
+              <ul>
+                <li>A big chalet with a hot tub and room to gather</li>
+                <li>Lake day at Alta, bike park for the brave</li>
+                <li>Patio dinner reservations for the whole crew</li>
+                <li>An itinerary with space to just hang out</li>
+              </ul>
+              <a href="#brief" class="theme-btn secondary">Plan Something Like This →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <!-- NOTE: Sample testimonials — replace with real client quotes before launch -->
+    <section id="reviews" class="theme-section ea-band" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">What Groups Say</span>
+          <h2 class="theme-heading h2">Trips People Still Talk About</h2>
+        </div>
+
+        <div class="theme-grid auto-fit">
+          <div class="theme-card testimonial-card">
+            <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+            <p class="testimonial-quote">"I sent one email with our dates and headcount, and got back a plan my whole family could agree on — which is a miracle in itself."</p>
+            <p class="testimonial-who">Family reunion · 14 guests · Winter</p>
+          </div>
+
+          <div class="theme-card testimonial-card">
+            <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+            <p class="testimonial-quote">"As an EA, this saved me a full week of vendor wrangling. The proposal was clean enough to forward straight to my exec."</p>
+            <p class="testimonial-who">Corporate incentive trip · 22 guests</p>
+          </div>
+
+          <div class="theme-card testimonial-card">
+            <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+            <p class="testimonial-quote">"They knew exactly which chalet fit our group and booked the dinner spot we'd never have found ourselves."</p>
+            <p class="testimonial-who">Summer getaway · 9 guests</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="faq" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">FAQ</span>
+          <h2 class="theme-heading h2">Good Questions</h2>
+        </div>
+
+        <div class="faq-item">
+          <h3>What does the planning service cost?</h3>
+          <p>The trip plan is free and comes with no obligation. If you go ahead, we're paid through our partner arrangements — you don't pay us a planning fee.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How far ahead should we book?</h3>
+          <p>For peak winter weeks (Christmas through spring break), group accommodation genuinely fills 6+ months out. Summer has more flexibility, but the best chalets go early. The sooner you send your brief, the more options you'll have.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Do you handle the actual bookings?</h3>
+          <p>Yes. Once you approve the plan, we coordinate stays, transfers, dining, and activities with our Whistler partners, and you get one point of contact throughout.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What size of group do you work with?</h3>
+          <p>Anything from a couple's escape to a 30+ person corporate outing. Bigger than that? Ask — we've got the partners for it.</p>
+        </div>
+
+        <div class="theme-cta" style="margin-top: var(--spacing-2xl);">
+          <a href="#brief" class="theme-btn primary">Get My Free Trip Plan</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="theme-container">
+      <p class="text-center">
+        <a href="mailto:keith@whistlerbusinesssolutions.com">keith@whistlerbusinesssolutions.com</a>
+      </p>
+      <p class="text-center theme-text muted">
+        Also from Whistler Business Solutions — software:
+        <a href="https://birdnestfamilies.com" target="_blank" rel="noopener noreferrer">birdNest Families</a> ·
+        <a href="https://www.birdnestteams.com" target="_blank" rel="noopener noreferrer">birdNest Teams</a> ·
+        <a href="https://maisie-prod.whistlerbusinesssolutions.com/" target="_blank" rel="noopener noreferrer">Maisie Schedules</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Sticky mobile CTA -->
+  <div class="sticky-cta">
+    <a href="#brief" class="theme-btn primary">Get My Free Trip Plan →</a>
+  </div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script type="module" src="/src/app.js"></script>
+  <script type="module">
+    // Progressive disclosure: reveal budget/email/notes once the first three
+    // fields are answered, so the form starts at just three fields.
+    const form = document.getElementById('trip-brief-form');
+    const more = document.getElementById('brief-more');
+    const firstFields = ['tb-dates', 'tb-guests', 'tb-type'].map(id => document.getElementById(id));
+
+    function maybeExpand() {
+      if (firstFields.every(f => f.value)) more.classList.add('open');
+    }
+    firstFields.forEach(f => {
+      f.addEventListener('change', maybeExpand);
+      f.addEventListener('input', maybeExpand);
+    });
+
+    // No backend yet: submit composes a pre-filled email to Keith.
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = id => document.getElementById(id).value || '—';
+      const body = [
+        `Dates: ${v('tb-dates')}`,
+        `Guests: ${v('tb-guests')}`,
+        `Trip type: ${v('tb-type')}`,
+        `Budget: ${v('tb-budget')}`,
+        `Reply-to email: ${v('tb-email')}`,
+        `Notes: ${v('tb-notes')}`
+      ].join('\r\n');
+      gtag('event', 'generate_lead', { form: 'trip_brief_v1' });
+      window.location.href = 'mailto:keith@whistlerbusinesssolutions.com'
+        + '?subject=' + encodeURIComponent('Whistler Trip Plan Request')
+        + '&body=' + encodeURIComponent(body);
+    });
+  </script>
+</body>
+
+</html>

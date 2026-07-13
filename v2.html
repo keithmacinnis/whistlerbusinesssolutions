@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Whistler group trip packages — family ski weeks, corporate reward weekends, and summer reunions. Transparent per-person pricing, everything coordinated for you.">
+  <meta name="keywords" content="Whistler packages, Whistler group trips, Whistler ski week package, corporate retreat Whistler, Whistler summer package">
+  <title>Whistler Trip Packages | Whistler Business Solutions</title>
+  <link rel="stylesheet" href="/src/newstyles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Montserrat:700">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNSRY1HCJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-RNSRY1HCJE');
+  </script>
+  <style>
+    /* ===== V2: Packages & offers — page-specific styles ===== */
+    .urgency-ribbon {
+      background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+      color: #fff;
+      text-align: center;
+      padding: var(--spacing-md);
+      font-weight: 600;
+      font-size: var(--font-size-sm);
+    }
+    .urgency-ribbon a { color: #fff; text-decoration: underline; }
+
+    .season-tabs {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-2xl);
+    }
+    .season-tab {
+      padding: var(--spacing-md) var(--spacing-xl);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      font-family: var(--font-family-heading);
+      font-weight: 700;
+      font-size: var(--font-size-base);
+      cursor: pointer;
+      min-height: 48px;
+    }
+    .season-tab.active {
+      background: var(--color-accent-primary);
+      border-color: var(--color-accent-primary);
+      color: #fff;
+    }
+    .season-panel { display: none; }
+    .season-panel.active { display: block; }
+
+    .package-card {
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .package-photo {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .package-flag {
+      position: absolute;
+      top: var(--spacing-md);
+      left: var(--spacing-md);
+      background: var(--color-accent-warning);
+      color: #1f2937;
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-full);
+    }
+    .package-body {
+      padding: var(--spacing-xl);
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .package-body ul {
+      list-style: none;
+      padding: 0;
+      margin: var(--spacing-md) 0;
+      flex: 1;
+    }
+    .package-body li {
+      padding: var(--spacing-xs) 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+    .package-body li::before {
+      content: '✓';
+      color: var(--color-accent-success);
+      font-weight: 700;
+      margin-right: var(--spacing-sm);
+    }
+    .package-price {
+      margin: var(--spacing-md) 0;
+      font-family: var(--font-family-heading);
+    }
+    .package-price .from {
+      display: block;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      font-weight: 400;
+    }
+    .package-price .amount {
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    .package-price .unit {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+    .package-card .theme-btn { text-align: center; }
+
+    .stats-strip {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-2xl);
+      flex-wrap: wrap;
+      text-align: center;
+    }
+    .stat-big {
+      font-family: var(--font-family-heading);
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      color: var(--color-accent-primary);
+    }
+    .stat-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+
+    .price-note {
+      max-width: 720px;
+      margin: var(--spacing-2xl) auto 0;
+      text-align: center;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .testimonial-card { border-left: 4px solid var(--color-accent-primary); }
+    .testimonial-quote {
+      font-style: italic;
+      font-size: var(--font-size-lg);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-md);
+    }
+    .testimonial-who {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+    .stars { color: var(--color-accent-warning); letter-spacing: 2px; }
+
+    .faq-item {
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-lg) 0;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .faq-item h3 {
+      font-family: var(--font-family-heading);
+      font-size: var(--font-size-lg);
+      margin-bottom: var(--spacing-sm);
+      color: var(--color-text-primary);
+    }
+    .faq-item p { color: var(--color-text-secondary); }
+
+    .sticky-cta {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--color-bg-primary);
+      border-top: 1px solid var(--color-border);
+      padding: var(--spacing-md);
+      z-index: 90;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    }
+    .sticky-cta a { display: block; text-align: center; }
+    @media (max-width: 768px) {
+      .sticky-cta { display: block; }
+      body { padding-bottom: 80px; }
+      .stats-strip { gap: var(--spacing-xl); }
+    }
+  </style>
+</head>
+
+<body class="light-mode">
+  <div id="loader" class="loader"></div>
+  <header>
+    <div class="theme-container">
+      <h1>
+        <span aria-label="Whistler Business Solutions" style="position: relative; top: -12px;">WBS</span>
+        <br>
+
+      </h1>
+
+      <nav aria-label="Main Navigation">
+        <ul id="main-nav">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#packages">Packages</a></li>
+          <li><a href="#included">What's Included</a></li>
+          <li><a href="#reviews">Reviews</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#book">Check Availability</a></li>
+        </ul>
+      </nav>
+      <button id="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon dark-mode-icon" aria-hidden="true">&#x1F319;</span>
+        <span class="theme-icon light-mode-icon" aria-hidden="true">&#x2600;</span>
+      </button>
+      <button class="hamburger-menu" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav-overlay"></div>
+
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-close" aria-label="Close mobile menu">×</button>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#packages">Packages</a></li>
+      <li><a href="#included">What's Included</a></li>
+      <li><a href="#reviews">Reviews</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#book">Check Availability</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section id="home" class="hero" tabindex="-1">
+      <div class="hero-content theme-container">
+        <div class="hero-badge">Whistler Retreats &amp; Outings</div>
+
+        <p class="hero-subtitle">Your Whistler Getaway, Thoughtfully Planned</p>
+
+        <p class="hero-description">We help families and teams plan unforgettable retreats and outings in Whistler, BC — from where to stay to what to do. Tell us what you're dreaming up, and we'll help you put the whole trip together.</p>
+
+        <div class="hero-cta">
+          <a href="#packages" class="theme-btn primary">
+            See Trip Packages
+          </a>
+        </div>
+
+        <div class="hero-features">
+          <div class="feature-item">
+            <span class="feature-icon">👨‍👩‍👧‍👦</span>
+            <span>Family Getaways</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🏆</span>
+            <span>Corporate Rewards</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🏔️</span>
+            <span>Year-Round in Whistler</span>
+          </div>
+        </div>
+      </div>
+      <div id="hero-background" class="hero-background" data-current-image="1"></div>
+    </section>
+
+    <div class="urgency-ribbon">
+      ⛷️ Winter 2026/27: peak weeks (Christmas–spring break) book out 6+ months ahead — <a href="#book">check your dates now</a>
+    </div>
+
+    <section id="packages" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">Trip Packages</span>
+          <h2 class="theme-heading h2">Pick a Starting Point — We Tailor the Rest</h2>
+          <p class="theme-text">Every package is a template, not a straitjacket. Prices flex with group size, dates, and how fancy you want to get.</p>
+        </div>
+
+        <div class="season-tabs" role="tablist">
+          <button class="season-tab active" data-season="winter" role="tab">❄️ Winter</button>
+          <button class="season-tab" data-season="summer" role="tab">☀️ Summer</button>
+        </div>
+
+        <!-- NOTE: "from" prices are placeholders — confirm real numbers with partners before launch -->
+        <div class="season-panel active" data-season="winter">
+          <div class="theme-grid auto-fit">
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd1.jpg');">
+                <span class="package-flag">Most popular</span>
+              </div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Family Ski Week</h3>
+                <ul>
+                  <li>5–7 nights, ski-in/ski-out condos or chalet</li>
+                  <li>Lift tickets &amp; lessons arranged for all levels</li>
+                  <li>Tubing night + one big family dinner booked</li>
+                  <li>Private YVR–Whistler shuttle both ways</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,950</span>
+                  <span class="unit">CAD / person · 5 nights</span>
+                </div>
+                <a href="#book" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd2.jpg');"></div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Corporate Reward Weekend</h3>
+                <ul>
+                  <li>2–3 nights, slopeside hotel room block</li>
+                  <li>Welcome après reception on arrival</li>
+                  <li>Peak 2 Peak + guided group activity</li>
+                  <li>Private awards dinner, one itemized invoice</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,400</span>
+                  <span class="unit">CAD / person · 2 nights</span>
+                </div>
+                <a href="#book" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd3.jpg');"></div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Winter Celebration Escape</h3>
+                <ul>
+                  <li>3–4 nights, chalet with hot tub</li>
+                  <li>Snowshoe or sleigh-ride group outing</li>
+                  <li>Spa afternoon + celebration dinner booked</li>
+                  <li>Transfers and reservations all handled</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,150</span>
+                  <span class="unit">CAD / person · 3 nights</span>
+                </div>
+                <a href="#book" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="season-panel" data-season="summer">
+          <div class="theme-grid auto-fit">
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd4.jpg');">
+                <span class="package-flag">Best value</span>
+              </div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Summer Family Reunion</h3>
+                <ul>
+                  <li>4–7 nights, big chalet or condo cluster</li>
+                  <li>Lake day at Alta + Peak 2 Peak sightseeing</li>
+                  <li>Group patio dinners reserved</li>
+                  <li>Room in the schedule to just hang out</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$950</span>
+                  <span class="unit">CAD / person · 4 nights</span>
+                </div>
+                <a href="#book" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd6.jpg');"></div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Team Offsite in the Alpine</h3>
+                <ul>
+                  <li>2–3 nights, village hotel + meeting space</li>
+                  <li>Morning work sessions, afternoon adventures</li>
+                  <li>Ziplining, rafting, or golf — your pick</li>
+                  <li>Group dinners and transfers coordinated</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,100</span>
+                  <span class="unit">CAD / person · 2 nights</span>
+                </div>
+                <a href="#book" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd.jpg');"></div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Bike &amp; Lake Adventure Trip</h3>
+                <ul>
+                  <li>3–5 nights, condos near the village core</li>
+                  <li>Bike park passes or guided trail rides</li>
+                  <li>Paddleboard session on Lost Lake</li>
+                  <li>Après patios and dinner spots pre-booked</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,050</span>
+                  <span class="unit">CAD / person · 3 nights</span>
+                </div>
+                <a href="#book" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="price-note">All prices in CAD, based on typical group sizes, before taxes. No hidden fees — your proposal shows the full itemized cost before you commit to anything.</p>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="included" class="theme-section ea-band" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">Every Package Includes</span>
+          <h2 class="theme-heading h2">One Contact. Zero Logistics for You.</h2>
+        </div>
+
+        <div class="stats-strip" style="margin-bottom: var(--spacing-2xl);">
+          <div><div class="stat-big">1</div><div class="stat-label">point of contact</div></div>
+          <div><div class="stat-big">1 day</div><div class="stat-label">to your first proposal</div></div>
+          <div><div class="stat-big">$0</div><div class="stat-label">planning fees</div></div>
+          <div><div class="stat-big">100%</div><div class="stat-label">itemized pricing</div></div>
+        </div>
+
+        <div class="brief-box">
+          <h3 class="theme-heading h3">Handled on every trip</h3>
+          <ul class="checklist">
+            <li>Group accommodation matched to budget and headcount</li>
+            <li>Airport transfers and in-resort transport</li>
+            <li>Group dinners, dietary needs, and reservations</li>
+            <li>Activities and experiences for every energy level</li>
+            <li>One itemized itinerary, ready for approval and expensing</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <!-- NOTE: Sample testimonials — replace with real client quotes before launch -->
+    <section id="reviews" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">What Groups Say</span>
+          <h2 class="theme-heading h2">Trips People Still Talk About</h2>
+        </div>
+
+        <div class="theme-grid auto-fit">
+          <div class="theme-card testimonial-card">
+            <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+            <p class="testimonial-quote">"The per-person price was clear from the first proposal — no surprises at the end, which made approvals painless."</p>
+            <p class="testimonial-who">Corporate reward weekend · 22 guests</p>
+          </div>
+
+          <div class="theme-card testimonial-card">
+            <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+            <p class="testimonial-quote">"We started from the Family Ski Week package and tweaked it for the grandparents. Best family trip we've done."</p>
+            <p class="testimonial-who">Family ski week · 14 guests</p>
+          </div>
+
+          <div class="theme-card testimonial-card">
+            <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+            <p class="testimonial-quote">"Booked the summer offsite six weeks out and they still made it seamless. The team hasn't stopped talking about it."</p>
+            <p class="testimonial-who">Team offsite · 11 guests</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="faq" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">FAQ</span>
+          <h2 class="theme-heading h2">Good Questions</h2>
+        </div>
+
+        <div class="faq-item">
+          <h3>Are the package prices fixed?</h3>
+          <p>They're honest starting points. Your final per-person price depends on dates, group size, and accommodation level — and it's fully itemized in your proposal before you commit to anything.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How far ahead should we book?</h3>
+          <p>Peak winter weeks genuinely sell out 6+ months ahead for groups. Summer is more forgiving, but the best chalets go early. Checking availability costs nothing.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What if none of the packages fit?</h3>
+          <p>Then we build from scratch — the packages are just proven starting points. Tell us what you're picturing and we'll shape it.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Is there a planning fee?</h3>
+          <p>No. Proposals are free and no-obligation; we're paid through our partner arrangements when you book.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="book" class="theme-section ea-band" tabindex="-1">
+      <div class="theme-container">
+        <div class="contact-header text-center mb-4">
+          <span class="section-eyebrow">Free · No Obligation</span>
+          <h2 class="theme-heading h2">Check Availability for Your Dates</h2>
+          <p class="theme-text">Tell us your rough dates and group size — we'll confirm what's available and send a full itemized proposal within one business day.</p>
+        </div>
+
+        <div class="theme-cta">
+          <a href="mailto:keith@whistlerbusinesssolutions.com?subject=Whistler%20Availability%20Check&body=Package%20or%20trip%20type%3A%0D%0ADates%3A%0D%0AGuests%3A%0D%0ABudget%3A%0D%0A" class="theme-btn primary">Check My Dates →</a>
+        </div>
+
+        <p class="text-center theme-text muted" style="margin-top: var(--spacing-xl);">
+          Prefer to talk it through? Email
+          <a href="mailto:keith@whistlerbusinesssolutions.com?subject=Whistler%20Trip%20Inquiry">keith@whistlerbusinesssolutions.com</a>
+          and we'll set up a quick call.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="theme-container">
+      <p class="text-center">
+        <a href="mailto:keith@whistlerbusinesssolutions.com">keith@whistlerbusinesssolutions.com</a>
+      </p>
+      <p class="text-center theme-text muted">
+        Also from Whistler Business Solutions — software:
+        <a href="https://birdnestfamilies.com" target="_blank" rel="noopener noreferrer">birdNest Families</a> ·
+        <a href="https://www.birdnestteams.com" target="_blank" rel="noopener noreferrer">birdNest Teams</a> ·
+        <a href="https://maisie-prod.whistlerbusinesssolutions.com/" target="_blank" rel="noopener noreferrer">Maisie Schedules</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Sticky mobile CTA -->
+  <div class="sticky-cta">
+    <a href="#book" class="theme-btn primary">Check Availability →</a>
+  </div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script type="module" src="/src/app.js"></script>
+  <script type="module">
+    // Winter / summer package tabs
+    document.querySelectorAll('.season-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const season = tab.dataset.season;
+        document.querySelectorAll('.season-tab').forEach(t => t.classList.toggle('active', t === tab));
+        document.querySelectorAll('.season-panel').forEach(p => p.classList.toggle('active', p.dataset.season === season));
+        gtag('event', 'select_content', { content_type: 'season_tab', item_id: season });
+      });
+    });
+  </script>
+</body>
+
+</html>
