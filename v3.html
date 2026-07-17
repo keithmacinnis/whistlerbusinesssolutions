@@ -219,6 +219,39 @@
       color: var(--color-text-muted);
     }
 
+    .stats-strip {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-2xl);
+      flex-wrap: wrap;
+      text-align: center;
+    }
+    .stat-big {
+      font-family: var(--font-family-heading);
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      color: var(--color-accent-primary);
+    }
+    .stat-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-lg) 0;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .faq-item h3 {
+      font-family: var(--font-family-heading);
+      font-size: var(--font-size-lg);
+      margin-bottom: var(--spacing-sm);
+      color: var(--color-text-primary);
+    }
+    .faq-item p { color: var(--color-text-secondary); }
+
     .sticky-cta {
       display: none;
       position: fixed;
@@ -259,6 +292,8 @@
           <li><a href="#summer">Summer</a></li>
           <li><a href="#together">Gather</a></li>
           <li><a href="#packages">Packages</a></li>
+      <li><a href="#faq">FAQ</a></li>
+          <li><a href="#faq">FAQ</a></li>
           <li><a href="#plan">Start Planning</a></li>
         </ul>
       </nav>
@@ -508,6 +543,98 @@
         </div>
 
         <p class="price-note">All prices in CAD, based on typical group sizes, before taxes. No hidden fees — your proposal shows the full itemized cost before you commit to anything.</p>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="included" class="theme-section ea-band" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">Every Trip Includes</span>
+          <h2 class="theme-heading h2">One Contact. Zero Logistics for You.</h2>
+        </div>
+
+        <div class="stats-strip" style="margin-bottom: var(--spacing-2xl);">
+          <div><div class="stat-big">1</div><div class="stat-label">point of contact</div></div>
+          <div><div class="stat-big">1 day</div><div class="stat-label">to your first proposal</div></div>
+          <div><div class="stat-big">$0</div><div class="stat-label">planning fees</div></div>
+          <div><div class="stat-big">100%</div><div class="stat-label">itemized pricing</div></div>
+        </div>
+
+        <div class="brief-box">
+          <h3 class="theme-heading h3">Handled on every trip</h3>
+          <ul class="checklist">
+            <li>Group accommodation matched to budget and headcount</li>
+            <li>Airport transfers and in-resort transport</li>
+            <li>Group dinners, dietary needs, and reservations</li>
+            <li>Activities and experiences for every energy level</li>
+            <li>One itemized itinerary, ready for approval and expensing</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="how" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">How It Works</span>
+          <h2 class="theme-heading h2">Three Steps, Zero Stress</h2>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <h3 class="theme-heading h3">Tell us the basics</h3>
+            <p class="theme-text">Dates, group size, and the occasion — a few lines is plenty. We'll ask if we need more.</p>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <h3 class="theme-heading h3">Get your plan in 1 business day</h3>
+            <p class="theme-text">Stays, transfers, dining, and activities matched to your group and budget — one tidy proposal, ready to share.</p>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <h3 class="theme-heading h3">Approve it — we handle the rest</h3>
+            <p class="theme-text">Once you sign off, we coordinate every booking with our Whistler partners. You just show up.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="faq" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">FAQ</span>
+          <h2 class="theme-heading h2">Good Questions</h2>
+        </div>
+
+        <div class="faq-item">
+          <h3>Are the package prices fixed?</h3>
+          <p>They're honest starting points. Your final per-person price depends on dates, group size, and accommodation level — and it's fully itemized in your proposal before you commit to anything.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How far ahead should we book?</h3>
+          <p>Peak winter weeks (Christmas through spring break) genuinely sell out 6+ months ahead for groups. Summer is more forgiving, but the best chalets go early. Checking availability costs nothing.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What if none of the packages fit?</h3>
+          <p>Then we build from scratch — the packages are just proven starting points. Tell us what you're picturing and we'll shape it.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Is there a planning fee?</h3>
+          <p>No. Proposals are free and no-obligation; we're paid through our partner arrangements when you book.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What size of group do you work with?</h3>
+          <p>Anything from a couple's escape to a 30+ person corporate outing. Bigger than that? Ask — we've got the partners for it.</p>
+        </div>
       </div>
     </section>
 
