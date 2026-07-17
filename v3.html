@@ -117,6 +117,108 @@
       color: var(--color-text-muted);
     }
 
+    /* Packages (UI carried over from v2) */
+    .season-tabs {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-2xl);
+    }
+    .season-tab {
+      padding: var(--spacing-md) var(--spacing-xl);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      font-family: var(--font-family-heading);
+      font-weight: 700;
+      font-size: var(--font-size-base);
+      cursor: pointer;
+      min-height: 48px;
+    }
+    .season-tab.active {
+      background: var(--color-accent-primary);
+      border-color: var(--color-accent-primary);
+      color: #fff;
+    }
+    .season-panel { display: none; }
+    .season-panel.active { display: block; }
+
+    .package-card {
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .package-photo {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .package-flag {
+      position: absolute;
+      top: var(--spacing-md);
+      left: var(--spacing-md);
+      background: var(--color-accent-warning);
+      color: #1f2937;
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-full);
+    }
+    .package-body {
+      padding: var(--spacing-xl);
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .package-body ul {
+      list-style: none;
+      padding: 0;
+      margin: var(--spacing-md) 0;
+      flex: 1;
+    }
+    .package-body li {
+      padding: var(--spacing-xs) 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+    .package-body li::before {
+      content: '✓';
+      color: var(--color-accent-success);
+      font-weight: 700;
+      margin-right: var(--spacing-sm);
+    }
+    .package-price {
+      margin: var(--spacing-md) 0;
+      font-family: var(--font-family-heading);
+    }
+    .package-price .from {
+      display: block;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      font-weight: 400;
+    }
+    .package-price .amount {
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    .package-price .unit {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+    .package-card .theme-btn { text-align: center; }
+
+    .price-note {
+      max-width: 720px;
+      margin: var(--spacing-2xl) auto 0;
+      text-align: center;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
     .sticky-cta {
       display: none;
       position: fixed;
@@ -156,6 +258,7 @@
           <li><a href="#winter">Winter</a></li>
           <li><a href="#summer">Summer</a></li>
           <li><a href="#together">Gather</a></li>
+          <li><a href="#packages">Packages</a></li>
           <li><a href="#plan">Start Planning</a></li>
         </ul>
       </nav>
@@ -182,6 +285,7 @@
       <li><a href="#winter">Winter</a></li>
       <li><a href="#summer">Summer</a></li>
       <li><a href="#together">Gather</a></li>
+      <li><a href="#packages">Packages</a></li>
       <li><a href="#plan">Start Planning</a></li>
     </ul>
   </nav>
@@ -263,7 +367,151 @@
       </div>
     </section>
 
-    <section id="plan" class="theme-section" tabindex="-1">
+    <section id="packages" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">Trip Packages</span>
+          <h2 class="theme-heading h2">Pick a Starting Point — We Tailor the Rest</h2>
+          <p class="theme-text">Every package is a template, not a straitjacket. Prices flex with group size, dates, and how fancy you want to get.</p>
+        </div>
+
+        <div class="season-tabs" role="tablist">
+          <button class="season-tab active" data-season="winter" role="tab">❄️ Winter</button>
+          <button class="season-tab" data-season="summer" role="tab">☀️ Summer</button>
+        </div>
+
+        <!-- NOTE: "from" prices are placeholders — confirm real numbers with partners before launch -->
+        <div class="season-panel active" data-season="winter">
+          <div class="theme-grid auto-fit">
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd3.jpg');">
+                <span class="package-flag">Most popular</span>
+              </div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Family Ski Week</h3>
+                <ul>
+                  <li>5–7 nights, ski-in/ski-out condos or chalet</li>
+                  <li>Lift tickets &amp; lessons arranged for all levels</li>
+                  <li>Tubing night + one big family dinner booked</li>
+                  <li>Private YVR–Whistler shuttle both ways</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,950</span>
+                  <span class="unit">CAD / person · 5 nights</span>
+                </div>
+                <a href="#plan" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd6.jpg');"></div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Corporate Reward Weekend</h3>
+                <ul>
+                  <li>2–3 nights, slopeside hotel room block</li>
+                  <li>Welcome après reception on arrival</li>
+                  <li>Peak 2 Peak + guided group activity</li>
+                  <li>Private awards dinner, one itemized invoice</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,400</span>
+                  <span class="unit">CAD / person · 2 nights</span>
+                </div>
+                <a href="#plan" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd.jpg');"></div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Winter Celebration Escape</h3>
+                <ul>
+                  <li>3–4 nights, chalet with hot tub</li>
+                  <li>Snowshoe or sleigh-ride group outing</li>
+                  <li>Spa afternoon + celebration dinner booked</li>
+                  <li>Transfers and reservations all handled</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,150</span>
+                  <span class="unit">CAD / person · 3 nights</span>
+                </div>
+                <a href="#plan" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="season-panel" data-season="summer">
+          <div class="theme-grid auto-fit">
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd6.jpg');">
+                <span class="package-flag">Best value</span>
+              </div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Summer Family Reunion</h3>
+                <ul>
+                  <li>4–7 nights, big chalet or condo cluster</li>
+                  <li>Lake day at Alta + Peak 2 Peak sightseeing</li>
+                  <li>Group patio dinners reserved</li>
+                  <li>Room in the schedule to just hang out</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$950</span>
+                  <span class="unit">CAD / person · 4 nights</span>
+                </div>
+                <a href="#plan" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd.jpg');"></div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Team Offsite in the Alpine</h3>
+                <ul>
+                  <li>2–3 nights, village hotel + meeting space</li>
+                  <li>Morning work sessions, afternoon adventures</li>
+                  <li>Ziplining, rafting, or golf — your pick</li>
+                  <li>Group dinners and transfers coordinated</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,100</span>
+                  <span class="unit">CAD / person · 2 nights</span>
+                </div>
+                <a href="#plan" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+
+            <div class="theme-card package-card">
+              <div class="package-photo" style="background-image: url('/whistler-mountain-hd3.jpg');"></div>
+              <div class="package-body">
+                <h3 class="theme-heading h3">Bike &amp; Lake Adventure Trip</h3>
+                <ul>
+                  <li>3–5 nights, condos near the village core</li>
+                  <li>Bike park passes or guided trail rides</li>
+                  <li>Paddleboard session on Lost Lake</li>
+                  <li>Après patios and dinner spots pre-booked</li>
+                </ul>
+                <div class="package-price">
+                  <span class="from">from</span>
+                  <span class="amount">$1,050</span>
+                  <span class="unit">CAD / person · 3 nights</span>
+                </div>
+                <a href="#plan" class="theme-btn primary">Check Availability →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="price-note">All prices in CAD, based on typical group sizes, before taxes. No hidden fees — your proposal shows the full itemized cost before you commit to anything.</p>
+      </div>
+    </section>
+
+    <section id="plan" class="theme-section ea-band" tabindex="-1">
       <div class="theme-container">
         <div class="closer">
           <span class="section-eyebrow">Free · No Obligation · 1 Business Day</span>
@@ -297,6 +545,17 @@
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
   <script type="module" src="/src/app.js"></script>
+  <script type="module">
+    // Winter / summer package tabs
+    document.querySelectorAll('.season-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const season = tab.dataset.season;
+        document.querySelectorAll('.season-tab').forEach(t => t.classList.toggle('active', t === tab));
+        document.querySelectorAll('.season-panel').forEach(p => p.classList.toggle('active', p.dataset.season === season));
+        gtag('event', 'select_content', { content_type: 'season_tab', item_id: season });
+      });
+    });
+  </script>
 </body>
 
 </html>
