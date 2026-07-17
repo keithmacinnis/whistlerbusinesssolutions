@@ -252,6 +252,106 @@
     }
     .faq-item p { color: var(--color-text-secondary); }
 
+    /* Footer */
+    footer {
+      text-align: left;
+      padding: var(--spacing-2xl) 0 var(--spacing-xl);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1.4fr;
+      gap: var(--spacing-2xl);
+      align-items: start;
+      padding-bottom: var(--spacing-xl);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .footer-logo {
+      font-family: var(--font-family-heading);
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: var(--spacing-sm);
+    }
+    .footer-tagline {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: var(--font-size-sm);
+      line-height: 1.6;
+      margin-bottom: var(--spacing-md);
+    }
+    .footer-email {
+      color: #fff;
+      font-size: var(--font-size-sm);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .footer-heading {
+      font-family: var(--font-family-heading);
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: var(--spacing-md);
+    }
+    .footer-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .footer-links li { padding: var(--spacing-xs) 0; }
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      font-size: var(--font-size-sm);
+    }
+    .footer-links a:hover { color: #fff; text-decoration: underline; }
+    .footer-app {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+      text-decoration: none;
+      color: #fff;
+      transition: background 0.2s ease;
+    }
+    .footer-app:hover { background: rgba(255, 255, 255, 0.14); }
+    .footer-app-icon {
+      font-size: 1.75rem;
+      line-height: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-sm);
+    }
+    .footer-app-text { display: flex; flex-direction: column; text-align: left; }
+    .footer-app-name {
+      font-family: var(--font-family-heading);
+      font-weight: 700;
+      font-size: var(--font-size-base);
+    }
+    .footer-app-desc {
+      font-size: var(--font-size-sm);
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .footer-legal {
+      text-align: center;
+      font-size: var(--font-size-sm);
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: var(--spacing-xl);
+    }
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xl);
+        text-align: center;
+      }
+      .footer-app { justify-content: center; }
+      .footer-app-text { text-align: left; }
+    }
+
     .sticky-cta {
       display: none;
       position: fixed;
@@ -292,8 +392,8 @@
           <li><a href="#summer">Summer</a></li>
           <li><a href="#together">Gather</a></li>
           <li><a href="#packages">Packages</a></li>
-      <li><a href="#faq">FAQ</a></li>
           <li><a href="#faq">FAQ</a></li>
+          <li><a href="shop.html">Shop</a></li>
           <li><a href="#plan">Start Planning</a></li>
         </ul>
       </nav>
@@ -321,6 +421,8 @@
       <li><a href="#summer">Summer</a></li>
       <li><a href="#together">Gather</a></li>
       <li><a href="#packages">Packages</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="shop.html">Shop</a></li>
       <li><a href="#plan">Start Planning</a></li>
     </ul>
   </nav>
@@ -653,15 +755,43 @@
 
   <footer>
     <div class="theme-container">
-      <p class="text-center">
-        <a href="mailto:keith@whistlerbusinesssolutions.com">keith@whistlerbusinesssolutions.com</a>
-      </p>
-      <p class="text-center theme-text muted">
-        Also from Whistler Business Solutions — software:
-        <a href="https://birdnestfamilies.com" target="_blank" rel="noopener noreferrer">birdNest Families</a> ·
-        <a href="https://www.birdnestteams.com" target="_blank" rel="noopener noreferrer">birdNest Teams</a> ·
-        <a href="https://maisie-prod.whistlerbusinesssolutions.com/" target="_blank" rel="noopener noreferrer">Maisie Schedules</a>
-      </p>
+      <div class="footer-grid">
+        <div class="footer-col footer-brand">
+          <p class="footer-logo">WBS</p>
+          <p class="footer-tagline">Trips planned by Whistler locals.<br>Software made in the mountains.</p>
+          <a class="footer-email" href="mailto:keith@whistlerbusinesssolutions.com">keith@whistlerbusinesssolutions.com</a>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-heading">Explore</p>
+          <ul class="footer-links">
+            <li><a href="#packages">Trip packages</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="#plan">Start planning</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-heading">Apps by WBS</p>
+          <a class="footer-app" href="https://birdnestfamilies.com" target="_blank" rel="noopener noreferrer">
+            <span class="footer-app-icon" aria-hidden="true">🐣</span>
+            <span class="footer-app-text">
+              <span class="footer-app-name">BirdNest</span>
+              <span class="footer-app-desc">Baby Tracker</span>
+            </span>
+          </a>
+          <a class="footer-app" href="https://for-play.app" target="_blank" rel="noopener noreferrer">
+            <span class="footer-app-icon" aria-hidden="true">🏘️</span>
+            <span class="footer-app-text">
+              <span class="footer-app-name">For Play</span>
+              <span class="footer-app-desc">The Neighbourhood Connector</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <p class="footer-legal">© 2026 Whistler Business Solutions · Whistler, BC, Canada</p>
     </div>
   </footer>
 
