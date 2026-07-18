@@ -25,6 +25,10 @@
       </div>
     </section>
   </main>
+  <script>
+    // Payment completed — now it's safe to empty the cart.
+    try { localStorage.removeItem('wbs_cart_whistler'); } catch (e) { /* ignore */ }
+  </script>
   <script type="module" src="/src/app.js"></script>
 </body>
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
+import HoneydewImportModal from '../../components/HoneydewImportModal'
 import { useAuth } from '../../auth'
 
 const dollars = (cents) => (cents == null ? '—' : `$${(cents / 100).toFixed(2)}`)
@@ -9,6 +10,7 @@ const NETWORKS = ['', 'awin']
 
 const TYPE_BADGES = {
   merch: 'bg-green-100 text-green-700',
+  honeydew: 'bg-sky-100 text-sky-700',
   affiliate: 'bg-purple-100 text-purple-700',
   own_store: 'bg-green-100 text-green-700',
   dropship: 'bg-blue-100 text-blue-700',
@@ -23,6 +25,9 @@ export default function MerchProducts() {
   const [filter, setFilter] = useState(searchParams.get('filter') || 'all')
   const [error, setError] = useState('')
   const [importer, setImporter] = useState(null) // { products, store }
+  const [honeydewOpen, setHoneydewOpen] = useState(false)
+  const [syncNote, setSyncNote] = useState('')
+  const [syncing, setSyncing] = useState(false)
   const [affiliateForm, setAffiliateForm] = useState(null)
   const [busy, setBusy] = useState(false)
 
@@ -64,9 +69,11 @@ export default function MerchProducts() {
           ownerLabel: webs.find((w) => w.slug === p.store)?.name || p.store,
           name: p.title,
           imageUrl: p.imageUrl,
-          type: 'merch',
-          typeLabel: 'Merch · Printful',
-          detail: null,
+          type: p.supplier === 'honeydew' ? 'honeydew' : 'merch',
+          typeLabel: p.supplier === 'honeydew' ? 'Merch · Honeydew 🇺🇸' : 'Merch · Printful',
+          detail: p.supplier === 'honeydew' && p.supplierPriceCents != null
+            ? `cost ${dollars(p.supplierPriceCents)} · ${p.markupPct ?? 0}% markup`
+            : null,
           priceCents: p.priceCents,
           commission: null,
           active: p.active,
@@ -153,6 +160,20 @@ export default function MerchProducts() {
     }
   }
 
+  const syncHoneydew = async () => {
+    setSyncing(true)
+    setSyncNote('')
+    try {
+      const { updated, deactivated, missing } = await api('/api/commerce/admin/honeydew/sync', { method: 'POST' })
+      setSyncNote(`Honeydew sync: ${updated} updated, ${deactivated} deactivated, ${missing} gone from feed`)
+      reload()
+    } catch (err) {
+      setSyncNote(err.message)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   const openAffiliate = () => {
     setAffiliateForm({
       target: filter !== 'all' ? filter : websites[0] ? `web:${websites[0].slug}` : '',
@@ -204,6 +225,19 @@ export default function MerchProducts() {
             Import from Printful
           </button>
           <button
+            onClick={() => setHoneydewOpen(true)}
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            🇺🇸 Import from Honeydew
+          </button>
+          <button
+            onClick={syncHoneydew}
+            disabled={syncing}
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            {syncing ? 'Syncing…' : '↻ Sync Honeydew'}
+          </button>
+          <button
             onClick={openAffiliate}
             className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
           >
@@ -229,6 +263,7 @@ export default function MerchProducts() {
       </div>
 
       {error && <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
+      {syncNote && <div className="mb-4 rounded-md bg-sky-50 px-4 py-2 text-sm text-sky-700">{syncNote}</div>}
       {!rows && !error && <div className="text-gray-500">Loading…</div>}
 
       {visible?.length === 0 && (
@@ -321,6 +356,18 @@ export default function MerchProducts() {
             ))}
           </div>
         </Modal>
+      )}
+
+      {honeydewOpen && (
+        <HoneydewImportModal
+          defaultStore={filter.startsWith('web:') ? filter.slice(4) : 'birdnest'}
+          onClose={() => setHoneydewOpen(false)}
+          onImported={(result) => {
+            setHoneydewOpen(false)
+            reload()
+            window.alert(`Imported/updated ${result.imported} product(s), skipped ${result.skipped}.`)
+          }}
+        />
       )}
 
       {affiliateForm && (

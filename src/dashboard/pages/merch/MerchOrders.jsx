@@ -4,7 +4,17 @@ import StatusPill from '../../components/StatusPill'
 import { useAuth } from '../../auth'
 
 const STORES = ['', 'whistler', 'birdnest']
-const STATUSES = ['pending', 'paid', 'fulfilled', 'failed', 'refunded']
+const STATUSES = ['pending', 'paid', 'fulfilled', 'needs_fulfillment', 'failed', 'refunded']
+
+const itemLabel = (i) => `${i.quantity}× ${i.title}${i.size ? ` (${i.size})` : ''}`
+
+const shipLine = (addr) => {
+  if (!addr) return null
+  const a = addr.address || {}
+  return [addr.name, a.line1, a.line2, a.city, a.state, a.postal_code, a.country]
+    .filter(Boolean)
+    .join(', ')
+}
 const dollars = (cents) => (cents == null ? '—' : `$${(cents / 100).toFixed(2)}`)
 
 export default function MerchOrders() {
@@ -78,8 +88,29 @@ export default function MerchOrders() {
                     {new Date(o.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3 text-gray-600">{o.store}</td>
-                  <td className="max-w-56 truncate px-4 py-3 text-gray-700">
-                    {(o.items || []).map((i) => `${i.quantity}× ${i.title}`).join(', ') || '—'}
+                  <td className="max-w-56 px-4 py-3 text-gray-700">
+                    {o.status === 'needs_fulfillment' ? (
+                      <details>
+                        <summary className="cursor-pointer truncate font-medium text-amber-700">
+                          {(o.items || []).map(itemLabel).join(', ') || '—'}
+                        </summary>
+                        <div className="mt-1 space-y-1 text-xs text-gray-600">
+                          {(o.items || [])
+                            .filter((i) => (i.supplier || 'printful') !== 'printful')
+                            .map((i, idx) => (
+                              <div key={idx}>
+                                {itemLabel(i)} {i.sku && <span className="text-gray-400">SKU {i.sku}</span>}
+                              </div>
+                            ))}
+                          {shipLine(o.shippingAddress) && <div>📦 {shipLine(o.shippingAddress)}</div>}
+                          <div className="text-gray-400">Place the supplier order, then mark fulfilled.</div>
+                        </div>
+                      </details>
+                    ) : (
+                      <span className="block truncate">
+                        {(o.items || []).map(itemLabel).join(', ') || '—'}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-gray-600">{o.customerEmail || '—'}</td>
                   <td className="px-4 py-3 text-gray-700">{dollars(o.amountCents)}</td>

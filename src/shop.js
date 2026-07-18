@@ -21,9 +21,15 @@ try {
   if (ref) sessionStorage.setItem(REF_KEY, ref.slice(0, 32));
 } catch { /* storage unavailable — attribution is best-effort */ }
 
-// ===== Cart state (localStorage: { [productId]: quantity }) =====
+// ===== Cart state (localStorage: { [key]: quantity }) =====
+// Keys are "productId" or "productId|variantId" when a size was chosen.
 
 let productsById = {};
+
+const keyParts = (key) => {
+  const [productId, variantId] = key.split('|');
+  return { productId, variantId: variantId || null };
+};
 
 const loadCart = () => {
   try {
@@ -39,26 +45,29 @@ const saveCart = (cart) => {
   renderCartBar();
 };
 
-const setQty = (productId, qty) => {
+const setQty = (key, qty) => {
   const cart = loadCart();
-  if (qty <= 0) delete cart[productId];
-  else cart[productId] = Math.min(qty, 10);
+  if (qty <= 0) delete cart[key];
+  else cart[key] = Math.min(qty, 10);
   saveCart(cart);
   renderCartPanel();
 };
 
 const cartEntries = () =>
-  Object.entries(loadCart()).filter(([id]) => productsById[id]);
+  Object.entries(loadCart()).filter(([key]) => productsById[keyParts(key).productId]);
 
 const cartCount = () => cartEntries().reduce((n, [, q]) => n + q, 0);
 
 const cartTotalCents = () =>
-  cartEntries().reduce((sum, [id, q]) => sum + productsById[id].priceCents * q, 0);
+  cartEntries().reduce((sum, [key, q]) => sum + productsById[keyParts(key).productId].priceCents * q, 0);
 
 // ===== Checkout =====
 
 const checkout = async (button) => {
-  const items = cartEntries().map(([productId, quantity]) => ({ productId, quantity }));
+  const items = cartEntries().map(([key, quantity]) => {
+    const { productId, variantId } = keyParts(key);
+    return { productId, quantity, ...(variantId && { variantId }) };
+  });
   if (!items.length) return;
   button.disabled = true;
   const original = button.textContent;
@@ -74,7 +83,7 @@ const checkout = async (button) => {
     if (!res.ok) throw new Error(`Checkout failed (${res.status})`);
     const { url } = await res.json();
     if (!url) throw new Error('No checkout URL returned');
-    try { localStorage.removeItem(CART_KEY); } catch { /* ignore */ }
+    // Cart is cleared on the success page, so a canceled checkout keeps it.
     window.location.href = url;
   } catch (err) {
     console.error(err);
@@ -148,23 +157,25 @@ const renderCartPanel = () => {
       <p style="font-size:0.75rem;color:#9ca3af;margin-top:0.5rem;text-align:center;">Secure payment via Stripe · shipping calculated at checkout</p>
     </div>`;
   const list = inner.querySelector('#cart-items');
-  entries.forEach(([id, qty]) => {
-    const p = productsById[id];
+  entries.forEach(([key, qty]) => {
+    const { productId, variantId } = keyParts(key);
+    const p = productsById[productId];
+    const size = variantId && (p.variants || []).find((v) => v.id === variantId)?.title;
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;gap:0.75rem;align-items:center;margin-bottom:1rem;';
     row.innerHTML = `
       ${p.imageUrl ? `<img src="${p.imageUrl}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:8px;">` : ''}
       <div style="flex:1;min-width:0;">
         <div style="font-weight:600;font-size:0.9rem;">${p.title}</div>
-        <div style="color:#6b7280;font-size:0.85rem;">${formatPrice(p.priceCents, p.currency)}</div>
+        <div style="color:#6b7280;font-size:0.85rem;">${formatPrice(p.priceCents, p.currency)}${size ? ` · ${size}` : ''}</div>
       </div>
       <div style="display:flex;align-items:center;gap:0.4rem;">
         <button data-act="dec" style="width:26px;height:26px;border-radius:6px;border:1px solid #d1d5db;background:#fff;cursor:pointer;">−</button>
         <span style="min-width:1.2rem;text-align:center;">${qty}</span>
         <button data-act="inc" style="width:26px;height:26px;border-radius:6px;border:1px solid #d1d5db;background:#fff;cursor:pointer;">+</button>
       </div>`;
-    row.querySelector('[data-act="dec"]').addEventListener('click', () => setQty(id, qty - 1));
-    row.querySelector('[data-act="inc"]').addEventListener('click', () => setQty(id, qty + 1));
+    row.querySelector('[data-act="dec"]').addEventListener('click', () => setQty(key, qty - 1));
+    row.querySelector('[data-act="inc"]').addEventListener('click', () => setQty(key, qty + 1));
     list.appendChild(row);
   });
   inner.querySelector('#cart-checkout').addEventListener('click', (e) => checkout(e.currentTarget));
@@ -187,11 +198,23 @@ const renderProducts = (products) => {
       ${isAffiliate
         ? `<a class="theme-btn primary" href="${p.buyUrl}" target="_blank" rel="noopener sponsored">Buy Direct</a>
            ${p.partnerName ? `<p class="theme-text" style="font-size:0.8rem;opacity:0.7;margin-top:0.5rem;">Sold by ${p.partnerName}</p>` : ''}`
-        : `<button class="theme-btn primary" type="button">Add to Cart</button>`}
+        : `${p.variants?.length
+            ? `<select data-role="size" style="display:block;width:100%;margin-bottom:0.75rem;padding:0.5rem 0.75rem;border:1px solid #d1d5db;border-radius:8px;font-size:0.9rem;">
+                 ${p.variants.map((v, i, arr) => `<option value="${v.id}" ${v.available ? '' : 'disabled'} ${v.available && arr.findIndex((x) => x.available) === i ? 'selected' : ''}>${v.title}${v.available ? '' : ' — sold out'}</option>`).join('')}
+               </select>`
+            : ''}
+           <button class="theme-btn primary" type="button">Add to Cart</button>`}
     `;
     if (!isAffiliate) {
       card.querySelector('button').addEventListener('click', (e) => {
-        setQty(p.id, (loadCart()[p.id] || 0) + 1);
+        let key = p.id;
+        if (p.variants?.length) {
+          const select = card.querySelector('[data-role="size"]');
+          const variantId = select?.value || p.variants.find((v) => v.available)?.id;
+          if (!variantId) return;
+          key = `${p.id}|${variantId}`;
+        }
+        setQty(key, (loadCart()[key] || 0) + 1);
         const btn = e.currentTarget;
         btn.textContent = 'Added ✓';
         setTimeout(() => { btn.textContent = 'Add to Cart'; }, 1200);
