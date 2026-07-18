@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16324f"/>
+      <stop offset="1" stop-color="#0b1d33"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1024" height="1024" fill="url(#sky)"/>
+
+  <!-- back peak -->
+  <polygon points="640,255 940,625 340,625" fill="#a9c8e8"/>
+  <!-- back peak snowcap -->
+  <polygon points="640,255 700,329 664,311 640,340 610,305 580,329" fill="#eef4fa"/>
+
+  <!-- front peak -->
+  <polygon points="400,320 700,625 100,625" fill="#f4f7fa"/>
+  <!-- front peak shadow face -->
+  <polygon points="400,320 700,625 400,625" fill="#d3e1ef"/>
+
+  <!-- baseline -->
+  <rect x="100" y="625" width="840" height="10" fill="#3d6b99"/>
+
+  <!-- wordmark -->
+  <text x="512" y="840" text-anchor="middle"
+        font-family="Helvetica Neue, Helvetica, Arial, sans-serif"
+        font-size="230" font-weight="800" letter-spacing="18"
+        fill="#ffffff">WBS</text>
+</svg>
