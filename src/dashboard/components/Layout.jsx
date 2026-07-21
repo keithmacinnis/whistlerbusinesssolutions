@@ -14,7 +14,7 @@ export default function Layout() {
       <aside className="flex w-56 flex-col bg-gray-900 p-4">
         <div className="mb-6 px-3">
           <div className="text-lg font-bold text-white">WBS Dashboard</div>
-          <div className="text-xs text-gray-400">Voice Platform</div>
+          <div className="text-xs text-gray-400">Commerce Platform</div>
         </div>
         <nav className="flex flex-1 flex-col gap-1">
           <NavLink to="/" end className={navLinkClass}>Overview</NavLink>
@@ -27,6 +27,10 @@ export default function Layout() {
           <NavLink to="/merch/orders" className={navLinkClass}>Orders</NavLink>
           {user?.role === 'super_admin' && (
             <>
+              <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Marketing
+              </div>
+              <NavLink to="/marketing/qr-codes" className={navLinkClass}>QR Codes</NavLink>
               <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Admin
               </div>
