@@ -11,6 +11,14 @@ import MerchProducts from './pages/merch/MerchProducts'
 import MerchOrders from './pages/merch/MerchOrders'
 import OnlineStores from './pages/merch/OnlineStores'
 import QrCodes from './pages/marketing/QrCodes'
+import EducationResources from './pages/education/Resources'
+import EducationTeachers from './pages/education/Teachers'
+import EducationSessions from './pages/education/Sessions'
+import EducationSettlements from './pages/education/Settlements'
+import MyCourses from './pages/education/MyCourses'
+import EducationAvailability from './pages/education/Availability'
+import EducationStudents from './pages/education/Students'
+import MyEarnings from './pages/education/MyEarnings'
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
@@ -19,6 +27,12 @@ function RequireAuth({ children }) {
   }
   if (!user) return <Navigate to="/login" replace />
   return children
+}
+
+function TeacherHomeRedirect() {
+  const { user } = useAuth()
+  if (user?.role === 'teacher') return <Navigate to="/education/my-courses" replace />
+  return <Overview />
 }
 
 export default function App() {
@@ -34,7 +48,7 @@ export default function App() {
             </RequireAuth>
           }
         >
-          <Route index element={<Overview />} />
+          <Route index element={<TeacherHomeRedirect />} />
           <Route path="businesses" element={<BusinessList />} />
           <Route path="businesses/new" element={<NewBusinessWizard />} />
           <Route path="businesses/:id/*" element={<BusinessDetail />} />
@@ -43,6 +57,14 @@ export default function App() {
           <Route path="merch/orders" element={<MerchOrders />} />
           <Route path="marketing/qr-codes" element={<QrCodes />} />
           <Route path="users" element={<Users />} />
+          <Route path="education/resources" element={<EducationResources />} />
+          <Route path="education/teachers" element={<EducationTeachers />} />
+          <Route path="education/sessions" element={<EducationSessions />} />
+          <Route path="education/settlements" element={<EducationSettlements />} />
+          <Route path="education/my-courses" element={<MyCourses />} />
+          <Route path="education/availability" element={<EducationAvailability />} />
+          <Route path="education/students" element={<EducationStudents />} />
+          <Route path="education/my-earnings" element={<MyEarnings />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

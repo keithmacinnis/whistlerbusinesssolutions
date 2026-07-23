@@ -8,6 +8,8 @@ const navLinkClass = ({ isActive }) =>
 
 export default function Layout() {
   const { user, logout } = useAuth()
+  const isTeacher = user?.role === 'teacher'
+  const isSuper = user?.role === 'super_admin'
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -17,15 +19,40 @@ export default function Layout() {
           <div className="text-xs text-gray-400">Commerce Platform</div>
         </div>
         <nav className="flex flex-1 flex-col gap-1">
-          <NavLink to="/" end className={navLinkClass}>Overview</NavLink>
-          <NavLink to="/businesses" className={navLinkClass}>Call Centres</NavLink>
+          {!isTeacher && (
+            <>
+              <NavLink to="/" end className={navLinkClass}>Overview</NavLink>
+              <NavLink to="/businesses" className={navLinkClass}>Call Centres</NavLink>
+              <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Commerce
+              </div>
+              <NavLink to="/merch/stores" className={navLinkClass}>Online Stores</NavLink>
+              <NavLink to="/merch/products" className={navLinkClass}>Products</NavLink>
+              <NavLink to="/merch/orders" className={navLinkClass}>Orders</NavLink>
+            </>
+          )}
+
           <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-            Commerce
+            Education
           </div>
-          <NavLink to="/merch/stores" className={navLinkClass}>Online Stores</NavLink>
-          <NavLink to="/merch/products" className={navLinkClass}>Products</NavLink>
-          <NavLink to="/merch/orders" className={navLinkClass}>Orders</NavLink>
-          {user?.role === 'super_admin' && (
+          {isSuper && (
+            <>
+              <NavLink to="/education/resources" className={navLinkClass}>Resources</NavLink>
+              <NavLink to="/education/teachers" className={navLinkClass}>Teachers</NavLink>
+              <NavLink to="/education/sessions" className={navLinkClass}>Sessions</NavLink>
+              <NavLink to="/education/settlements" className={navLinkClass}>Settlements</NavLink>
+            </>
+          )}
+          {isTeacher && (
+            <>
+              <NavLink to="/education/my-courses" className={navLinkClass}>My courses</NavLink>
+              <NavLink to="/education/availability" className={navLinkClass}>Availability</NavLink>
+              <NavLink to="/education/students" className={navLinkClass}>Students</NavLink>
+              <NavLink to="/education/my-earnings" className={navLinkClass}>My earnings</NavLink>
+            </>
+          )}
+
+          {isSuper && (
             <>
               <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Marketing
@@ -40,6 +67,7 @@ export default function Layout() {
         </nav>
         <div className="border-t border-gray-800 pt-3">
           <div className="truncate px-3 text-sm text-gray-300">{user?.email || user?.name}</div>
+          <div className="truncate px-3 text-xs text-gray-500">{user?.role?.replace(/_/g, ' ')}</div>
           <button
             onClick={logout}
             className="mt-1 w-full rounded-md px-3 py-2 text-left text-sm text-gray-400 hover:bg-gray-800 hover:text-white"

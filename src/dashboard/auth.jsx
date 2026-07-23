@@ -16,10 +16,17 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (email, password) => {
-    const { token, user } = await api('/api/auth/login', { method: 'POST', body: { email, password } })
+    const { token, user: loggedIn } = await api('/api/auth/login', { method: 'POST', body: { email, password } })
     setToken(token)
-    setUser(user)
-    return user
+    // Refresh /me so teacherProfile (and businessIds) are present.
+    try {
+      const { user: full } = await api('/api/auth/me')
+      setUser(full)
+      return full
+    } catch {
+      setUser(loggedIn)
+      return loggedIn
+    }
   }
 
   const logout = () => {
