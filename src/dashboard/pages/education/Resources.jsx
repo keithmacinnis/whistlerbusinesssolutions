@@ -21,6 +21,18 @@ const EMPTY = {
 
 const dollars = (cents) => `$${((cents || 0) / 100).toFixed(2)}`
 
+const fileToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = String(reader.result || '')
+      const b64 = result.includes(',') ? result.split(',')[1] : result
+      resolve(b64)
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+
 export default function EducationResources() {
   const [resources, setResources] = useState(null)
   const [assets, setAssets] = useState([])
@@ -28,6 +40,7 @@ export default function EducationResources() {
   const [form, setForm] = useState(null)
   const [assetForm, setAssetForm] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [coverBusy, setCoverBusy] = useState(false)
 
   const reload = useCallback(() => {
     setError('')
@@ -68,22 +81,35 @@ export default function EducationResources() {
     }
   }
 
+  const uploadCover = async (file) => {
+    if (!file) return
+    setCoverBusy(true)
+    setError('')
+    try {
+      const contentBase64 = await fileToBase64(file)
+      const { imageUrl } = await api('/api/education/admin/upload-cover', {
+        method: 'POST',
+        body: {
+          contentBase64,
+          filename: file.name,
+          mimeType: file.type || 'image/jpeg',
+        },
+      })
+      setForm((prev) => (prev ? { ...prev, imageUrl } : prev))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setCoverBusy(false)
+    }
+  }
+
   const uploadAsset = async () => {
     setBusy(true)
     setError('')
     try {
       const { title, priceCents, file } = assetForm
       if (!file) throw new Error('Choose a PDF file')
-      const contentBase64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => {
-          const result = String(reader.result || '')
-          const b64 = result.includes(',') ? result.split(',')[1] : result
-          resolve(b64)
-        }
-        reader.onerror = reject
-        reader.readAsDataURL(file)
-      })
+      const contentBase64 = await fileToBase64(file)
       await api('/api/education/admin/digital-assets', {
         method: 'POST',
         body: {
@@ -228,7 +254,28 @@ export default function EducationResources() {
             <Field label="Description">
               <textarea className="input" rows={3} value={form.description || ''} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </Field>
-            <Field label="Image URL">
+            <Field label="Cover image">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                disabled={coverBusy}
+                onChange={(e) => uploadCover(e.target.files?.[0])}
+              />
+              {coverBusy && <p className="mt-1 text-xs text-gray-500">Uploading…</p>}
+              {form.imageUrl ? (
+                <div className="mt-2 flex items-start gap-3">
+                  <img src={form.imageUrl} alt="" className="h-20 w-20 rounded object-cover" />
+                  <button
+                    type="button"
+                    className="text-xs text-red-600 hover:underline"
+                    onClick={() => setForm({ ...form, imageUrl: '' })}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : null}
+            </Field>
+            <Field label="Or image URL (affiliate / external)">
               <input className="input" value={form.imageUrl || ''} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} />
             </Field>
             <Field label="External / affiliate URL">
@@ -248,7 +295,7 @@ export default function EducationResources() {
             </label>
             <div className="flex justify-end gap-2 pt-2">
               <button onClick={() => setForm(null)} className="rounded-md px-4 py-2 text-sm text-gray-600">Cancel</button>
-              <button disabled={busy} onClick={saveResource} className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
+              <button disabled={busy || coverBusy} onClick={saveResource} className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50">
                 Save
               </button>
             </div>
