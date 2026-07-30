@@ -117,7 +117,7 @@ export default function OnlineStores() {
               />
             </label>
             <p className="text-xs text-gray-400">
-              New websites start as affiliate storefronts (Buy Direct products). Merch checkout with
+              New websites start as affiliate storefronts (See Pricing &amp; Buy products). Merch checkout with
               Printful fulfillment is currently available on the two original stores.
             </p>
             <button
