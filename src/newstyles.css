@@ -142,7 +142,9 @@ html, body {
 
 /* Button Component */
 .theme-btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: var(--spacing-md) var(--spacing-xl);
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -151,8 +153,10 @@ html, body {
   border: none;
   cursor: pointer;
   font-size: var(--font-size-base);
+  line-height: 1.2;
   text-align: center;
   min-height: 44px;
+  box-sizing: border-box;
 }
 
 .theme-btn.primary {
