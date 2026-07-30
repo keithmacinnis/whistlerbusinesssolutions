@@ -204,7 +204,7 @@ const renderProducts = (products) => {
         <div class="shop-card-footer">
           ${isAffiliate
             ? `<a class="btn-buy-direct" href="${p.buyUrl}" target="_blank" rel="noopener sponsored">
-                 See Pricing &amp; Buy <span class="ext-icon" aria-hidden="true">↗</span>
+                 Select This Card <span class="ext-icon" aria-hidden="true">↗</span>
                </a>
                ${p.partnerName ? `<p class="shop-card-sold-by">Sold by ${p.partnerName}</p>` : ''}`
             : `${p.variants?.length
