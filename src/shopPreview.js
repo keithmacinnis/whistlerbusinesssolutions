@@ -1,5 +1,5 @@
 // Landing-page teaser for the shop: pulls a few live products so visitors
-// see real gear and gift cards before clicking through to the full store.
+// see real gift cards before clicking through to the full store.
 // Read-only — no cart/checkout logic here, every card links to shop.html.
 const RAW_API_BASE = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com';
 const API_BASE = /^https?:\/\//.test(RAW_API_BASE) ? RAW_API_BASE : `https://${RAW_API_BASE}`;
