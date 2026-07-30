@@ -833,6 +833,12 @@ header h1 span {
   margin: var(--spacing-xl) 0 0;
 }
 
+.hero-cta .theme-btn {
+  white-space: nowrap;
+  padding-left: var(--spacing-2xl);
+  padding-right: var(--spacing-2xl);
+}
+
 .hero-features {
   display: flex;
   justify-content: center;
