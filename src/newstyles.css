@@ -517,6 +517,22 @@ header h1 span {
   outline: none;
 }
 
+/* Primary CTA pulled out of the nav's plain-link styling */
+#main-nav a.nav-cta {
+  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+  color: #fff;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-full);
+  margin-left: var(--spacing-sm);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+#main-nav a.nav-cta:hover, #main-nav a.nav-cta:focus {
+  background: linear-gradient(135deg, #3730a3, #0891b2);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
 /* Theme Toggle */
 #theme-toggle {
   background: transparent;
@@ -761,6 +777,10 @@ body.light-mode .mobile-nav a {
   background: var(--color-bg-tertiary);
 }
 
+.mobile-nav a.nav-cta {
+  color: var(--color-accent-primary) !important;
+}
+
 .mobile-nav-close {
   position: absolute;
   top: var(--spacing-lg);
@@ -781,6 +801,66 @@ body.light-mode .mobile-nav-close {
   color: var(--color-accent-primary);
 }
 
+/* Mobile variant of the desktop hover sub-menu — click-to-expand instead */
+.mobile-nav .services-menu {
+  position: static;
+}
+
+.mobile-nav .services-menu::after {
+  display: none;
+}
+
+.mobile-nav .services-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 15px 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.mobile-nav .services-toggle::after {
+  content: '▼';
+  font-size: 12px;
+  opacity: 0.6;
+  transition: transform var(--transition-normal);
+}
+
+.mobile-nav .services-toggle.active::after {
+  transform: rotate(180deg);
+}
+
+.mobile-nav .sub-menu {
+  display: none;
+  position: static;
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  margin: 0 0 10px;
+  min-width: auto;
+}
+
+.mobile-nav .sub-menu.active {
+  display: block;
+}
+
+.mobile-nav .sub-menu li {
+  border-bottom: none;
+  padding-left: 20px;
+}
+
+.mobile-nav .sub-menu a {
+  padding: 10px 0;
+  font-size: 16px;
+}
+
 /* ========================================
    SUB-MENU STYLES
    ======================================== */
@@ -799,7 +879,8 @@ body.light-mode .mobile-nav-close {
   z-index: 10;
 }
 
-.services-menu:hover .sub-menu {
+.services-menu:hover .sub-menu,
+.services-menu.active .sub-menu {
   display: block;
 }
 

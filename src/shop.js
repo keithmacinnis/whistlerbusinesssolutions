@@ -188,22 +188,34 @@ const renderProducts = (products) => {
   grid.innerHTML = '';
   products.forEach((p) => {
     const card = document.createElement('div');
-    card.className = 'theme-card';
+    card.className = 'shop-card';
     const isAffiliate = p.kind === 'affiliate';
+    const badgeLabel = isAffiliate ? 'Digital · Opens partner site' : 'Ships from Whistler';
     card.innerHTML = `
-      ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy" style="width:100%;border-radius:8px;margin-bottom:1rem;">` : ''}
-      <h3 class="theme-heading h3">${p.title}</h3>
-      ${p.description ? `<p class="theme-text">${p.description}</p>` : ''}
-      ${p.priceCents != null ? `<p class="theme-text"><strong>${formatPrice(p.priceCents, p.currency)}</strong></p>` : ''}
-      ${isAffiliate
-        ? `<a class="theme-btn primary" href="${p.buyUrl}" target="_blank" rel="noopener sponsored">Buy Direct</a>
-           ${p.partnerName ? `<p class="theme-text" style="font-size:0.8rem;opacity:0.7;margin-top:0.5rem;">Sold by ${p.partnerName}</p>` : ''}`
-        : `${p.variants?.length
-            ? `<select data-role="size" style="display:block;width:100%;margin-bottom:0.75rem;padding:0.5rem 0.75rem;border:1px solid #d1d5db;border-radius:8px;font-size:0.9rem;">
-                 ${p.variants.map((v, i, arr) => `<option value="${v.id}" ${v.available ? '' : 'disabled'} ${v.available && arr.findIndex((x) => x.available) === i ? 'selected' : ''}>${v.title}${v.available ? '' : ' — sold out'}</option>`).join('')}
-               </select>`
-            : ''}
-           <button class="theme-btn primary" type="button">Add to Cart</button>`}
+      <div class="shop-card-media">
+        ${p.imageUrl
+          ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">`
+          : `<div class="shop-card-media-empty" aria-hidden="true">🏔️</div>`}
+        <span class="shop-card-badge">${badgeLabel}</span>
+      </div>
+      <div class="shop-card-body">
+        <h3 class="shop-card-title">${p.title}</h3>
+        ${p.description ? `<p class="shop-card-desc">${p.description}</p>` : ''}
+        ${p.priceCents != null ? `<p class="shop-card-price">${formatPrice(p.priceCents, p.currency)}</p>` : ''}
+        <div class="shop-card-footer">
+          ${isAffiliate
+            ? `<a class="btn-buy-direct" href="${p.buyUrl}" target="_blank" rel="noopener sponsored">
+                 Buy Direct <span class="ext-icon" aria-hidden="true">↗</span>
+               </a>
+               ${p.partnerName ? `<p class="shop-card-sold-by">Sold by ${p.partnerName}</p>` : ''}`
+            : `${p.variants?.length
+                ? `<select class="shop-card-select" data-role="size">
+                     ${p.variants.map((v, i, arr) => `<option value="${v.id}" ${v.available ? '' : 'disabled'} ${v.available && arr.findIndex((x) => x.available) === i ? 'selected' : ''}>${v.title}${v.available ? '' : ' — sold out'}</option>`).join('')}
+                   </select>`
+                : ''}
+               <button class="theme-btn primary btn-add-cart" type="button">Add to Cart</button>`}
+        </div>
+      </div>
     `;
     if (!isAffiliate) {
       card.querySelector('button').addEventListener('click', (e) => {
