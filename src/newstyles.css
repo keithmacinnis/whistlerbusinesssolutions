@@ -1218,7 +1218,14 @@ footer {
     gap: var(--spacing-xl);
     text-align: center;
   }
-  .footer-app { justify-content: center; }
+  /* Same-width cards, left-aligned rows so icons stack in a column like desktop */
+  .footer-app {
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 280px;
+    margin-inline: auto;
+    text-align: left;
+  }
   .footer-app-text { text-align: left; }
 }
 
