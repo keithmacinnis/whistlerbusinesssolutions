@@ -16,6 +16,31 @@ const TYPE_BADGES = {
   dropship: 'bg-blue-100 text-blue-700',
 }
 
+const EMPTY_AFFILIATE = {
+  mode: 'create',
+  target: '',
+  name: '',
+  description: '',
+  imageUrl: '',
+  partnerUrl: '',
+  partnerName: '',
+  network: 'awin',
+  priceCents: '',
+  commissionPct: '',
+}
+
+const fileToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = String(reader.result || '')
+      const comma = result.indexOf(',')
+      resolve(comma >= 0 ? result.slice(comma + 1) : result)
+    }
+    reader.onerror = () => reject(new Error('Failed to read file'))
+    reader.readAsDataURL(file)
+  })
+
 export default function MerchProducts() {
   const { user } = useAuth()
   const [searchParams] = useSearchParams()
@@ -28,8 +53,10 @@ export default function MerchProducts() {
   const [honeydewOpen, setHoneydewOpen] = useState(false)
   const [syncNote, setSyncNote] = useState('')
   const [syncing, setSyncing] = useState(false)
-  const [affiliateForm, setAffiliateForm] = useState(null)
+  const [productForm, setProductForm] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [imageBusy, setImageBusy] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   const isAdmin = user?.role === 'super_admin'
 
@@ -64,52 +91,73 @@ export default function MerchProducts() {
       const unified = [
         ...merch.map((p) => ({
           rowId: `m:${p.id}`,
+          id: p.id,
           source: 'merch',
           owner: `web:${p.store}`,
           ownerLabel: webs.find((w) => w.slug === p.store)?.name || p.store,
           name: p.title,
+          description: p.description || '',
           imageUrl: p.imageUrl,
+          partnerUrl: '',
+          partnerName: '',
+          network: '',
           type: p.supplier === 'honeydew' ? 'honeydew' : 'merch',
           typeLabel: p.supplier === 'honeydew' ? 'Merch · Honeydew 🇺🇸' : 'Merch · Printful',
           detail: p.supplier === 'honeydew' && p.supplierPriceCents != null
             ? `cost ${dollars(p.supplierPriceCents)} · ${p.markupPct ?? 0}% markup`
             : null,
           priceCents: p.priceCents,
+          commissionPct: null,
           commission: null,
           active: p.active,
           patchPath: `/api/commerce/admin/products/${p.id}`,
+          editable: true,
         })),
         ...webAff.flat().map((p) => ({
           rowId: `wa:${p.id}`,
+          id: p.id,
           source: 'webaff',
           owner: `web:${p._web.slug}`,
           ownerLabel: p._web.name,
           name: p.name,
+          description: p.description || '',
           imageUrl: p.imageUrl,
+          partnerUrl: p.partnerUrl || '',
+          partnerName: p.partnerName || '',
+          network: p.network || '',
           type: 'affiliate',
           typeLabel: `Affiliate${p.network ? ` · ${p.network}` : ''}`,
           detail: p.partnerName,
           priceCents: p.priceCents,
+          commissionPct: p.commissionPct,
           commission: p.commissionPct != null ? `${p.commissionPct}%` : null,
           active: p.active,
           patchPath: `/api/commerce/admin/affiliate-products/${p.id}`,
+          editable: true,
         })),
         ...ccProds.flat().map((p) => ({
           rowId: `cc:${p.id}`,
+          id: p.id,
           source: 'ccprod',
           owner: `cc:${p._cc.id}`,
           ownerLabel: `📞 ${p._cc.name}`,
           name: p.name,
+          description: p.description || '',
           imageUrl: p.imageUrl,
+          partnerUrl: p.partnerUrl || '',
+          partnerName: p.partnerName || '',
+          network: p.network || '',
           type: p.kind || 'affiliate',
           typeLabel:
             (p.kind === 'own_store' ? 'Our store' : p.kind === 'dropship' ? 'Dropship' : 'Affiliate') +
             (p.network ? ` · ${p.network}` : ''),
           detail: p.partnerName,
           priceCents: p.priceCents,
+          commissionPct: p.commissionPct,
           commission: p.commissionPct != null ? `${p.commissionPct}%` : null,
           active: p.active,
           patchPath: `/api/voice/products/${p.id}`,
+          editable: true,
         })),
       ]
       setRows(unified)
@@ -174,49 +222,135 @@ export default function MerchProducts() {
     }
   }
 
-  const openAffiliate = () => {
-    setAffiliateForm({
+  const openCreateAffiliate = () => {
+    setProductForm({
+      ...EMPTY_AFFILIATE,
       target: filter !== 'all' ? filter : websites[0] ? `web:${websites[0].slug}` : '',
-      name: '', partnerUrl: '', partnerName: '', network: 'awin', priceCents: '', commissionPct: '',
     })
   }
 
-  const saveAffiliate = async () => {
-    const f = affiliateForm
-    const body = {
-      name: f.name,
-      partnerUrl: f.partnerUrl,
-      partnerName: f.partnerName || null,
-      network: f.network || null,
-      priceCents: f.priceCents === '' ? null : Math.round(parseFloat(f.priceCents) * 100),
-      commissionPct: f.commissionPct === '' ? null : parseFloat(f.commissionPct),
+  const openEdit = (row) => {
+    if (row.source === 'merch') {
+      setProductForm({
+        mode: 'edit',
+        source: 'merch',
+        id: row.id,
+        patchPath: row.patchPath,
+        target: row.owner,
+        name: row.name || '',
+        description: row.description || '',
+        imageUrl: row.imageUrl || '',
+        partnerUrl: '',
+        partnerName: '',
+        network: '',
+        priceCents: row.priceCents != null ? (row.priceCents / 100).toFixed(2) : '',
+        commissionPct: '',
+      })
+      return
     }
+    setProductForm({
+      mode: 'edit',
+      source: row.source,
+      id: row.id,
+      patchPath: row.patchPath,
+      target: row.owner,
+      name: row.name || '',
+      description: row.description || '',
+      imageUrl: row.imageUrl || '',
+      partnerUrl: row.partnerUrl || '',
+      partnerName: row.partnerName || '',
+      network: row.network || '',
+      priceCents: row.priceCents != null ? (row.priceCents / 100).toFixed(2) : '',
+      commissionPct: row.commissionPct != null ? String(row.commissionPct) : '',
+    })
+  }
+
+  const uploadImage = async (file) => {
+    if (!file || !productForm) return
+    setImageBusy(true)
+    setError('')
     try {
-      if (f.target.startsWith('web:')) {
-        const site = websites.find((w) => w.slug === f.target.slice(4))
-        await api(`/api/commerce/admin/websites/${site.id}/affiliate-products`, { method: 'POST', body })
-      } else {
-        await api(`/api/voice/businesses/${f.target.slice(3)}/products`, {
-          method: 'POST',
-          body: { ...body, kind: 'affiliate' },
+      const contentBase64 = await fileToBase64(file)
+      const { imageUrl } = await api('/api/commerce/admin/upload-product-image', {
+        method: 'POST',
+        body: {
+          contentBase64,
+          filename: file.name,
+          mimeType: file.type || 'image/jpeg',
+        },
+      })
+      setProductForm((prev) => (prev ? { ...prev, imageUrl } : prev))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setImageBusy(false)
+    }
+  }
+
+  const saveProduct = async () => {
+    const f = productForm
+    if (!f) return
+    setSaving(true)
+    setError('')
+    try {
+      if (f.mode === 'edit' && f.source === 'merch') {
+        await api(f.patchPath, {
+          method: 'PATCH',
+          body: {
+            title: f.name.trim(),
+            description: f.description || null,
+            imageUrl: f.imageUrl || null,
+            priceCents: f.priceCents === '' ? null : Math.round(parseFloat(f.priceCents) * 100),
+          },
         })
+      } else {
+        const body = {
+          name: f.name.trim(),
+          description: f.description || null,
+          imageUrl: f.imageUrl || null,
+          partnerUrl: f.partnerUrl.trim(),
+          partnerName: f.partnerName || null,
+          network: f.network || null,
+          priceCents: f.priceCents === '' ? null : Math.round(parseFloat(f.priceCents) * 100),
+          commissionPct: f.commissionPct === '' ? null : parseFloat(f.commissionPct),
+        }
+        if (f.mode === 'create') {
+          if (f.target.startsWith('web:')) {
+            const site = websites.find((w) => w.slug === f.target.slice(4))
+            await api(`/api/commerce/admin/websites/${site.id}/affiliate-products`, { method: 'POST', body })
+          } else {
+            await api(`/api/voice/businesses/${f.target.slice(3)}/products`, {
+              method: 'POST',
+              body: { ...body, kind: 'affiliate' },
+            })
+          }
+        } else {
+          await api(f.patchPath, { method: 'PATCH', body })
+        }
       }
-      setAffiliateForm(null)
+      setProductForm(null)
       reload()
     } catch (err) {
       setError(err.message)
+    } finally {
+      setSaving(false)
     }
   }
 
   if (!isAdmin) return <div className="text-gray-500">Commerce admin is limited to super admins.</div>
 
   const visible = rows?.filter((r) => filter === 'all' || r.owner === filter)
+  const isMerchEdit = productForm?.mode === 'edit' && productForm?.source === 'merch'
+  const formValid = productForm
+    && productForm.name.trim()
+    && productForm.target
+    && (isMerchEdit || productForm.partnerUrl.trim())
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={openPrintful}
             disabled={busy}
@@ -238,10 +372,10 @@ export default function MerchProducts() {
             {syncing ? 'Syncing…' : '↻ Sync Honeydew'}
           </button>
           <button
-            onClick={openAffiliate}
+            onClick={openCreateAffiliate}
             className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
           >
-            + Add Affiliate
+            + Add Affiliate Product
           </button>
         </div>
       </div>
@@ -284,6 +418,7 @@ export default function MerchProducts() {
                 <th className="px-4 py-3">Price</th>
                 <th className="px-4 py-3">Commission</th>
                 <th className="px-4 py-3">Visible</th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -291,7 +426,9 @@ export default function MerchProducts() {
                 <tr key={r.rowId}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      {r.imageUrl && <img src={r.imageUrl} alt="" className="h-10 w-10 rounded object-cover" />}
+                      {r.imageUrl
+                        ? <img src={r.imageUrl} alt="" className="h-10 w-10 rounded object-cover" />
+                        : <div className="flex h-10 w-10 items-center justify-center rounded bg-gray-100 text-xs text-gray-400">—</div>}
                       <div className="font-medium text-gray-900">{r.name}</div>
                     </div>
                   </td>
@@ -312,6 +449,14 @@ export default function MerchProducts() {
                       }`}
                     >
                       {r.active ? 'Visible' : 'Hidden'}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => openEdit(r)}
+                      className="text-sm font-medium text-brand-600 hover:text-brand-700"
+                    >
+                      Edit
                     </button>
                   </td>
                 </tr>
@@ -370,58 +515,148 @@ export default function MerchProducts() {
         />
       )}
 
-      {affiliateForm && (
-        <Modal title="Add affiliate product" onClose={() => setAffiliateForm(null)}>
+      {productForm && (
+        <Modal
+          title={productForm.mode === 'create' ? 'Add affiliate product' : isMerchEdit ? 'Edit merch product' : 'Edit product'}
+          onClose={() => setProductForm(null)}
+        >
           <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700">
               Show on
               <select
-                value={affiliateForm.target}
-                onChange={(e) => setAffiliateForm({ ...affiliateForm, target: e.target.value })}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+                value={productForm.target}
+                disabled={productForm.mode === 'edit'}
+                onChange={(e) => setProductForm({ ...productForm, target: e.target.value })}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
               >
                 {websites.map((w) => (
                   <option key={w.slug} value={`web:${w.slug}`}>🌐 {w.name}</option>
                 ))}
-                {centres.map((c) => (
+                {!isMerchEdit && centres.map((c) => (
                   <option key={c.id} value={`cc:${c.id}`}>📞 {c.name}</option>
                 ))}
               </select>
             </label>
-            {[
-              ['name', 'Product name *'],
-              ['partnerUrl', 'Affiliate / deep link URL *'],
-              ['partnerName', 'Brand (shown as "Sold by …")'],
-              ['priceCents', 'Price (USD, optional)'],
-              ['commissionPct', 'Commission %'],
-            ].map(([key, label]) => (
-              <label key={key} className="block text-sm font-medium text-gray-700">
-                {label}
-                <input
-                  value={affiliateForm[key]}
-                  onChange={(e) => setAffiliateForm({ ...affiliateForm, [key]: e.target.value })}
-                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
-                />
-              </label>
-            ))}
+
             <label className="block text-sm font-medium text-gray-700">
-              Network
-              <select
-                value={affiliateForm.network}
-                onChange={(e) => setAffiliateForm({ ...affiliateForm, network: e.target.value })}
+              {isMerchEdit ? 'Product name *' : 'Product name *'}
+              <input
+                value={productForm.name}
+                onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
-              >
-                {NETWORKS.map((n) => (
-                  <option key={n} value={n}>{n || 'direct / other'}</option>
-                ))}
-              </select>
+              />
             </label>
+
+            <label className="block text-sm font-medium text-gray-700">
+              Short description
+              <input
+                value={productForm.description}
+                onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+              />
+            </label>
+
+            <div>
+              <div className="text-sm font-medium text-gray-700">Product image</div>
+              <div className="mt-1 flex items-start gap-3">
+                {productForm.imageUrl ? (
+                  <img src={productForm.imageUrl} alt="" className="h-20 w-20 rounded object-cover" />
+                ) : (
+                  <div className="flex h-20 w-20 items-center justify-center rounded border border-dashed border-gray-300 text-xs text-gray-400">
+                    No image
+                  </div>
+                )}
+                <div className="min-w-0 flex-1 space-y-2">
+                  <label className="inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    {imageBusy ? 'Uploading…' : 'Upload image'}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      className="hidden"
+                      disabled={imageBusy}
+                      onChange={(e) => {
+                        uploadImage(e.target.files?.[0])
+                        e.target.value = ''
+                      }}
+                    />
+                  </label>
+                  {productForm.imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setProductForm({ ...productForm, imageUrl: '' })}
+                      className="ml-2 text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      Remove
+                    </button>
+                  )}
+                  <input
+                    value={productForm.imageUrl}
+                    onChange={(e) => setProductForm({ ...productForm, imageUrl: e.target.value })}
+                    placeholder="Or paste an image URL"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {!isMerchEdit && (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Affiliate / deep link URL *
+                  <input
+                    value={productForm.partnerUrl}
+                    onChange={(e) => setProductForm({ ...productForm, partnerUrl: e.target.value })}
+                    placeholder="https://www.awin1.com/awclick.php?..."
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Brand (shown as &quot;Sold by …&quot;)
+                  <input
+                    value={productForm.partnerName}
+                    onChange={(e) => setProductForm({ ...productForm, partnerName: e.target.value })}
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Network
+                  <select
+                    value={productForm.network}
+                    onChange={(e) => setProductForm({ ...productForm, network: e.target.value })}
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+                  >
+                    {NETWORKS.map((n) => (
+                      <option key={n} value={n}>{n || 'direct / other'}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Commission %
+                  <input
+                    value={productForm.commissionPct}
+                    onChange={(e) => setProductForm({ ...productForm, commissionPct: e.target.value })}
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+                  />
+                </label>
+              </>
+            )}
+
+            <label className="block text-sm font-medium text-gray-700">
+              Price (optional)
+              <input
+                value={productForm.priceCents}
+                onChange={(e) => setProductForm({ ...productForm, priceCents: e.target.value })}
+                placeholder="e.g. 50.00"
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+              />
+            </label>
+
             <button
-              onClick={saveAffiliate}
-              disabled={!affiliateForm.name.trim() || !affiliateForm.partnerUrl.trim() || !affiliateForm.target}
+              onClick={saveProduct}
+              disabled={!formValid || saving || imageBusy}
               className="w-full rounded-md bg-brand-600 px-4 py-2 font-medium text-white hover:bg-brand-700 disabled:opacity-50"
             >
-              Add product
+              {saving ? 'Saving…' : productForm.mode === 'create' ? 'Add product' : 'Save changes'}
             </button>
           </div>
         </Modal>
