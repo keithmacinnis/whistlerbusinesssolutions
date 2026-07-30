@@ -18,10 +18,6 @@
       "destination": "/sms-consent.html"
     },
     {
-      "source": "/gift-cards",
-      "destination": "/gift-cards.html"
-    },
-    {
       "source": "/dashboard",
       "destination": "/dashboard.html"
     },

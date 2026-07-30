@@ -288,6 +288,177 @@ html, body {
 .theme-grid.two-col { grid-template-columns: 1fr 1fr; }
 .theme-grid.three-col { grid-template-columns: repeat(3, 1fr); }
 
+/* ========================================
+   SHOP PRODUCT CARDS
+   Shared between the full shop grid (shop.html) and the landing-page
+   shop preview (index.html) — image-forward, compact, clear CTAs.
+   ======================================== */
+.shop-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.shop-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-hover);
+}
+
+.shop-card-media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--color-bg-secondary);
+  overflow: hidden;
+}
+.shop-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.shop-card-media-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  opacity: 0.3;
+}
+.shop-card-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: rgba(17, 24, 39, 0.82);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-full);
+}
+body.dark-mode .shop-card-badge {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.shop-card-body {
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+.shop-card-title {
+  font-family: var(--font-family-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+.shop-card-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.shop-card-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0.15rem 0 0;
+}
+
+.shop-card-footer {
+  margin-top: auto;
+  padding-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.shop-card-select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+.btn-add-cart {
+  width: 100%;
+}
+.btn-buy-direct {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 2px solid var(--color-accent-primary);
+  color: var(--color-accent-primary);
+  background: transparent;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.btn-buy-direct:hover {
+  background: var(--color-accent-primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.btn-buy-direct .ext-icon {
+  font-size: 0.8em;
+}
+.shop-card-sold-by {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0.1rem 0 0;
+}
+
+/* Compact link-card variant used for the landing-page shop preview */
+.shop-preview-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-bg-primary);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.shop-preview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-hover);
+}
+.shop-preview-card-body {
+  padding: 0.85rem 1rem 1.1rem;
+}
+.shop-preview-card-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin: 0 0 0.25rem;
+  color: var(--color-text-primary);
+}
+.shop-preview-card-price {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
 /* Call to Action Component */
 .theme-cta {
   background: rgba(160, 180, 214, 0.1);
@@ -515,22 +686,6 @@ header h1 span {
   background: var(--color-bg-tertiary);
   border-radius: var(--radius-sm);
   outline: none;
-}
-
-/* Primary CTA pulled out of the nav's plain-link styling */
-#main-nav a.nav-cta {
-  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
-  color: #fff;
-  padding: 0.55rem 1.25rem;
-  border-radius: var(--radius-full);
-  margin-left: var(--spacing-sm);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-}
-
-#main-nav a.nav-cta:hover, #main-nav a.nav-cta:focus {
-  background: linear-gradient(135deg, #3730a3, #0891b2);
-  color: #fff;
-  transform: translateY(-1px);
 }
 
 /* Theme Toggle */
@@ -775,10 +930,6 @@ body.light-mode .mobile-nav a {
 .mobile-nav a:focus {
   color: var(--color-accent-primary);
   background: var(--color-bg-tertiary);
-}
-
-.mobile-nav a.nav-cta {
-  color: var(--color-accent-primary) !important;
 }
 
 .mobile-nav-close {

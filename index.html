@@ -241,6 +241,56 @@
       font-weight: 600;
     }
 
+    /* Gift card use cases */
+    .giftcard-uses {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-xl);
+      max-width: 900px;
+      margin: var(--spacing-2xl) auto 0;
+    }
+    .giftcard-use {
+      text-align: center;
+    }
+    .giftcard-use-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--color-bg-tertiary);
+      font-size: 1.5rem;
+      margin-bottom: var(--spacing-sm);
+    }
+    .giftcard-use h3 {
+      margin-bottom: var(--spacing-xs);
+    }
+    .giftcard-use p {
+      font-size: var(--font-size-sm);
+    }
+    .giftcard-brands {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--spacing-md) var(--spacing-xl);
+      margin-top: var(--spacing-2xl);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* Shop preview grid */
+    .shop-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--spacing-lg);
+      max-width: 900px;
+      margin: var(--spacing-2xl) auto 0;
+    }
+
     .faq-item {
       border-bottom: 1px solid var(--color-border);
       padding: var(--spacing-lg) 0;
@@ -401,9 +451,8 @@
               <li><a href="#faq">FAQ</a></li>
             </ul>
           </li>
-          <li><a href="gift-cards.html">Gift Cards</a></li>
           <li><a href="shop.html">Shop</a></li>
-          <li><a href="#plan" class="nav-cta">Start Planning</a></li>
+          <li><a href="#plan">Start Planning</a></li>
         </ul>
       </nav>
       <button id="theme-toggle" aria-label="Toggle theme">
@@ -436,9 +485,8 @@
           <li><a href="#faq">FAQ</a></li>
         </ul>
       </li>
-      <li><a href="gift-cards.html">Gift Cards</a></li>
       <li><a href="shop.html">Shop</a></li>
-      <li><a href="#plan" class="nav-cta">Start Planning</a></li>
+      <li><a href="#plan">Start Planning</a></li>
     </ul>
   </nav>
 
@@ -694,13 +742,62 @@
 
     <div class="theme-divider"></div>
 
-    <section id="gift-cards" class="theme-section" tabindex="-1">
+    <section id="gift-cards" class="theme-section ea-band" tabindex="-1">
       <div class="theme-container">
-        <div class="closer">
+        <div class="services-header text-center mb-4">
           <span class="section-eyebrow">For the Group</span>
           <h2 class="theme-heading h2">Outfit Travellers with Gift Cards</h2>
-          <p class="theme-text" style="margin-bottom: var(--spacing-xl);">Meals, condo groceries, coffee runs, and flex spend — instant Canadian gift cards your guests can use the day they arrive. Built for EAs and trip planners who already have enough vendors on the list.</p>
-          <a href="gift-cards.html" class="theme-btn primary">See Gift Card Options →</a>
+          <p class="theme-text" style="max-width: 640px; margin: var(--spacing-md) auto 0;">Meals, condo groceries, coffee runs, and flex spend — instant Canadian gift cards your guests can use the day they arrive. Built for EAs and trip planners who already have enough vendors on the list.</p>
+        </div>
+
+        <div class="giftcard-uses">
+          <div class="giftcard-use">
+            <span class="giftcard-use-icon" aria-hidden="true">🍽️</span>
+            <h3 class="theme-heading h4">Group dinners</h3>
+            <p class="theme-text">Uber Eats credit so nobody's splitting a bill after a long travel day.</p>
+          </div>
+          <div class="giftcard-use">
+            <span class="giftcard-use-icon" aria-hidden="true">🛒</span>
+            <h3 class="theme-heading h4">Condo groceries</h3>
+            <p class="theme-text">Sobeys cards stock the kitchen for the week — breakfasts, snacks, late-night runs.</p>
+          </div>
+          <div class="giftcard-use">
+            <span class="giftcard-use-icon" aria-hidden="true">☕</span>
+            <h3 class="theme-heading h4">Coffee &amp; thank-yous</h3>
+            <p class="theme-text">Tim Hortons cards for the morning huddle, or a quiet thank-you for the coordinator.</p>
+          </div>
+          <div class="giftcard-use">
+            <span class="giftcard-use-icon" aria-hidden="true">💳</span>
+            <h3 class="theme-heading h4">Flex spend</h3>
+            <p class="theme-text">Prepaid Mastercard when you want guests to choose — restaurants, gear, or a treat.</p>
+          </div>
+        </div>
+
+        <div class="giftcard-brands" aria-label="Example brands available">
+          <span>Uber Eats</span>
+          <span>Sobeys</span>
+          <span>Tim Hortons</span>
+          <span>Prepaid Mastercard</span>
+        </div>
+
+        <div class="text-center" style="margin-top: var(--spacing-2xl);">
+          <a href="shop.html" class="theme-btn primary">Shop Gift Cards →</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="theme-divider"></div>
+
+    <section id="shop-preview" class="theme-section" tabindex="-1">
+      <div class="theme-container">
+        <div class="services-header text-center mb-4">
+          <span class="section-eyebrow">From the Shop</span>
+          <h2 class="theme-heading h2">Gear &amp; Gift Cards, Ready to Send</h2>
+          <p class="theme-text" style="max-width: 560px; margin: var(--spacing-md) auto 0;">Whistler-inspired apparel and instant Canadian gift cards — one storefront, shipped or delivered in minutes.</p>
+        </div>
+        <div id="shop-preview-grid" class="shop-preview-grid"></div>
+        <div class="text-center" style="margin-top: var(--spacing-xl);">
+          <a href="shop.html" class="theme-btn secondary">Visit the Full Shop →</a>
         </div>
       </div>
     </section>
@@ -795,7 +892,7 @@
           <ul class="footer-links">
             <li><a href="#packages">Trip packages</a></li>
             <li><a href="#faq">FAQ</a></li>
-            <li><a href="gift-cards.html">Gift cards</a></li>
+            <li><a href="#gift-cards">Gift cards</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li><a href="#plan">Start planning</a></li>
           </ul>
@@ -831,6 +928,7 @@
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
   <script type="module" src="/src/app.js"></script>
+  <script type="module" src="/src/shopPreview.js"></script>
   <script type="module">
     // Winter / summer package tabs
     document.querySelectorAll('.season-tab').forEach(tab => {

@@ -190,13 +190,12 @@ const renderProducts = (products) => {
     const card = document.createElement('div');
     card.className = 'shop-card';
     const isAffiliate = p.kind === 'affiliate';
-    const badgeLabel = isAffiliate ? 'Digital · Opens partner site' : 'Ships from Whistler';
     card.innerHTML = `
       <div class="shop-card-media">
         ${p.imageUrl
           ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">`
           : `<div class="shop-card-media-empty" aria-hidden="true">🏔️</div>`}
-        <span class="shop-card-badge">${badgeLabel}</span>
+        ${!isAffiliate ? `<span class="shop-card-badge">Ships from Whistler</span>` : ''}
       </div>
       <div class="shop-card-body">
         <h3 class="shop-card-title">${p.title}</h3>

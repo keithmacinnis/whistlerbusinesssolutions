@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
-    content="Whistler-inspired apparel and gift sets from Whistler Business Solutions — printed on demand and shipped to your door.">
+    content="Whistler-inspired apparel printed on demand, plus instant Canadian gift cards — Uber Eats, Tim Hortons, Sobeys, and more — from Whistler Business Solutions.">
   <title>Shop | Whistler Business Solutions</title>
   <link rel="icon" href="/wbs-icon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
@@ -21,148 +21,17 @@
     gtag('config', 'G-RNSRY1HCJE');
   </script>
   <style>
-    /* ===== Shop product cards — compact, image-forward, clear CTAs ===== */
+    /* Two prominent columns instead of a dense auto-fill grid. */
     #shop-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: 1fr;
       gap: var(--spacing-xl);
       margin-bottom: var(--spacing-2xl);
     }
-
-    .shop-card {
-      display: flex;
-      flex-direction: column;
-      background: var(--color-bg-primary);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    }
-    .shop-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--color-border-hover);
-    }
-
-    .shop-card-media {
-      position: relative;
-      aspect-ratio: 1 / 1;
-      background: var(--color-bg-secondary);
-      overflow: hidden;
-    }
-    .shop-card-media img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .shop-card-media-empty {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      opacity: 0.3;
-    }
-    .shop-card-badge {
-      position: absolute;
-      top: 0.75rem;
-      left: 0.75rem;
-      background: rgba(17, 24, 39, 0.82);
-      color: #fff;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.6rem;
-      border-radius: var(--radius-full);
-    }
-
-    .shop-card-body {
-      padding: 1.25rem 1.25rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      flex: 1;
-    }
-    .shop-card-title {
-      font-family: var(--font-family-heading);
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin: 0;
-      color: var(--color-text-primary);
-    }
-    .shop-card-desc {
-      font-size: 0.875rem;
-      color: var(--color-text-muted);
-      margin: 0;
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .shop-card-price {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--color-text-primary);
-      margin: 0.15rem 0 0;
-    }
-
-    .shop-card-footer {
-      margin-top: auto;
-      padding-top: 0.85rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .shop-card-select {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      font-size: 0.875rem;
-      background: var(--color-bg-primary);
-      color: var(--color-text-primary);
-    }
-    .btn-add-cart {
-      width: 100%;
-    }
-    .btn-buy-direct {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      width: 100%;
-      min-height: 44px;
-      padding: 0.7rem 1rem;
-      border-radius: var(--radius-md);
-      font-weight: 600;
-      font-size: 0.95rem;
-      border: 2px solid var(--color-accent-primary);
-      color: var(--color-accent-primary);
-      background: transparent;
-      text-decoration: none;
-      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-    }
-    .btn-buy-direct:hover {
-      background: var(--color-accent-primary);
-      color: #fff;
-      transform: translateY(-2px);
-    }
-    .btn-buy-direct .ext-icon {
-      font-size: 0.8em;
-    }
-    .shop-card-sold-by {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-      text-align: center;
-      margin: 0.1rem 0 0;
-    }
-
-    body.dark-mode .shop-card-badge {
-      background: rgba(255, 255, 255, 0.12);
+    @media (min-width: 640px) {
+      #shop-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
@@ -178,9 +47,8 @@
         <ul id="main-nav">
           <li><a href="index.html#home">Home</a></li>
           <li><a href="index.html#packages">Packages</a></li>
-          <li><a href="gift-cards.html">Gift Cards</a></li>
           <li><a href="shop.html" aria-current="page">Shop</a></li>
-          <li><a href="index.html#plan" class="nav-cta">Start Planning</a></li>
+          <li><a href="index.html#plan">Start Planning</a></li>
         </ul>
       </nav>
       <button id="theme-toggle" aria-label="Toggle theme">
@@ -201,9 +69,8 @@
     <ul>
       <li><a href="index.html#home">Home</a></li>
       <li><a href="index.html#packages">Packages</a></li>
-      <li><a href="gift-cards.html">Gift Cards</a></li>
       <li><a href="shop.html">Shop</a></li>
-      <li><a href="index.html#plan" class="nav-cta">Start Planning</a></li>
+      <li><a href="index.html#plan">Start Planning</a></li>
     </ul>
   </nav>
 
@@ -212,11 +79,7 @@
       <div class="theme-container">
         <div class="services-header text-center mb-4">
           <h2 class="theme-heading h2">Whistler Shop</h2>
-          <p class="theme-text">Whistler-inspired apparel and gift sets — printed on demand and shipped to your door.</p>
-          <p class="theme-text" style="margin-top: var(--spacing-md);">
-            Need digital gift cards for travellers?
-            <a href="gift-cards.html">Canadian gift cards for trip planners →</a>
-          </p>
+          <p class="theme-text">Whistler-inspired apparel printed on demand, plus instant Canadian gift cards — Uber Eats, Tim Hortons, Sobeys, and more — for outfitting your whole group.</p>
         </div>
         <div id="shop-status" class="theme-text text-center"></div>
         <div id="shop-grid"></div>
