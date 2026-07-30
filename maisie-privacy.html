@@ -43,10 +43,6 @@
           <li><a href="index.html#contact">Contact</a></li>
         </ul>
       </nav>
-      <button id="theme-toggle" aria-label="Toggle theme">
-        <span class="theme-icon dark-mode-icon" aria-hidden="true">&#x1F319;</span>
-        <span class="theme-icon light-mode-icon" aria-hidden="true">&#x2600;</span>
-      </button>
       <button class="hamburger-menu" aria-label="Toggle mobile menu">
         <span></span>
         <span></span>
@@ -77,45 +73,26 @@
 <style>
   .wbslogotext,
   .wbslogotext a {
-    color: #000000 !important; /* Black for both modes, override defaults */
+    color: #000000 !important;
     text-decoration: none;
-  }
-  body.light-mode .wbslogotext,
-  body.light-mode .wbslogotext a {
-    color: #000000 !important; /* Explicitly black in light mode */
-  }
-  body.dark-mode .wbslogotext,
-  body.dark-mode .wbslogotext a {
-    color: #ffffff !important; /* White in dark mode */
   }
   p a {
     color: #007bff;
     text-decoration: none;
   }
-  body.light-mode #privacy ul a {
+  #privacy ul a {
     color: #000000;
     text-decoration: underline;
   }
-  body.light-mode #privacy ul a:hover,
-  body.light-mode #privacy ul a:focus {
+  #privacy ul a:hover,
+  #privacy ul a:focus {
     color: #000000;
     background: rgba(0, 0, 0, 0.1);
-  }
-  body.dark-mode #privacy ul a {
-    color: #1e90ff;
-    text-decoration: underline;
-  }
-  body.dark-mode #privacy ul a:hover,
-  body.dark-mode #privacy ul a:focus {
-    color: #1e90ff;
-    background: rgba(255, 255, 255, 0.1);
   }
   h2 {
     text-align: left;
   }
 </style>
-    
-  </style>
   <main>
     <section id="privacy" class="section" tabindex="-1">
       <div class="container">

@@ -7,19 +7,19 @@
    CSS CUSTOM PROPERTIES (VARIABLES)
    ======================================== */
 :root {
-  /* Colors - Light Theme */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8fafc;
-  --color-bg-tertiary: rgba(0, 0, 0, 0.05);
-  --color-text-primary: #1f2937;
-  --color-text-secondary: #374151;
-  --color-text-muted: #6b7280;
-  --color-accent-primary: #4f46e5;
-  --color-accent-secondary: #06b6d4;
+  /* Colors — dark base (single polished theme; light islands via .theme-light) */
+  --color-bg-primary: #1a1a1a;
+  --color-bg-secondary: #2C3E50;
+  --color-bg-tertiary: rgba(255, 255, 255, 0.05);
+  --color-text-primary: #f4f4f4;
+  --color-text-secondary: #e5e7eb;
+  --color-text-muted: #9ca3af;
+  --color-accent-primary: #6366f1;
+  --color-accent-secondary: #8b5cf6;
   --color-accent-success: #10b981;
   --color-accent-warning: #f59e0b;
-  --color-border: rgba(0, 0, 0, 0.1);
-  --color-border-hover: rgba(31, 41, 55, 0.3);
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-border-hover: rgba(160, 180, 214, 0.3);
   
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -56,20 +56,34 @@
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
+  color-scheme: dark;
 }
 
-/* Dark Theme Variables */
-body.dark-mode {
-  --color-bg-primary: #1a1a1a;
-  --color-bg-secondary: #2C3E50;
-  --color-bg-tertiary: rgba(255, 255, 255, 0.05);
-  --color-text-primary: #f4f4f4;
-  --color-text-secondary: #e5e7eb;
-  --color-text-muted: #9ca3af;
-  --color-accent-primary: #6366f1;
-  --color-accent-secondary: #8b5cf6;
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-border-hover: rgba(160, 180, 214, 0.3);
+/* Light surfaces — shop page + gift-card shop preview on the landing page */
+.theme-light {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8fafc;
+  --color-bg-tertiary: rgba(0, 0, 0, 0.05);
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #374151;
+  --color-text-muted: #6b7280;
+  --color-accent-primary: #4f46e5;
+  --color-accent-secondary: #06b6d4;
+  --color-border: rgba(0, 0, 0, 0.1);
+  --color-border-hover: rgba(31, 41, 55, 0.3);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.12);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  color-scheme: light;
+}
+
+/* Landing-page shop preview: full-bleed light band against the dark base */
+#shop-preview.theme-light {
+  background: var(--color-bg-secondary);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* ========================================
@@ -345,9 +359,6 @@ html, body {
   text-transform: uppercase;
   padding: 0.3rem 0.6rem;
   border-radius: var(--radius-full);
-}
-body.dark-mode .shop-card-badge {
-  background: rgba(255, 255, 255, 0.12);
 }
 
 .shop-card-body {
@@ -692,25 +703,7 @@ header h1 span {
   outline: none;
 }
 
-/* Theme Toggle */
-#theme-toggle {
-  background: transparent;
-  border: none;
-  padding: var(--spacing-sm) var(--spacing-md);
-  margin-left: var(--spacing-md);
-  cursor: pointer;
-}
-
-.theme-icon {
-  font-size: 24px;
-  line-height: 1;
-  display: none;
-}
-
-body.dark-mode #theme-toggle .dark-mode-icon,
-body.light-mode #theme-toggle .light-mode-icon {
-  display: inline;
-}
+/* Theme toggle removed — single hybrid theme */
 
 /* ========================================
    HERO SECTION
@@ -845,7 +838,7 @@ body.light-mode #theme-toggle .light-mode-icon {
   border-radius: 2px;
 }
 
-body.light-mode .hamburger-menu span {
+body.theme-light .hamburger-menu span {
   background: #000;
 }
 
@@ -892,7 +885,7 @@ body.light-mode .hamburger-menu span {
   padding: 80px var(--spacing-lg) var(--spacing-lg);
 }
 
-body.light-mode .mobile-nav {
+body.theme-light .mobile-nav {
   background: #ffffff;
   border-left: 1px solid var(--color-border);
 }
@@ -926,7 +919,7 @@ body.light-mode .mobile-nav {
   transition: color var(--transition-normal);
 }
 
-body.light-mode .mobile-nav a {
+body.theme-light .mobile-nav a {
   color: #000;
 }
 
@@ -948,7 +941,7 @@ body.light-mode .mobile-nav a {
   padding: var(--spacing-sm);
 }
 
-body.light-mode .mobile-nav-close {
+body.theme-light .mobile-nav-close {
   color: #000;
 }
 
@@ -1053,7 +1046,7 @@ body.light-mode .mobile-nav-close {
   min-width: 200px;
 }
 
-body.light-mode .sub-menu {
+body.theme-light .sub-menu {
   background: #E5E8E8;
 }
 
@@ -2070,7 +2063,7 @@ footer {
 
 /* Tinted band to break up the flow of plain sections */
 .ea-band {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.06), rgba(6, 182, 212, 0.06));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(139, 92, 246, 0.1));
   border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
 }

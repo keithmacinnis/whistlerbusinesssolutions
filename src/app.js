@@ -20,25 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Apply saved theme from localStorage
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  const body = document.body;
-  if (savedTheme === 'dark') {
-    body.classList.add('dark-mode');
-    body.classList.remove('light-mode');
-  } else {
-    body.classList.add('light-mode');
-    body.classList.remove('dark-mode');
-  }
-  const themeToggle = document.getElementById('theme-toggle');
-  if (themeToggle) {
-    const lightIcon = themeToggle.querySelector('.light-mode-icon');
-    const darkIcon = themeToggle.querySelector('.dark-mode-icon');
-    lightIcon.classList.toggle('hidden', savedTheme !== 'light');
-    darkIcon.classList.toggle('hidden', savedTheme !== 'dark');
-  }
-
   // Mobile Navigation
+  const body = document.body;
   const hamburgerMenu = document.querySelector('.hamburger-menu');
   const mobileNav = document.querySelector('.mobile-nav');
   const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
@@ -162,22 +145,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   window.addEventListener('scroll', reveal);
-
-  // Theme toggle
-  function toggleTheme() {
-    body.classList.toggle('light-mode');
-    body.classList.toggle('dark-mode');
-    const lightIcon = themeToggle.querySelector('.light-mode-icon');
-    const darkIcon = themeToggle.querySelector('.dark-mode-icon');
-    lightIcon.classList.toggle('hidden');
-    darkIcon.classList.toggle('hidden');
-    const newTheme = body.classList.contains('light-mode') ? 'light' : 'dark';
-    localStorage.setItem('theme', newTheme);
-    console.log('Theme set to:', newTheme);
-  }
-
-  if (themeToggle) {
-    themeToggle.addEventListener('click', toggleTheme);
-  }
 });
 
