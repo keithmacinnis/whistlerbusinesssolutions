@@ -6,7 +6,7 @@ import HoneydewImportModal from '../../components/HoneydewImportModal'
 import { useAuth } from '../../auth'
 
 const dollars = (cents) => (cents == null ? '—' : `$${(cents / 100).toFixed(2)}`)
-const NETWORKS = ['', 'awin']
+const NETWORKS = ['', 'awin', 'cj']
 
 const TYPE_BADGES = {
   merch: 'bg-green-100 text-green-700',
@@ -606,7 +606,7 @@ export default function MerchProducts() {
                   <input
                     value={productForm.partnerUrl}
                     onChange={(e) => setProductForm({ ...productForm, partnerUrl: e.target.value })}
-                    placeholder="https://www.awin1.com/awclick.php?..."
+                    placeholder="https://www.kqzyfj.com/click-… or AWIN / partner URL"
                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
                   />
                 </label>

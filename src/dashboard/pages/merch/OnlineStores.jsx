@@ -10,6 +10,7 @@ export default function OnlineStores() {
   const [error, setError] = useState('')
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState({ name: '', domain: '' })
+  const [savingCta, setSavingCta] = useState(null)
 
   const reload = useCallback(() => {
     api('/api/commerce/admin/websites')
@@ -37,6 +38,22 @@ export default function OnlineStores() {
       reload()
     } catch (err) {
       setError(err.message)
+    }
+  }
+
+  const setCtaProduct = async (w, ctaProductId) => {
+    setError('')
+    setSavingCta(w.id)
+    try {
+      await api(`/api/commerce/admin/websites/${w.id}`, {
+        method: 'PATCH',
+        body: { ctaProductId: ctaProductId || null },
+      })
+      reload()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSavingCta(null)
     }
   }
 
@@ -85,6 +102,27 @@ export default function OnlineStores() {
               <div>🛍 {w.merchCount} merch product{w.merchCount === 1 ? '' : 's'}</div>
               <div>🤝 {w.affiliateCount} affiliate product{w.affiliateCount === 1 ? '' : 's'}</div>
             </div>
+
+            <label className="mt-4 block text-sm font-medium text-gray-700">
+              Primary CTA product
+              <select
+                value={w.ctaProductId || ''}
+                disabled={savingCta === w.id || !(w.affiliateProducts?.length)}
+                onChange={(e) => setCtaProduct(w, e.target.value)}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none disabled:bg-gray-50"
+              >
+                <option value="">None — use site defaults</option>
+                {(w.affiliateProducts || []).map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            </label>
+            <p className="mt-1 text-xs text-gray-400">
+              Landing-page &quot;Book a Stay&quot; CTAs use this product&apos;s tracked link
+              {w.ctaProduct ? ` (currently ${w.ctaProduct.name})` : ''}.
+              {!w.affiliateProducts?.length && ' Add an affiliate product first.'}
+            </p>
+
             <Link
               to={`/merch/products?filter=web:${w.slug}`}
               className="mt-4 inline-block text-sm font-medium text-brand-600 hover:underline"
@@ -123,7 +161,7 @@ export default function OnlineStores() {
             <button
               onClick={add}
               disabled={!form.name.trim() || !form.domain.trim()}
-              className="w-full rounded-md bg-brand-600 px-4 py-2 font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+              className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
             >
               Create website
             </button>

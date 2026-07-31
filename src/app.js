@@ -1,12 +1,11 @@
-// Where every call-to-action button points. Change these in one place.
+import { BOOKING_LINKS, whistlerStaysLink } from './affiliates/booking.js';
+
+// Legacy email/referral switch kept for pages that still use data-referral.
 const CONTACT_EMAIL = 'keith@whistlerbusinesssolutions.com';
-const REFERRAL_URL = 'https://www.whistler.com/'; // swap for the affiliate booking link once approved
-// Button state: 'email' collects inquiries by email; switch to 'referral' when the
-// Whistler.com affiliate booking link goes live.
+const REFERRAL_URL = 'https://www.whistler.com/';
 const BUTTON_MODE = 'email';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Point every CTA at the current destination based on the button state
   const mailto = `mailto:${CONTACT_EMAIL}?subject=Whistler%20Retreat%20Inquiry`;
   document.querySelectorAll('a[data-referral]').forEach(link => {
     if (BUTTON_MODE === 'referral') {
@@ -19,6 +18,61 @@ document.addEventListener('DOMContentLoaded', () => {
       link.removeAttribute('rel');
     }
   });
+
+  // Booking.com CJ affiliate — primary conversion path for stays + travel add-ons.
+  // Whistler stays CTAs prefer the store's dashboard-assigned CTA product (tracked /r/ link);
+  // hardcoded evergreen deep links remain the fallback until that loads.
+  const RAW_API = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com';
+  const API_BASE = /^https?:\/\//.test(RAW_API) ? RAW_API : `https://${RAW_API}`;
+  const STORE = 'whistler';
+
+  const bookingHref = {
+    whistler: (sid) => whistlerStaysLink(sid),
+    cta: (sid) => whistlerStaysLink(sid),
+    flights: () => BOOKING_LINKS.flights,
+    cars: () => BOOKING_LINKS.cars,
+    attractions: () => BOOKING_LINKS.attractions,
+    taxis: () => BOOKING_LINKS.taxis,
+    getaway: () => BOOKING_LINKS.getawayDeals,
+    homepage: () => BOOKING_LINKS.homepage,
+  };
+
+  const wireBookingLink = (link, href, kind, sid) => {
+    link.href = href;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer sponsored';
+    if (link.dataset.bookingWired) return;
+    link.dataset.bookingWired = '1';
+    link.addEventListener('click', () => {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'booking_affiliate_click', {
+          booking_kind: kind,
+          booking_sid: sid,
+        });
+      }
+    });
+  };
+
+  document.querySelectorAll('a[data-booking]').forEach((link) => {
+    const kind = link.dataset.booking;
+    const sid = link.dataset.bookingSid || 'wbs';
+    const resolve = bookingHref[kind];
+    if (!resolve) return;
+    wireBookingLink(link, resolve(sid), kind, sid);
+  });
+
+  // Overlay primary stay CTAs with the store CTA product when configured in the dashboard.
+  fetch(`${API_BASE}/api/commerce/products?store=${STORE}`)
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data) => {
+      const buyUrl = data?.cta?.buyUrl;
+      if (!buyUrl) return;
+      document.querySelectorAll('a[data-booking="whistler"], a[data-booking="cta"]').forEach((link) => {
+        const sid = link.dataset.bookingSid || 'wbs';
+        wireBookingLink(link, buyUrl, 'cta', sid);
+      });
+    })
+    .catch(() => { /* keep hardcoded Booking fallbacks */ });
 
   // Mobile Navigation
   const body = document.body;
