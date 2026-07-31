@@ -13,6 +13,13 @@ const formatPrice = (cents, currency) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: (currency || 'usd').toUpperCase() })
     .format((cents || 0) / 100);
 
+const escapeHtml = (value) =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
 // Voice-platform referral: /r/CODE links land here with ?ref=CODE. Keep it
 // for the session so the eventual purchase gets attributed to that call.
 const REF_KEY = 'wbs_ref';
@@ -204,7 +211,7 @@ const renderProducts = (products) => {
         <div class="shop-card-footer">
           ${isAffiliate
             ? `<a class="btn-buy-direct" href="${p.buyUrl}" target="_blank" rel="noopener sponsored">
-                 Select This Card <span class="ext-icon" aria-hidden="true">↗</span>
+                 ${escapeHtml(p.ctaLabel || 'Select This Card')} <span class="ext-icon" aria-hidden="true">↗</span>
                </a>
                ${p.partnerName ? `<p class="shop-card-sold-by">Sold by ${p.partnerName}</p>` : ''}`
             : `${p.variants?.length

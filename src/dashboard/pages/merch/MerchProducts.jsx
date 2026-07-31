@@ -25,6 +25,7 @@ const EMPTY_AFFILIATE = {
   partnerUrl: '',
   partnerName: '',
   network: 'awin',
+  ctaLabel: '',
   priceCents: '',
   commissionPct: '',
 }
@@ -125,6 +126,7 @@ export default function MerchProducts() {
           partnerUrl: p.partnerUrl || '',
           partnerName: p.partnerName || '',
           network: p.network || '',
+          ctaLabel: p.ctaLabel || '',
           type: 'affiliate',
           typeLabel: `Affiliate${p.network ? ` · ${p.network}` : ''}`,
           detail: p.partnerName,
@@ -147,6 +149,7 @@ export default function MerchProducts() {
           partnerUrl: p.partnerUrl || '',
           partnerName: p.partnerName || '',
           network: p.network || '',
+          ctaLabel: p.ctaLabel || '',
           type: p.kind || 'affiliate',
           typeLabel:
             (p.kind === 'own_store' ? 'Our store' : p.kind === 'dropship' ? 'Dropship' : 'Affiliate') +
@@ -243,6 +246,7 @@ export default function MerchProducts() {
         partnerUrl: '',
         partnerName: '',
         network: '',
+        ctaLabel: '',
         priceCents: row.priceCents != null ? (row.priceCents / 100).toFixed(2) : '',
         commissionPct: '',
       })
@@ -260,6 +264,7 @@ export default function MerchProducts() {
       partnerUrl: row.partnerUrl || '',
       partnerName: row.partnerName || '',
       network: row.network || '',
+      ctaLabel: row.ctaLabel || '',
       priceCents: row.priceCents != null ? (row.priceCents / 100).toFixed(2) : '',
       commissionPct: row.commissionPct != null ? String(row.commissionPct) : '',
     })
@@ -311,6 +316,7 @@ export default function MerchProducts() {
           partnerUrl: f.partnerUrl.trim(),
           partnerName: f.partnerName || null,
           network: f.network || null,
+          ctaLabel: f.ctaLabel?.trim() || null,
           priceCents: f.priceCents === '' ? null : Math.round(parseFloat(f.priceCents) * 100),
           commissionPct: f.commissionPct === '' ? null : parseFloat(f.commissionPct),
         }
@@ -617,6 +623,18 @@ export default function MerchProducts() {
                     onChange={(e) => setProductForm({ ...productForm, partnerName: e.target.value })}
                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
                   />
+                </label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Shop button label
+                  <input
+                    value={productForm.ctaLabel}
+                    onChange={(e) => setProductForm({ ...productForm, ctaLabel: e.target.value })}
+                    placeholder="Select This Card"
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+                  />
+                  <span className="mt-1 block text-xs text-gray-400">
+                    Shown on the shop card. Leave blank for &quot;Select This Card&quot; (gift cards). Use &quot;Select Dates&quot; for stays.
+                  </span>
                 </label>
                 <label className="block text-sm font-medium text-gray-700">
                   Network
