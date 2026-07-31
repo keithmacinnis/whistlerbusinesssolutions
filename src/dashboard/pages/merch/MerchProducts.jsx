@@ -450,6 +450,9 @@ export default function MerchProducts() {
                   <td className="px-4 py-3">
                     <button
                       onClick={() => toggleActive(r)}
+                      title={r.type === 'affiliate' || r.source === 'affiliate' || r.source === 'ccprod'
+                        ? 'Hide from shop only — still usable as a landing CTA'
+                        : 'Show or hide this product on the storefront'}
                       className={`rounded-full px-3 py-1 text-xs font-medium ${
                         r.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'
                       }`}

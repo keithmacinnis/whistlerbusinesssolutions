@@ -188,7 +188,9 @@ export default function OnlineStores() {
                       >
                         <option value="">None — use site default</option>
                         {(w.affiliateProducts || []).map((p) => (
-                          <option key={p.id} value={p.id}>{p.name}</option>
+                          <option key={p.id} value={p.id}>
+                            {p.name}{p.active === false ? ' (hidden from shop)' : ''}
+                          </option>
                         ))}
                       </select>
                     </label>
@@ -196,6 +198,7 @@ export default function OnlineStores() {
                 </div>
                 <p className="mt-2 text-xs text-gray-400">
                   Slot 1 drives primary stay buttons. Slots 2–5 map to Flights, Cars, Attractions, and Gift Cards on the plan section.
+                  Products marked Hidden still appear here for CTA use; they just stay off the shop.
                   {!w.affiliateProducts?.length && ' Add an affiliate product first.'}
                 </p>
               </div>
