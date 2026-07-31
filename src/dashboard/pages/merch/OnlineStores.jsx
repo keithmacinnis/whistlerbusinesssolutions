@@ -7,16 +7,16 @@ import { useAuth } from '../../auth'
 const MAX_CTA_SLOTS = 10
 
 const CTA_SLOT_META = [
-  { n: 1, name: 'Primary', ordinal: 'First (1st)' },
-  { n: 2, name: 'Secondary', ordinal: 'Second (2nd)' },
-  { n: 3, name: 'Tertiary', ordinal: 'Third (3rd)' },
-  { n: 4, name: 'Quaternary', ordinal: 'Fourth (4th)' },
-  { n: 5, name: 'Quinary', ordinal: 'Fifth (5th)' },
-  { n: 6, name: 'Senary', ordinal: 'Sixth (6th)' },
-  { n: 7, name: 'Septenary', ordinal: 'Seventh (7th)' },
-  { n: 8, name: 'Octonary', ordinal: 'Eighth (8th)' },
-  { n: 9, name: 'Nonary', ordinal: 'Ninth (9th)' },
-  { n: 10, name: 'Decenary', ordinal: 'Tenth (10th)' },
+  { n: 1, name: 'Primary' },
+  { n: 2, name: 'Secondary' },
+  { n: 3, name: 'Tertiary' },
+  { n: 4, name: 'Quaternary' },
+  { n: 5, name: 'Quinary' },
+  { n: 6, name: 'Senary' },
+  { n: 7, name: 'Septenary' },
+  { n: 8, name: 'Octonary' },
+  { n: 9, name: 'Nonary' },
+  { n: 10, name: 'Decenary' },
 ]
 
 export default function OnlineStores() {
@@ -178,7 +178,7 @@ export default function OnlineStores() {
                 <div className="space-y-3">
                   {CTA_SLOT_META.slice(0, slotCount).map((slot, index) => (
                     <label key={slot.n} className="block text-sm font-medium text-gray-700">
-                      {slot.name}: {slot.ordinal}
+                      {slot.name} CTA
                       <span className="ml-1 font-normal text-gray-400">cta-{slot.n}</span>
                       <select
                         value={w.ctaProductIds?.[index] || ''}
