@@ -20,15 +20,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Booking.com CJ affiliate — primary conversion path for stays + travel add-ons.
-  // Whistler stays CTAs prefer the store's dashboard-assigned CTA product (tracked /r/ link);
-  // hardcoded evergreen deep links remain the fallback until that loads.
+  // Dashboard CTA slots (cta-1 … cta-10) overlay these when assigned on the store.
   const RAW_API = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com';
   const API_BASE = /^https?:\/\//.test(RAW_API) ? RAW_API : `https://${RAW_API}`;
   const STORE = 'whistler';
 
+  const ctaFallback = {
+    1: (sid) => whistlerStaysLink(sid),
+    2: () => BOOKING_LINKS.flights,
+    3: () => BOOKING_LINKS.cars,
+    4: () => BOOKING_LINKS.attractions,
+    5: () => 'shop.html',
+  };
+
   const bookingHref = {
     whistler: (sid) => whistlerStaysLink(sid),
     cta: (sid) => whistlerStaysLink(sid),
+    'cta-1': (sid) => whistlerStaysLink(sid),
+    'cta-2': () => BOOKING_LINKS.flights,
+    'cta-3': () => BOOKING_LINKS.cars,
+    'cta-4': () => BOOKING_LINKS.attractions,
+    'cta-5': () => 'shop.html',
     flights: () => BOOKING_LINKS.flights,
     cars: () => BOOKING_LINKS.cars,
     attractions: () => BOOKING_LINKS.attractions,
@@ -39,8 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const wireBookingLink = (link, href, kind, sid) => {
     link.href = href;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer sponsored';
+    if (href === 'shop.html' || href.startsWith('/') || href.endsWith('shop.html')) {
+      link.removeAttribute('target');
+      link.removeAttribute('rel');
+    } else {
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer sponsored';
+    }
     if (link.dataset.bookingWired) return;
     link.dataset.bookingWired = '1';
     link.addEventListener('click', () => {
@@ -53,32 +70,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  const bookingSlot = (kind) => {
+    if (kind === 'whistler' || kind === 'cta') return 1;
+    const m = /^cta-(\d+)$/.exec(kind || '');
+    return m ? Number(m[1]) : null;
+  };
+
   document.querySelectorAll('a[data-booking]').forEach((link) => {
     const kind = link.dataset.booking;
     const sid = link.dataset.bookingSid || 'wbs';
-    const resolve = bookingHref[kind];
+    const slot = bookingSlot(kind);
+    const resolve = bookingHref[kind] || (slot && ctaFallback[slot]);
     if (!resolve) return;
     wireBookingLink(link, resolve(sid), kind, sid);
   });
 
-  // Overlay primary stay CTAs with the store CTA product when configured in the dashboard.
+  // Overlay CTA slots with dashboard-assigned affiliate products when present.
   fetch(`${API_BASE}/api/commerce/products?store=${STORE}`)
     .then((res) => (res.ok ? res.json() : null))
     .then((data) => {
-      const buyUrl = data?.cta?.buyUrl;
-      const ctaLabel = data?.cta?.ctaLabel?.trim();
-      if (buyUrl) {
-        document.querySelectorAll('a[data-booking="whistler"], a[data-booking="cta"]').forEach((link) => {
-          const sid = link.dataset.bookingSid || 'wbs';
-          wireBookingLink(link, buyUrl, 'cta', sid);
-        });
-      }
-      if (ctaLabel) {
-        document.querySelectorAll('a[data-booking-label="cta"]').forEach((link) => {
+      const ctas = { ...(data?.ctas || {}) };
+      if (data?.cta && !ctas['1']) ctas['1'] = data.cta;
+
+      document.querySelectorAll('a[data-booking]').forEach((link) => {
+        const kind = link.dataset.booking;
+        const slot = bookingSlot(kind);
+        if (!slot) return;
+        const product = ctas[String(slot)];
+        if (!product?.buyUrl) return;
+        const sid = link.dataset.bookingSid || 'wbs';
+        wireBookingLink(link, product.buyUrl, `cta-${slot}`, sid);
+        if (link.dataset.bookingLabel === String(slot) || link.dataset.bookingLabel === 'cta') {
+          const label = (product.ctaLabel || product.title || '').trim();
+          if (!label) return;
           const arrow = link.textContent.includes('→') ? ' →' : '';
-          link.textContent = `${ctaLabel}${arrow}`;
-        });
-      }
+          link.textContent = `${label}${arrow}`;
+        }
+      });
     })
     .catch(() => { /* keep hardcoded Booking fallbacks */ });
 
