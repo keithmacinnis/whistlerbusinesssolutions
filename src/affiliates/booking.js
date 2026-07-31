@@ -6,10 +6,11 @@ export const BOOKING_LINKS = {
   evergreen: 'https://www.kqzyfj.com/click-101831150-17293132',
   homepage: 'https://www.dpbolvw.net/click-101831150-17288959',
   getawayDeals: 'https://www.kqzyfj.com/click-101831150-17288985',
-  flights: 'https://www.anrdoezrs.net/click-101831150-17288982',
-  cars: 'https://www.anrdoezrs.net/click-101831150-17288983',
-  attractions: 'https://www.tkqlhce.com/click-101831150-17288984',
-  taxis: 'https://www.tkqlhce.com/click-101831150-17322565',
+  // Prefer CJ "HTML Links" click hosts from the publisher export (same link IDs).
+  flights: 'https://www.jdoqocy.com/click-101831150-17288982',
+  cars: 'https://www.kqzyfj.com/click-101831150-17288983',
+  attractions: 'https://www.dpbolvw.net/click-101831150-17288984',
+  taxis: 'https://www.anrdoezrs.net/click-101831150-17322565',
 };
 
 /** Destination-level Whistler stays — broader inventory converts better than a single hotel. */

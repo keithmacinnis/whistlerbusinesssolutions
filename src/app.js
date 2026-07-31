@@ -66,11 +66,19 @@ document.addEventListener('DOMContentLoaded', () => {
     .then((res) => (res.ok ? res.json() : null))
     .then((data) => {
       const buyUrl = data?.cta?.buyUrl;
-      if (!buyUrl) return;
-      document.querySelectorAll('a[data-booking="whistler"], a[data-booking="cta"]').forEach((link) => {
-        const sid = link.dataset.bookingSid || 'wbs';
-        wireBookingLink(link, buyUrl, 'cta', sid);
-      });
+      const ctaLabel = data?.cta?.ctaLabel?.trim();
+      if (buyUrl) {
+        document.querySelectorAll('a[data-booking="whistler"], a[data-booking="cta"]').forEach((link) => {
+          const sid = link.dataset.bookingSid || 'wbs';
+          wireBookingLink(link, buyUrl, 'cta', sid);
+        });
+      }
+      if (ctaLabel) {
+        document.querySelectorAll('a[data-booking-label="cta"]').forEach((link) => {
+          const arrow = link.textContent.includes('→') ? ' →' : '';
+          link.textContent = `${ctaLabel}${arrow}`;
+        });
+      }
     })
     .catch(() => { /* keep hardcoded Booking fallbacks */ });
 
