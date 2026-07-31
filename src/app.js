@@ -1,4 +1,4 @@
-import { BOOKING_LINKS, whistlerStaysLink } from './affiliates/booking.js';
+import { BOOKING_LINKS, bookingDeepLink, whistlerStaysLink } from './affiliates/booking.js';
 
 // Legacy email/referral switch kept for pages that still use data-referral.
 const CONTACT_EMAIL = 'keith@whistlerbusinesssolutions.com';
@@ -24,6 +24,209 @@ document.addEventListener('DOMContentLoaded', () => {
   const RAW_API = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com';
   const API_BASE = /^https?:\/\//.test(RAW_API) ? RAW_API : `https://${RAW_API}`;
   const STORE = 'whistler';
+
+  // Hero search: pass dates, adults, children/ages, and rooms into Booking.com's search URL,
+  // then wrap that destination in the CJ evergreen affiliate deep link.
+  const bookingForm = document.getElementById('hero-booking-form');
+  const checkinInput = document.getElementById('hero-checkin');
+  const checkoutInput = document.getElementById('hero-checkout');
+  const adultsInput = document.getElementById('hero-adults');
+  const childrenInput = document.getElementById('hero-children');
+  const roomsInput = document.getElementById('hero-rooms');
+  const guestsToggle = document.getElementById('hero-guests-toggle');
+  const guestsPopover = document.getElementById('hero-guests-popover');
+  const guestsDone = document.getElementById('hero-guests-done');
+  const childAgesContainer = document.getElementById('hero-child-ages');
+  const adultsCount = document.getElementById('hero-adults-count');
+  const childrenCount = document.getElementById('hero-children-count');
+  const roomsCount = document.getElementById('hero-rooms-count');
+
+  const dateInputValue = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  if (
+    bookingForm && checkinInput && checkoutInput && adultsInput && childrenInput && roomsInput
+    && guestsToggle && guestsPopover && guestsDone && childAgesContainer
+    && adultsCount && childrenCount && roomsCount
+  ) {
+    const guestState = {
+      adults: 2,
+      children: 0,
+      rooms: 1,
+      ages: [],
+    };
+
+    const plural = (count, singular, pluralForm = `${singular}s`) =>
+      `${count} ${count === 1 ? singular : pluralForm}`;
+
+    const renderChildAges = () => {
+      childAgesContainer.replaceChildren();
+      guestState.ages.forEach((age, index) => {
+        const label = document.createElement('label');
+        label.className = 'hero-child-age';
+        label.htmlFor = `hero-child-age-${index}`;
+
+        const text = document.createElement('span');
+        text.textContent = `Child ${index + 1} age at check-out`;
+
+        const select = document.createElement('select');
+        select.id = `hero-child-age-${index}`;
+        select.name = 'childAge';
+        select.setAttribute('aria-label', `Child ${index + 1} age at check-out`);
+        for (let years = 0; years <= 17; years += 1) {
+          const option = document.createElement('option');
+          option.value = String(years);
+          option.textContent = years === 0
+            ? 'Under 1 year old'
+            : `${years} ${years === 1 ? 'year' : 'years'} old`;
+          option.selected = years === age;
+          select.append(option);
+        }
+        select.addEventListener('change', () => {
+          guestState.ages[index] = Number(select.value);
+        });
+
+        label.append(text, select);
+        childAgesContainer.append(label);
+      });
+    };
+
+    const syncGuestUi = () => {
+      adultsInput.value = String(guestState.adults);
+      childrenInput.value = String(guestState.children);
+      roomsInput.value = String(guestState.rooms);
+      adultsCount.textContent = String(guestState.adults);
+      childrenCount.textContent = String(guestState.children);
+      roomsCount.textContent = String(guestState.rooms);
+
+      const parts = [plural(guestState.adults, 'adult')];
+      if (guestState.children) parts.push(plural(guestState.children, 'child', 'children'));
+      parts.push(plural(guestState.rooms, 'room'));
+      guestsToggle.textContent = parts.join(' · ');
+
+      const limits = {
+        'adults-minus': guestState.adults <= 1,
+        'adults-plus': guestState.adults >= 20,
+        'children-minus': guestState.children <= 0,
+        'children-plus': guestState.children >= 10,
+        'rooms-minus': guestState.rooms <= 1,
+        'rooms-plus': guestState.rooms >= 10,
+      };
+      Object.entries(limits).forEach(([action, disabled]) => {
+        const button = guestsPopover.querySelector(`[data-guest-action="${action}"]`);
+        if (button) button.disabled = disabled;
+      });
+      renderChildAges();
+    };
+
+    const closeGuests = () => {
+      guestsPopover.hidden = true;
+      guestsToggle.setAttribute('aria-expanded', 'false');
+    };
+
+    guestsToggle.addEventListener('click', () => {
+      const opening = guestsPopover.hidden;
+      guestsPopover.hidden = !opening;
+      guestsToggle.setAttribute('aria-expanded', String(opening));
+    });
+    guestsDone.addEventListener('click', () => {
+      closeGuests();
+      guestsToggle.focus();
+    });
+    guestsPopover.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-guest-action]');
+      if (!button) return;
+      const action = button.dataset.guestAction;
+      if (action === 'adults-minus') guestState.adults = Math.max(1, guestState.adults - 1);
+      if (action === 'adults-plus') guestState.adults = Math.min(20, guestState.adults + 1);
+      if (action === 'children-minus') {
+        guestState.children = Math.max(0, guestState.children - 1);
+        guestState.ages = guestState.ages.slice(0, guestState.children);
+      }
+      if (action === 'children-plus') {
+        guestState.children = Math.min(10, guestState.children + 1);
+        while (guestState.ages.length < guestState.children) guestState.ages.push(0);
+      }
+      if (action === 'rooms-minus') guestState.rooms = Math.max(1, guestState.rooms - 1);
+      if (action === 'rooms-plus') guestState.rooms = Math.min(10, guestState.rooms + 1);
+      syncGuestUi();
+    });
+    document.addEventListener('click', (event) => {
+      if (!guestsPopover.hidden && !event.target.closest('.hero-guests-field')) closeGuests();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !guestsPopover.hidden) {
+        closeGuests();
+        guestsToggle.focus();
+      }
+    });
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const defaultCheckout = new Date(tomorrow);
+    defaultCheckout.setDate(defaultCheckout.getDate() + 3);
+
+    checkinInput.min = dateInputValue(tomorrow);
+    checkinInput.value = dateInputValue(tomorrow);
+    checkoutInput.min = dateInputValue(defaultCheckout);
+    checkoutInput.value = dateInputValue(defaultCheckout);
+
+    checkinInput.addEventListener('change', () => {
+      if (!checkinInput.value) return;
+      const nextDay = new Date(`${checkinInput.value}T12:00:00`);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const minimumCheckout = dateInputValue(nextDay);
+      checkoutInput.min = minimumCheckout;
+      if (!checkoutInput.value || checkoutInput.value <= checkinInput.value) {
+        checkoutInput.value = minimumCheckout;
+      }
+    });
+
+    bookingForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      checkoutInput.setCustomValidity('');
+      if (!checkinInput.value || !checkoutInput.value) {
+        bookingForm.reportValidity();
+        return;
+      }
+      if (checkoutInput.value <= checkinInput.value) {
+        checkoutInput.setCustomValidity('Check-out must be after check-in.');
+        checkoutInput.reportValidity();
+        return;
+      }
+
+      const destination = new URL('https://www.booking.com/searchresults.html');
+      destination.searchParams.set('ss', 'Whistler, British Columbia, Canada');
+      destination.searchParams.set('dest_type', 'city');
+      destination.searchParams.set('checkin', checkinInput.value);
+      destination.searchParams.set('checkout', checkoutInput.value);
+      destination.searchParams.set('group_adults', adultsInput.value);
+      destination.searchParams.set('group_children', childrenInput.value);
+      guestState.ages.forEach((age) => destination.searchParams.append('age', String(age)));
+      destination.searchParams.set('no_rooms', roomsInput.value);
+      destination.searchParams.set('selected_currency', 'CAD');
+      destination.searchParams.set('lang', 'en-ca');
+
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'booking_affiliate_click', {
+          booking_kind: 'hero_search',
+          booking_sid: 'wbs-hero-search',
+          checkin: checkinInput.value,
+          checkout: checkoutInput.value,
+          adults: adultsInput.value,
+          children: childrenInput.value,
+          rooms: roomsInput.value,
+        });
+      }
+      window.open(bookingDeepLink(destination.toString(), 'wbs-hero-search'), '_blank', 'noopener,noreferrer');
+    });
+
+    syncGuestUi();
+  }
 
   const ctaFallback = {
     1: (sid) => whistlerStaysLink(sid),

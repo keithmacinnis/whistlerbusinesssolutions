@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
-    content="Picture your group in Whistler — powder mornings, alpine summers, long table dinners. We plan the whole trip; you just gather your people.">
-  <meta name="keywords" content="Whistler getaway, Whistler group trip, Whistler retreat planning, Whistler experiences, plan a Whistler trip">
-  <title>Picture Your Group in Whistler | Whistler Business Solutions</title>
+    content="Compare live Whistler hotels, condos, and chalets on Booking.com, then add flights, cars, attractions, and Canadian gift cards for your group.">
+  <meta name="keywords" content="Whistler stays, Whistler hotels, Whistler condos, Whistler group trip, Whistler vacation">
+  <title>Find Whistler Stays for Your Group | Whistler Business Solutions</title>
   <link rel="icon" href="/wbs-icon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -370,12 +370,75 @@
   <main>
     <section id="home" class="hero" tabindex="-1">
       <div class="hero-stage theme-container">
-        <div class="hero-intro">
+        <div class="hero-booking-panel">
           <div class="hero-badge">Whistler Retreats &amp; Outings</div>
-          <p class="hero-description">We help families and teams picture unforgettable retreats in Whistler, BC — then book stays, flights, and extras through Booking.com.</p>
+          <h1 class="hero-title">Find the Right Whistler Stay for Your Group</h1>
+          <p class="hero-description">Compare live hotels, condos, and chalets in Whistler, BC — then add flights, cars, attractions, and gift cards when you’re ready.</p>
+
+          <form id="hero-booking-form" class="hero-booking-form">
+            <label>
+              <span>Check-in</span>
+              <input id="hero-checkin" name="checkin" type="date" required>
+            </label>
+            <label>
+              <span>Check-out</span>
+              <input id="hero-checkout" name="checkout" type="date" required>
+            </label>
+            <div class="hero-guests-field">
+              <span class="hero-field-label">Guests &amp; rooms</span>
+              <button
+                id="hero-guests-toggle"
+                class="hero-guests-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="hero-guests-popover"
+              >
+                2 adults · 1 room
+              </button>
+              <div
+                id="hero-guests-popover"
+                class="hero-guests-popover"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Choose guests and rooms"
+                hidden
+              >
+                <div class="guest-counter-row">
+                  <span>Adults</span>
+                  <div class="guest-stepper">
+                    <button type="button" data-guest-action="adults-minus" aria-label="Remove an adult">−</button>
+                    <output id="hero-adults-count" aria-live="polite">2</output>
+                    <button type="button" data-guest-action="adults-plus" aria-label="Add an adult">+</button>
+                  </div>
+                </div>
+                <div class="guest-counter-row">
+                  <span>Children</span>
+                  <div class="guest-stepper">
+                    <button type="button" data-guest-action="children-minus" aria-label="Remove a child">−</button>
+                    <output id="hero-children-count" aria-live="polite">0</output>
+                    <button type="button" data-guest-action="children-plus" aria-label="Add a child">+</button>
+                  </div>
+                </div>
+                <div id="hero-child-ages" class="hero-child-ages"></div>
+                <div class="guest-counter-row">
+                  <span>Rooms</span>
+                  <div class="guest-stepper">
+                    <button type="button" data-guest-action="rooms-minus" aria-label="Remove a room">−</button>
+                    <output id="hero-rooms-count" aria-live="polite">1</output>
+                    <button type="button" data-guest-action="rooms-plus" aria-label="Add a room">+</button>
+                  </div>
+                </div>
+                <button id="hero-guests-done" type="button" class="guest-done-button">Done</button>
+              </div>
+              <input id="hero-adults" name="adults" type="hidden" value="2">
+              <input id="hero-children" name="children" type="hidden" value="0">
+              <input id="hero-rooms" name="rooms" type="hidden" value="1">
+            </div>
+            <button type="submit" class="theme-btn primary">Search Whistler Stays →</button>
+          </form>
         </div>
 
-        <div class="hero-content hero-content--video">
+        <div class="hero-video-panel">
           <div class="hero-video">
             <iframe
               src="https://www.youtube-nocookie.com/embed/_pLHzLaXQFc?rel=0"
@@ -385,12 +448,7 @@
               loading="lazy"
             ></iframe>
           </div>
-        </div>
-
-        <div class="hero-cta">
-          <a href="#winter" class="theme-btn primary">
-            Picture Your Trip&nbsp;↓
-          </a>
+          <p>See Whistler in every season</p>
         </div>
       </div>
     </section>
@@ -448,7 +506,7 @@
       <div class="story-copy">
         <span class="story-eyebrow">Any Season</span>
         <h2>The hard part isn't Whistler.<br>It's getting everyone here.</h2>
-        <p>Stays, shuttles, dinners, activities — coordinated by locals through one point of contact, so the person planning the trip gets to enjoy it too.</p>
+        <p>Start with live Whistler stays, then compare flights, cars, attractions, and group gift cards at your own pace.</p>
         <a href="https://www.kqzyfj.com/click-101831150-17293132?sid=wbs-together&amp;url=https%3A%2F%2Fwww.booking.com%2Fcity%2Fca%2Fwhistler.html" class="theme-btn primary" data-booking="whistler" data-booking-sid="wbs-together" target="_blank" rel="noopener noreferrer sponsored">Find Group Stays →</a>
       </div>
     </section>
@@ -458,7 +516,7 @@
         <div class="services-header text-center mb-4">
           <span class="section-eyebrow">Trip Packages</span>
           <h2 class="theme-heading h2">Pick a Starting Point — Then Book Your Stay</h2>
-          <p class="theme-text">Every package is a template for how a Whistler trip can feel. Prices flex with group size and dates — then browse live stays on Booking.com.</p>
+          <p class="theme-text">Every package is inspiration for how a Whistler trip can feel. Choose the ideas you like, then browse live stays on Booking.com.</p>
         </div>
 
         <div class="season-tabs" role="tablist">
@@ -466,7 +524,6 @@
           <button class="season-tab" data-season="summer" role="tab">☀️ Summer</button>
         </div>
 
-        <!-- NOTE: "from" prices are placeholders — confirm real numbers with partners before launch -->
         <div class="season-panel active" data-season="winter">
           <div class="theme-grid auto-fit">
             <div class="theme-card package-card">
@@ -477,15 +534,10 @@
                 <h3 class="theme-heading h3">Family Ski Week</h3>
                 <ul>
                   <li>5–7 nights, ski-in/ski-out condos or chalet</li>
-                  <li>Lift tickets &amp; lessons arranged for all levels</li>
-                  <li>Tubing night + one big family dinner booked</li>
-                  <li>Private YVR–Whistler shuttle both ways</li>
+                  <li>Ideas: lessons, tubing, and one big family dinner</li>
+                  <li>Compare flights, rental cars, and airport transfers</li>
+                  <li>Browse live availability for your group size</li>
                 </ul>
-                <div class="package-price">
-                  <span class="from">from</span>
-                  <span class="amount">$1,950</span>
-                  <span class="unit">CAD / person · 5 nights</span>
-                </div>
                 <a href="https://www.kqzyfj.com/click-101831150-17293132?sid=wbs-packages&amp;url=https%3A%2F%2Fwww.booking.com%2Fcity%2Fca%2Fwhistler.html" class="theme-btn primary" data-booking="whistler" data-booking-sid="wbs-packages" target="_blank" rel="noopener noreferrer sponsored">Browse Whistler Stays →</a>
               </div>
             </div>
@@ -495,16 +547,11 @@
               <div class="package-body">
                 <h3 class="theme-heading h3">Corporate Reward Weekend</h3>
                 <ul>
-                  <li>2–3 nights, slopeside hotel room block</li>
-                  <li>Welcome après reception on arrival</li>
-                  <li>Peak 2 Peak + guided group activity</li>
-                  <li>Private awards dinner, one itemized invoice</li>
+                  <li>2–3 nights in a slopeside or village hotel</li>
+                  <li>Look for meeting space and group-friendly common areas</li>
+                  <li>Ideas: Peak 2 Peak, après, and a team activity</li>
+                  <li>Compare rooms and live rates for the same dates</li>
                 </ul>
-                <div class="package-price">
-                  <span class="from">from</span>
-                  <span class="amount">$1,400</span>
-                  <span class="unit">CAD / person · 2 nights</span>
-                </div>
                 <a href="https://www.kqzyfj.com/click-101831150-17293132?sid=wbs-packages&amp;url=https%3A%2F%2Fwww.booking.com%2Fcity%2Fca%2Fwhistler.html" class="theme-btn primary" data-booking="whistler" data-booking-sid="wbs-packages" target="_blank" rel="noopener noreferrer sponsored">Browse Whistler Stays →</a>
               </div>
             </div>
@@ -515,15 +562,10 @@
                 <h3 class="theme-heading h3">Winter Celebration Escape</h3>
                 <ul>
                   <li>3–4 nights, chalet with hot tub</li>
-                  <li>Snowshoe or sleigh-ride group outing</li>
-                  <li>Spa afternoon + celebration dinner booked</li>
-                  <li>Transfers and reservations all handled</li>
+                  <li>Ideas: snowshoeing or a sleigh ride</li>
+                  <li>Add a spa afternoon and celebration dinner</li>
+                  <li>Browse chalets, condos, and unique stays</li>
                 </ul>
-                <div class="package-price">
-                  <span class="from">from</span>
-                  <span class="amount">$1,150</span>
-                  <span class="unit">CAD / person · 3 nights</span>
-                </div>
                 <a href="https://www.kqzyfj.com/click-101831150-17293132?sid=wbs-packages&amp;url=https%3A%2F%2Fwww.booking.com%2Fcity%2Fca%2Fwhistler.html" class="theme-btn primary" data-booking="whistler" data-booking-sid="wbs-packages" target="_blank" rel="noopener noreferrer sponsored">Browse Whistler Stays →</a>
               </div>
             </div>
@@ -540,15 +582,10 @@
                 <h3 class="theme-heading h3">Summer Family Reunion</h3>
                 <ul>
                   <li>4–7 nights, big chalet or condo cluster</li>
-                  <li>Lake day at Alta + Peak 2 Peak sightseeing</li>
-                  <li>Group patio dinners reserved</li>
+                  <li>Ideas: Alta Lake and Peak 2 Peak sightseeing</li>
+                  <li>Pick a few group-friendly patio dinners</li>
                   <li>Room in the schedule to just hang out</li>
                 </ul>
-                <div class="package-price">
-                  <span class="from">from</span>
-                  <span class="amount">$950</span>
-                  <span class="unit">CAD / person · 4 nights</span>
-                </div>
                 <a href="https://www.kqzyfj.com/click-101831150-17293132?sid=wbs-packages&amp;url=https%3A%2F%2Fwww.booking.com%2Fcity%2Fca%2Fwhistler.html" class="theme-btn primary" data-booking="whistler" data-booking-sid="wbs-packages" target="_blank" rel="noopener noreferrer sponsored">Browse Whistler Stays →</a>
               </div>
             </div>
@@ -558,16 +595,11 @@
               <div class="package-body">
                 <h3 class="theme-heading h3">Team Offsite in the Alpine</h3>
                 <ul>
-                  <li>2–3 nights, village hotel + meeting space</li>
+                  <li>2–3 nights in a village hotel with meeting space</li>
                   <li>Morning work sessions, afternoon adventures</li>
-                  <li>Ziplining, rafting, or golf — your pick</li>
-                  <li>Group dinners and transfers coordinated</li>
+                  <li>Ideas: ziplining, rafting, or golf</li>
+                  <li>Compare central stays for the full group</li>
                 </ul>
-                <div class="package-price">
-                  <span class="from">from</span>
-                  <span class="amount">$1,100</span>
-                  <span class="unit">CAD / person · 2 nights</span>
-                </div>
                 <a href="https://www.kqzyfj.com/click-101831150-17293132?sid=wbs-packages&amp;url=https%3A%2F%2Fwww.booking.com%2Fcity%2Fca%2Fwhistler.html" class="theme-btn primary" data-booking="whistler" data-booking-sid="wbs-packages" target="_blank" rel="noopener noreferrer sponsored">Browse Whistler Stays →</a>
               </div>
             </div>
@@ -578,51 +610,17 @@
                 <h3 class="theme-heading h3">Bike &amp; Lake Adventure Trip</h3>
                 <ul>
                   <li>3–5 nights, condos near the village core</li>
-                  <li>Bike park passes or guided trail rides</li>
-                  <li>Paddleboard session on Lost Lake</li>
-                  <li>Après patios and dinner spots pre-booked</li>
+                  <li>Ideas: bike park laps or guided trail rides</li>
+                  <li>Add a paddleboard session on Lost Lake</li>
+                  <li>Browse condos close to patios and restaurants</li>
                 </ul>
-                <div class="package-price">
-                  <span class="from">from</span>
-                  <span class="amount">$1,050</span>
-                  <span class="unit">CAD / person · 3 nights</span>
-                </div>
                 <a href="https://www.kqzyfj.com/click-101831150-17293132?sid=wbs-packages&amp;url=https%3A%2F%2Fwww.booking.com%2Fcity%2Fca%2Fwhistler.html" class="theme-btn primary" data-booking="whistler" data-booking-sid="wbs-packages" target="_blank" rel="noopener noreferrer sponsored">Browse Whistler Stays →</a>
               </div>
             </div>
           </div>
         </div>
 
-        <p class="price-note">All prices in CAD, based on typical group sizes, before taxes. Starting points only — browse live Whistler stays on Booking.com for current availability and rates.</p>
-      </div>
-    </section>
-
-    <div class="theme-divider"></div>
-
-    <section id="included" class="theme-section ea-band" tabindex="-1">
-      <div class="theme-container">
-        <div class="services-header text-center mb-4">
-          <span class="section-eyebrow">Why Book From Here</span>
-          <h2 class="theme-heading h2">Local Whistler Context. Live Booking.com Inventory.</h2>
-        </div>
-
-        <div class="stats-strip" style="margin-bottom: var(--spacing-2xl);">
-          <div><div class="stat-big">471+</div><div class="stat-label">Whistler stays to browse</div></div>
-          <div><div class="stat-big">Live</div><div class="stat-label">rates &amp; availability</div></div>
-          <div><div class="stat-big">$0</div><div class="stat-label">booking fees on stays</div></div>
-          <div><div class="stat-big">Gift cards</div><div class="stat-label">for the whole group</div></div>
-        </div>
-
-        <div class="brief-box">
-          <h3 class="theme-heading h3">What we help you line up</h3>
-          <ul class="checklist">
-            <li>Whistler hotels, condos, and chalets via Booking.com</li>
-            <li>Flights, cars, and airport taxis when you need the full trip stack</li>
-            <li>Attractions and experiences to fill the itinerary</li>
-            <li>Welcome-basket gift cards for meals, coffee, and a Squamish stock-up</li>
-            <li>Seasonal package ideas so you know what “good” looks like before you book</li>
-          </ul>
-        </div>
+        <p class="price-note">Trip ideas only — choose and book each part directly with the provider. Browse Booking.com for current Whistler availability and rates.</p>
       </div>
     </section>
 
@@ -713,8 +711,8 @@
         </div>
 
         <div class="faq-item">
-          <h3>Are the package prices fixed?</h3>
-          <p>They're honest starting points for planning. Live hotel and condo rates on Booking.com will reflect your dates, group size, and what's still available.</p>
+          <h3>Can I book these trip ideas as a package?</h3>
+          <p>Not as a single bundle. Use them as inspiration, then choose and book your stay, transport, and activities directly with each provider.</p>
         </div>
         <div class="faq-item">
           <h3>How far ahead should we book?</h3>
@@ -725,12 +723,12 @@
           <p>It's the widest Whistler inventory in one place — hotels, condos, and unique stays — with transparent pricing and 24/7 support. We deep-link you straight to Whistler so you're not starting from a generic homepage.</p>
         </div>
         <div class="faq-item">
-          <h3>Do you charge a planning fee?</h3>
-          <p>No. This site is free to use. When you book through our Booking.com links, we may earn a commission at no extra cost to you.</p>
+          <h3>Does WBS add a booking fee?</h3>
+          <p>No. You choose and book directly with Booking.com and the other providers linked from this site.</p>
         </div>
         <div class="faq-item">
-          <h3>What size of group do you work with?</h3>
-          <p>Anything from a couple's escape to a big family or corporate outing. Booking.com filters by occupancy; gift cards scale for the whole guest list.</p>
+          <h3>What group sizes can I search for?</h3>
+          <p>Anything from a couple's escape to a large family or team trip. Enter your dates, adults, children and their ages, and rooms above to carry the full group into Booking.com.</p>
         </div>
       </div>
     </section>
@@ -738,7 +736,6 @@
     <section id="plan" class="theme-section ea-band" tabindex="-1">
       <div class="theme-container">
         <div class="closer">
-          <span class="section-eyebrow">Book on Booking.com</span>
           <h2 class="theme-heading h2">Find Your Whistler Stay</h2>
           <p class="theme-text" style="margin-bottom: var(--spacing-xl);">Hundreds of hotels, condos, and chalets with live rates. Pick dates, compare options, and book in one session — then grab gift cards for the group.</p>
           <a href="https://www.kqzyfj.com/click-101831150-17293132?sid=wbs-plan&amp;url=https%3A%2F%2Fwww.booking.com%2Fcity%2Fca%2Fwhistler.html" class="theme-btn primary" data-booking="cta-1" data-booking-sid="wbs-plan" data-booking-label="1" target="_blank" rel="noopener noreferrer sponsored">Select Dates →</a>
@@ -758,7 +755,7 @@
       <div class="footer-grid">
         <div class="footer-col footer-brand">
           <p class="footer-logo">WBS</p>
-          <p class="footer-tagline">Trips planned by Whistler locals.<br>Software made in the mountains.</p>
+          <p class="footer-tagline">Whistler trip ideas from locals.<br>Software made in the mountains.</p>
           <a class="footer-email" href="mailto:keith@whistlerbusinesssolutions.com">keith@whistlerbusinesssolutions.com</a>
         </div>
 
