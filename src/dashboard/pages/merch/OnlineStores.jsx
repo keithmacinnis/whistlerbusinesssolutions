@@ -149,30 +149,27 @@ export default function OnlineStores() {
               </div>
 
               <div className="mt-4">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <p className="text-sm font-medium text-gray-700">Landing CTAs</p>
-                  <div className="flex items-center gap-1">
-                    {slotCount > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeLastSlot(w)}
-                        disabled={savingCta === w.id}
-                        className="rounded border border-gray-300 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-50 disabled:opacity-50"
-                        title="Remove last CTA slot"
-                      >
-                        −
-                      </button>
-                    )}
+                <div className="mb-2 flex items-center justify-end gap-1">
+                  {slotCount > 1 && (
                     <button
                       type="button"
-                      onClick={() => addSlot(w)}
-                      disabled={savingCta === w.id || slotCount >= MAX_CTA_SLOTS || !(w.affiliateProducts?.length)}
-                      className="rounded border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                      title="Add CTA slot"
+                      onClick={() => removeLastSlot(w)}
+                      disabled={savingCta === w.id}
+                      className="rounded border border-gray-300 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+                      title="Remove last CTA slot"
                     >
-                      +
+                      −
                     </button>
-                  </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => addSlot(w)}
+                    disabled={savingCta === w.id || slotCount >= MAX_CTA_SLOTS || !(w.affiliateProducts?.length)}
+                    className="rounded border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    title="Add CTA slot"
+                  >
+                    +
+                  </button>
                 </div>
 
                 <div className="space-y-3">
