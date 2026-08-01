@@ -808,7 +808,16 @@ header h1 span {
 }
 
 .hero-booking-form input[type='date'] {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   color-scheme: light;
+}
+
+.hero-date-field {
+  min-width: 0;
+  overflow: hidden;
 }
 
 .hero-booking-form input[type='date']::-webkit-calendar-picker-indicator {
@@ -1497,8 +1506,29 @@ footer {
 
 @media (max-width: 768px) {
   /* Show hamburger menu and hide desktop nav */
+  header {
+    padding: 0.75rem 0;
+  }
+
+  header::before {
+    top: auto;
+    bottom: 0;
+  }
+
+  header h1 {
+    margin: 0;
+    line-height: 1;
+  }
+
+  header h1 span {
+    display: block;
+    top: 0 !important;
+    font-size: 2.75rem;
+  }
+
   .hamburger-menu {
     display: flex;
+    padding: var(--spacing-sm);
   }
 
   #main-nav {
@@ -1597,6 +1627,29 @@ footer {
   * {
     max-width: 100%;
     box-sizing: border-box;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .hero-date-field input[type='date'] {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 2.5rem;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M3 11h18'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 18px 18px;
+  }
+
+  .hero-date-field input[type='date']::-webkit-date-and-time-value {
+    min-width: 0;
+    margin: 0;
+    text-align: left;
+  }
+
+  .hero-date-field input[type='date']::-webkit-calendar-picker-indicator {
+    opacity: 0;
   }
 }
 
