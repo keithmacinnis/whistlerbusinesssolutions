@@ -5,6 +5,7 @@ import StatCard from '../components/StatCard'
 import StatusPill from '../components/StatusPill'
 import BarChart from '../components/BarChart'
 import ActionItems from '../components/ActionItems'
+import PostHogAnalytics from '../components/PostHogAnalytics'
 import { useAuth } from '../auth'
 
 const dollars = (cents) => `$${((cents || 0) / 100).toFixed(2)}`
@@ -131,6 +132,8 @@ export default function Overview() {
       )}
 
       {isAdmin && <ActionItems />}
+
+      {isAdmin && <PostHogAnalytics />}
 
       {isAdmin && appMetrics && (
         <section className="mt-8 rounded-lg bg-white p-5 shadow-sm">
