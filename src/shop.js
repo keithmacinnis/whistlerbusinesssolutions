@@ -1,3 +1,5 @@
+import { captureEvent } from './analytics.js';
+
 // Whistler storefront: loads products from the standalone commerce service.
 // Own merch goes through a client-side cart → Stripe Checkout (multi-item);
 // affiliate products link out via tracked "Buy Direct" URLs.
@@ -76,6 +78,11 @@ const checkout = async (button) => {
     return { productId, quantity, ...(variantId && { variantId }) };
   });
   if (!items.length) return;
+  captureEvent('checkout_started', {
+    item_count: items.reduce((total, item) => total + item.quantity, 0),
+    cart_value_cents: cartTotalCents(),
+    currency: 'CAD',
+  });
   button.disabled = true;
   const original = button.textContent;
   button.textContent = 'Starting checkout…';
@@ -233,6 +240,13 @@ const renderProducts = (products) => {
           key = `${p.id}|${variantId}`;
         }
         setQty(key, (loadCart()[key] || 0) + 1);
+        captureEvent('product_added_to_cart', {
+          product_id: p.id,
+          product_name: p.title,
+          product_kind: p.kind,
+          price_cents: p.priceCents,
+          currency: p.currency,
+        });
         const btn = e.currentTarget;
         btn.textContent = 'Added ✓';
         setTimeout(() => { btn.textContent = 'Add to Cart'; }, 1200);

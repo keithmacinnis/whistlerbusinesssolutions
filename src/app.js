@@ -1,4 +1,5 @@
 import { BOOKING_LINKS, bookingDeepLink, whistlerStaysLink } from './affiliates/booking.js';
+import { captureEvent } from './analytics.js';
 
 // Legacy email/referral switch kept for pages that still use data-referral.
 const CONTACT_EMAIL = 'keith@whistlerbusinesssolutions.com';
@@ -211,16 +212,18 @@ document.addEventListener('DOMContentLoaded', () => {
       destination.searchParams.set('selected_currency', 'CAD');
       destination.searchParams.set('lang', 'en-ca');
 
+      const analyticsProperties = {
+        booking_kind: 'hero_search',
+        booking_sid: 'wbs-hero-search',
+        checkin: checkinInput.value,
+        checkout: checkoutInput.value,
+        adults: adultsInput.value,
+        children: childrenInput.value,
+        rooms: roomsInput.value,
+      };
+      captureEvent('booking_affiliate_click', analyticsProperties);
       if (typeof window.gtag === 'function') {
-        window.gtag('event', 'booking_affiliate_click', {
-          booking_kind: 'hero_search',
-          booking_sid: 'wbs-hero-search',
-          checkin: checkinInput.value,
-          checkout: checkoutInput.value,
-          adults: adultsInput.value,
-          children: childrenInput.value,
-          rooms: roomsInput.value,
-        });
+        window.gtag('event', 'booking_affiliate_click', analyticsProperties);
       }
       window.open(bookingDeepLink(destination.toString(), 'wbs-hero-search'), '_blank', 'noopener,noreferrer');
     });
@@ -264,11 +267,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (link.dataset.bookingWired) return;
     link.dataset.bookingWired = '1';
     link.addEventListener('click', () => {
+      const analyticsProperties = {
+        booking_kind: kind,
+        booking_sid: sid,
+        link_text: link.textContent.trim(),
+      };
+      captureEvent('booking_affiliate_click', analyticsProperties);
       if (typeof window.gtag === 'function') {
-        window.gtag('event', 'booking_affiliate_click', {
-          booking_kind: kind,
-          booking_sid: sid,
-        });
+        window.gtag('event', 'booking_affiliate_click', analyticsProperties);
       }
     });
   };
