@@ -1,7 +1,8 @@
 const POSTHOG_KEY =
   import.meta.env.VITE_POSTHOG_KEY ||
   'phc_vDUbmgQWxCsA3cQt5rAcocKBnbcduZi4RbpXpMkMJeTg';
-const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com';
+const POSTHOG_HOST =
+  import.meta.env.VITE_POSTHOG_HOST || 'https://t.whistlerbusinesssolutions.com';
 const PUBLIC_HOSTS = new Set([
   'whistlerbusinesssolutions.com',
   'www.whistlerbusinesssolutions.com',
