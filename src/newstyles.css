@@ -642,11 +642,13 @@ html, body {
    LAYOUT COMPONENTS
    ======================================== */
 
-/* Header */
+/* Header — WBS sits on the rainbow bar */
 header {
+  /* Mountain slate — fills corner-to-corner (no empty black wedges) */
+  --header-eclipse: #2c3e50;
   padding: 0;
   position: relative;
-  background: var(--color-bg-primary);
+  background: var(--header-eclipse);
 }
 
 header::before {
@@ -700,9 +702,11 @@ header::before {
 header .theme-container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   position: relative;
   z-index: 1;
+  min-height: 3.6rem;
+  padding-bottom: 0;
 }
 
 header h1 {
@@ -711,8 +715,17 @@ header h1 {
 }
 
 header h1 span {
+  display: block;
   font-size: 2em;
+  line-height: 0.78;
+  letter-spacing: 0.02em;
   color: var(--color-text-primary);
+  /* Sit just above the rainbow (match nav baseline) */
+  transform: translateY(calc(0.04em - 2px));
+}
+
+body.theme-light header {
+  --header-eclipse: #cfd8e6;
 }
 
 /* Navigation */
@@ -721,6 +734,7 @@ header h1 span {
   list-style: none;
   margin: 0;
   padding: 0;
+  align-items: flex-end;
 }
 
 #main-nav li {
@@ -728,11 +742,13 @@ header h1 span {
 }
 
 #main-nav a {
+  display: inline-block;
   color: var(--color-text-secondary);
   font-weight: 600;
-  padding: 0 var(--spacing-lg);
+  padding: 0.15rem var(--spacing-lg) 0;
   transition: all var(--transition-normal);
   text-decoration: none;
+  transform: translateY(0.18em);
 }
 
 #main-nav a:hover, #main-nav a:focus {
@@ -1158,10 +1174,11 @@ header h1 span {
   display: none;
   flex-direction: column;
   cursor: pointer;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md) 0.15rem;
   background: transparent;
   border: none;
   z-index: 1001;
+  align-self: flex-end;
 }
 
 .hamburger-menu span {
@@ -1535,14 +1552,20 @@ footer {
     padding: 0;
   }
 
+  header .theme-container {
+    min-height: 3.75rem;
+  }
+
   header h1 span {
     display: block;
     font-size: 2.75rem;
+    line-height: 0.76;
+    transform: translateY(calc(0.02em - 2px));
   }
 
   .hamburger-menu {
     display: flex;
-    padding: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-sm) 0.2rem;
   }
 
   #main-nav {
