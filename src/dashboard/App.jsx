@@ -19,6 +19,7 @@ import MyCourses from './pages/education/MyCourses'
 import EducationAvailability from './pages/education/Availability'
 import EducationStudents from './pages/education/Students'
 import MyEarnings from './pages/education/MyEarnings'
+import Finance from './pages/Finance'
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
@@ -65,6 +66,7 @@ export default function App() {
           <Route path="education/availability" element={<EducationAvailability />} />
           <Route path="education/students" element={<EducationStudents />} />
           <Route path="education/my-earnings" element={<MyEarnings />} />
+          <Route path="finance" element={<Finance />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
