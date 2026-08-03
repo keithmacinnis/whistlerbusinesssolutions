@@ -707,6 +707,7 @@ header .theme-container {
   z-index: 1;
   min-height: 3.6rem;
   padding-bottom: 0;
+  bottom: 5px;
 }
 
 header h1 {
