@@ -7,6 +7,17 @@ const REFERRAL_URL = 'https://www.whistler.com/';
 const BUTTON_MODE = 'email';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const syncRainbowRails = () => {
+    const header = document.querySelector('header');
+    if (!header) return;
+    // Track the bar's viewport Y so rails grow upward on scroll and stay attached.
+    const top = Math.max(0, Math.round(header.getBoundingClientRect().bottom));
+    document.documentElement.style.setProperty('--rainbow-rail-top', `${top}px`);
+  };
+  syncRainbowRails();
+  window.addEventListener('resize', syncRainbowRails);
+  window.addEventListener('scroll', syncRainbowRails, { passive: true });
+
   const mailto = `mailto:${CONTACT_EMAIL}?subject=Whistler%20Retreat%20Inquiry`;
   document.querySelectorAll('a[data-referral]').forEach(link => {
     if (BUTTON_MODE === 'referral') {
