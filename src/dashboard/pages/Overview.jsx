@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { api } from '../api'
 import StatCard from '../components/StatCard'
 import StatusPill from '../components/StatusPill'
-import BarChart from '../components/BarChart'
 import ActionItems from '../components/ActionItems'
 import WebsiteBehaviour from '../components/WebsiteBehaviour'
 import DashboardAiBrief from '../components/DashboardAiBrief'
@@ -18,8 +17,6 @@ export default function Overview() {
   const [syncing, setSyncing] = useState(false)
   const [syncNote, setSyncNote] = useState('')
   const [appMetrics, setAppMetrics] = useState(null)
-  const [appSyncing, setAppSyncing] = useState(false)
-  const [appSyncNote, setAppSyncNote] = useState('')
   const isAdmin = user?.role === 'super_admin'
 
   const load = () =>
@@ -37,22 +34,6 @@ export default function Overview() {
       .then(setAppMetrics)
       .catch(() => setAppMetrics(null))
   }, [isAdmin])
-
-  const syncAppStore = async () => {
-    setAppSyncing(true)
-    setAppSyncNote('')
-    try {
-      const r = await api('/api/site/app-metrics/sync', { method: 'POST' })
-      setAppSyncNote(
-        r.note || (r.synced != null ? `Synced ${r.synced} day(s) from "${r.report}"` : 'Not configured')
-      )
-      api('/api/site/app-metrics').then(setAppMetrics).catch(() => {})
-    } catch (err) {
-      setAppSyncNote(err.message)
-    } finally {
-      setAppSyncing(false)
-    }
-  }
 
   const syncAffiliates = async () => {
     setSyncing(true)
@@ -131,61 +112,6 @@ export default function Overview() {
       {isAdmin && <ActionItems />}
 
       {isAdmin && <WebsiteBehaviour />}
-
-      {isAdmin && appMetrics && (
-        <section className="mt-8 rounded-lg bg-white p-5 shadow-sm">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900">App performance — birdNest Families</h2>
-            {appMetrics.appstore.configured && (
-              <button
-                onClick={syncAppStore}
-                disabled={appSyncing}
-                className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              >
-                {appSyncing ? 'Syncing…' : '↻ Sync App Store data'}
-              </button>
-            )}
-          </div>
-          {appSyncNote && <div className="mb-3 rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-700">{appSyncNote}</div>}
-
-          {!appMetrics.revenuecat.configured ? (
-            <p className="text-sm text-gray-400">
-              RevenueCat not connected — set REVENUECAT_API_V2_KEY (v2 secret with metrics read) and
-              REVENUECAT_PROJECT_ID on the server for revenue &amp; subscriber stats.
-            </p>
-          ) : appMetrics.revenuecat.error ? (
-            <p className="text-sm text-red-600">{appMetrics.revenuecat.error}</p>
-          ) : (
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              {(appMetrics.revenuecat.metrics || []).slice(0, 8).map((m) => (
-                <StatCard
-                  key={m.id}
-                  label={m.name}
-                  value={m.unit === '$' || /revenue|mrr/i.test(m.id) ? `$${Number(m.value ?? 0).toLocaleString()}` : Number(m.value ?? 0).toLocaleString()}
-                  hint={m.period || undefined}
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="mt-5">
-            <h3 className="mb-2 text-sm font-semibold text-gray-700">App Store page views</h3>
-            {!appMetrics.appstore.configured ? (
-              <p className="text-sm text-gray-400">
-                App Store Connect not connected — set ASC_ISSUER_ID, ASC_KEY_ID, ASC_PRIVATE_KEY and
-                ASC_APP_ID on the server.
-              </p>
-            ) : appMetrics.appstore.pageViews.length === 0 ? (
-              <p className="text-sm text-gray-400">
-                No data yet — hit Sync. Apple provisions analytics reports asynchronously, so the first
-                data can take a few days to appear after the first sync.
-              </p>
-            ) : (
-              <BarChart points={appMetrics.appstore.pageViews} label="page views" />
-            )}
-          </div>
-        </section>
-      )}
 
       {data?.businesses?.length > 0 && (
         <div className="mt-8 overflow-hidden rounded-lg bg-white shadow-sm">

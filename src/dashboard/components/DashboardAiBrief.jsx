@@ -64,23 +64,25 @@ function buildBrief({ generatedAt, voice, cloudflare, posthog, appMetrics, finan
     }
   }
 
-  // Websites
+  // Websites / apps
   const rangeDays = cloudflare?.rangeDays || posthog?.rangeDays || 7
-  lines.push(`## Websites (last ${rangeDays} days)`)
+  lines.push(`## Sites & apps (last ${rangeDays} days)`)
+  lines.push(
+    'Note: Cloudflare edge uniques include bots. Human website visitors are PostHog only (currently WBS). BirdNest Families web does not have PostHog installed yet.'
+  )
   const sites = cloudflare?.configured ? cloudflare.sites || [] : []
-  if (!sites.length && !posthog?.configured) {
-    lines.push('No website analytics connected.')
-    lines.push('')
-  } else {
-    if (!sites.length && posthog?.configured) {
-      lines.push('### Whistler Business Solutions')
-      lines.push('- Cloudflare: not connected')
-      appendPosthog(lines, posthog)
-      lines.push('')
-    }
-    for (const site of sites) {
-      const t = siteTotals(site)
-      lines.push(`### ${site.label}`)
+  const catalog = [
+    { title: 'Whistler Business Solutions', match: /whistlerbusinesssolutions/i, posthog: true },
+    { title: 'BirdNest Families', match: /birdnestfamilies/i, posthog: false },
+  ]
+  let anySite = false
+  for (const item of catalog) {
+    const site = sites.find((s) => item.match.test(s.label || ''))
+    const t = site ? siteTotals(site) : { uniques: 0, pageviews: 0, requests: 0 }
+    if (item.hideIfEmpty && !t.requests && !t.uniques) continue
+    anySite = true
+    lines.push(`### ${item.title}${site ? ` (${site.label})` : ''}`)
+    if (site) {
       lines.push(
         `- Cloudflare edge: ${n(t.uniques)} unique clients · ${n(t.requests)} HTTP requests · ${n(t.pageviews)} HTML pageviews`
       )
@@ -92,22 +94,35 @@ function buildBrief({ generatedAt, voice, cloudflare, posthog, appMetrics, finan
             .join(' · ')}`
         )
       }
-      if (/whistlerbusinesssolutions/i.test(site.label) && posthog?.configured) {
-        appendPosthog(lines, posthog)
-      } else if (/whistlerbusinesssolutions/i.test(site.label) && posthog && !posthog.configured) {
-        lines.push('- PostHog: not connected')
-      }
-      lines.push('')
+    } else {
+      lines.push('- Cloudflare: no matching zone')
     }
-    if (cloudflare?.referers?.length) {
-      lines.push(
-        `Cloudflare RUM referrers: ${cloudflare.referers
-          .slice(0, 5)
-          .map((r) => `${r.referer} (${n(r.visits)} visits)`)
-          .join(' · ')}`
-      )
-      lines.push('')
+    if (item.posthog) {
+      if (posthog?.configured) appendPosthog(lines, posthog)
+      else lines.push('- Human visitors (PostHog): not connected')
+    } else {
+      lines.push('- Human visitors: not measured (PostHog not installed on this site)')
     }
+    lines.push('')
+  }
+  if (!anySite && posthog?.configured) {
+    lines.push('### Whistler Business Solutions')
+    lines.push('- Cloudflare: not connected')
+    appendPosthog(lines, posthog)
+    lines.push('')
+  }
+  if (!anySite && !posthog?.configured) {
+    lines.push('No website analytics connected.')
+    lines.push('')
+  }
+  if (cloudflare?.referers?.length) {
+    lines.push(
+      `Cloudflare RUM referrers: ${cloudflare.referers
+        .slice(0, 5)
+        .map((r) => `${r.referer} (${n(r.visits)} visits)`)
+        .join(' · ')}`
+    )
+    lines.push('')
   }
 
   // App
@@ -191,7 +206,7 @@ function buildBrief({ generatedAt, voice, cloudflare, posthog, appMetrics, finan
 function appendPosthog(lines, posthog) {
   const s = posthog.summary || {}
   lines.push(
-    `- PostHog product analytics: ${n(s.visitors)} visitors · ${n(s.sessions)} sessions · ${n(s.pageviews)} pageviews · ${n(s.bookingClicks)} booking clicks (${s.bookingClickRate ?? 0}% of visitors) · ${n(s.cartAdds)} cart adds · ${n(s.checkoutStarts)} checkout starts`
+    `- Human visitors (PostHog): ${n(s.visitors)} · ${n(s.sessions)} sessions · ${n(s.pageviews)} pageviews · ${n(s.bookingClicks)} booking clicks (${s.bookingClickRate ?? 0}% of visitors) · ${n(s.cartAdds)} cart adds · ${n(s.checkoutStarts)} checkout starts`
   )
   if (posthog.topPages?.length) {
     lines.push(
