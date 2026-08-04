@@ -20,7 +20,7 @@ function siteTotals(site) {
   }
 }
 
-function buildBrief({ generatedAt, voice, cloudflare, posthog, appMetrics, finance }) {
+function buildBrief({ generatedAt, voice, cloudflare, posthogWbs, posthogBirdnest, appMetrics, finance }) {
   const lines = []
   lines.push('# Whistler Business Solutions — dashboard snapshot')
   lines.push(`Generated: ${generatedAt}`)
@@ -65,15 +65,24 @@ function buildBrief({ generatedAt, voice, cloudflare, posthog, appMetrics, finan
   }
 
   // Websites / apps
-  const rangeDays = cloudflare?.rangeDays || posthog?.rangeDays || 7
+  const rangeDays =
+    cloudflare?.rangeDays || posthogWbs?.rangeDays || posthogBirdnest?.rangeDays || 7
   lines.push(`## Sites & apps (last ${rangeDays} days)`)
   lines.push(
-    'Note: Cloudflare edge uniques include bots. Human website visitors are PostHog only (currently WBS). BirdNest Families web does not have PostHog installed yet.'
+    'Note: Cloudflare edge uniques include bots. Human website visitors come from PostHog (WBS and BirdNest are separate projects).'
   )
   const sites = cloudflare?.configured ? cloudflare.sites || [] : []
   const catalog = [
-    { title: 'Whistler Business Solutions', match: /whistlerbusinesssolutions/i, posthog: true },
-    { title: 'BirdNest Families', match: /birdnestfamilies/i, posthog: false },
+    {
+      title: 'Whistler Business Solutions',
+      match: /whistlerbusinesssolutions/i,
+      posthog: posthogWbs,
+    },
+    {
+      title: 'BirdNest Families',
+      match: /birdnestfamilies/i,
+      posthog: posthogBirdnest,
+    },
   ]
   let anySite = false
   for (const item of catalog) {
@@ -97,21 +106,29 @@ function buildBrief({ generatedAt, voice, cloudflare, posthog, appMetrics, finan
     } else {
       lines.push('- Cloudflare: no matching zone')
     }
-    if (item.posthog) {
-      if (posthog?.configured) appendPosthog(lines, posthog)
-      else lines.push('- Human visitors (PostHog): not connected')
+    if (item.posthog?.configured) appendPosthog(lines, item.posthog)
+    else if (item.posthog && item.posthog.configured === false) {
+      lines.push('- Human visitors (PostHog): not connected')
     } else {
-      lines.push('- Human visitors: not measured (PostHog not installed on this site)')
+      lines.push('- Human visitors (PostHog): not loaded')
     }
     lines.push('')
   }
-  if (!anySite && posthog?.configured) {
-    lines.push('### Whistler Business Solutions')
-    lines.push('- Cloudflare: not connected')
-    appendPosthog(lines, posthog)
-    lines.push('')
+  if (!anySite && (posthogWbs?.configured || posthogBirdnest?.configured)) {
+    if (posthogWbs?.configured) {
+      lines.push('### Whistler Business Solutions')
+      lines.push('- Cloudflare: not connected')
+      appendPosthog(lines, posthogWbs)
+      lines.push('')
+    }
+    if (posthogBirdnest?.configured) {
+      lines.push('### BirdNest Families')
+      lines.push('- Cloudflare: not connected')
+      appendPosthog(lines, posthogBirdnest)
+      lines.push('')
+    }
   }
-  if (!anySite && !posthog?.configured) {
+  if (!anySite && !posthogWbs?.configured && !posthogBirdnest?.configured) {
     lines.push('No website analytics connected.')
     lines.push('')
   }
@@ -228,7 +245,8 @@ function appendPosthog(lines, posthog) {
 
 export default function DashboardAiBrief({ voice, appMetrics }) {
   const [cloudflare, setCloudflare] = useState(null)
-  const [posthog, setPosthog] = useState(null)
+  const [posthogWbs, setPosthogWbs] = useState(null)
+  const [posthogBirdnest, setPosthogBirdnest] = useState(null)
   const [finance, setFinance] = useState(null)
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -237,11 +255,13 @@ export default function DashboardAiBrief({ voice, appMetrics }) {
     setLoading(true)
     Promise.all([
       api('/api/site/analytics', { params: { days: 7 } }).catch(() => ({ configured: false })),
-      api('/api/site/posthog-analytics', { params: { days: 7 } }).catch(() => null),
+      api('/api/site/posthog-analytics', { params: { days: 7, project: 'wbs' } }).catch(() => null),
+      api('/api/site/posthog-analytics', { params: { days: 7, project: 'birdnest' } }).catch(() => null),
       api('/api/finance/summary', { params: { range: 'month' } }).catch(() => null),
-    ]).then(([cf, ph, fin]) => {
+    ]).then(([cf, phWbs, phBn, fin]) => {
       setCloudflare(cf)
-      setPosthog(ph)
+      setPosthogWbs(phWbs)
+      setPosthogBirdnest(phBn)
       setFinance(fin)
       setLoading(false)
     })
@@ -257,11 +277,12 @@ export default function DashboardAiBrief({ voice, appMetrics }) {
         generatedAt: new Date().toISOString(),
         voice,
         cloudflare,
-        posthog,
+        posthogWbs,
+        posthogBirdnest,
         appMetrics,
         finance,
       }),
-    [voice, cloudflare, posthog, appMetrics, finance]
+    [voice, cloudflare, posthogWbs, posthogBirdnest, appMetrics, finance]
   )
 
   const copy = async () => {

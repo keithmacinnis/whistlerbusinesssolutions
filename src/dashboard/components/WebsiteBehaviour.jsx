@@ -3,13 +3,15 @@ import { api } from '../api'
 import BarChart from './BarChart'
 import StatCard from './StatCard'
 
-const LAST_SYNCED_KEY = 'wbs_website_behaviour_synced_at'
+const CACHE_KEY = 'wbs_sites_apps_cache_v2'
+const DAYS_KEY = 'wbs_sites_apps_days'
 
 const number = (value) => Number(value || 0).toLocaleString()
 
 /**
- * Curated properties we care about — one card each.
- * Cloudflare zones are matched by domain substring; PostHog is WBS-only today.
+ * Curated properties — one card each.
+ * Cloudflare zones matched by domain; PostHog projects are per-property
+ * (WBS and BirdNest are separate free-tier accounts).
  */
 const IGNORED_ZONE_MATCH = /birdnestteams/i
 
@@ -21,7 +23,11 @@ const PROPERTIES = [
     domain: 'whistlerbusinesssolutions.com',
     match: /whistlerbusinesssolutions/i,
     posthog: true,
+    posthogProject: 'wbs',
+    posthogCache: 'posthogWbs',
+    showCommerceEvents: true,
     rumReferers: true,
+    sources: ['cloudflare', 'posthogWbs'],
   },
   {
     id: 'birdnest-web',
@@ -29,7 +35,11 @@ const PROPERTIES = [
     kind: 'website',
     domain: 'birdnestfamilies.com',
     match: /birdnestfamilies/i,
-    posthog: false,
+    posthog: true,
+    posthogProject: 'birdnest',
+    posthogCache: 'posthogBirdnest',
+    showCommerceEvents: false,
+    sources: ['cloudflare', 'posthogBirdnest'],
   },
   {
     id: 'birdnest-app',
@@ -38,8 +48,59 @@ const PROPERTIES = [
     domain: 'iOS App Store',
     match: null,
     appMetrics: true,
+    sources: ['appMetrics'],
   },
 ]
+
+function readCache() {
+  try {
+    return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null') || {}
+  } catch {
+    return {}
+  }
+}
+
+function writeCache(next) {
+  localStorage.setItem(CACHE_KEY, JSON.stringify(next))
+}
+
+function cacheSlot(cache, source, days) {
+  // App metrics aren't range-scoped the same way; store under "all".
+  const key = source === 'appMetrics' ? 'all' : String(days)
+  return cache?.[source]?.[key] || null
+}
+
+function setCacheSlot(cache, source, days, data) {
+  const key = source === 'appMetrics' ? 'all' : String(days)
+  const syncedAt = new Date().toISOString()
+  const next = {
+    ...cache,
+    [source]: {
+      ...(cache[source] || {}),
+      [key]: { data, syncedAt },
+    },
+  }
+  writeCache(next)
+  return { cache: next, syncedAt }
+}
+
+function formatSyncedAt(iso) {
+  if (!iso) return 'Never synced'
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return 'Never synced'
+  return d.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
+function latestSyncedAt(isos) {
+  const times = isos.filter(Boolean).map((iso) => new Date(iso).getTime()).filter((t) => !Number.isNaN(t))
+  if (!times.length) return null
+  return new Date(Math.max(...times)).toISOString()
+}
 
 function RankedList({ title, hint, rows, labelKey, valueKey, valueSuffix }) {
   return (
@@ -66,18 +127,6 @@ function RankedList({ title, hint, rows, labelKey, valueKey, valueSuffix }) {
   )
 }
 
-function formatSyncedAt(iso) {
-  if (!iso) return null
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return null
-  return d.toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  })
-}
-
 function siteTotals(site) {
   const days = site?.days || []
   return {
@@ -92,6 +141,23 @@ function findCloudflareSite(sites, prop) {
   return sites.find((s) => prop.match.test(s.label || '')) || null
 }
 
+function SyncControls({ syncing, onSync, lastSyncedAt, error }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        onClick={onSync}
+        disabled={syncing}
+        className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+      >
+        {syncing ? 'Syncing…' : '↻ Sync now'}
+      </button>
+      <span className="text-xs text-gray-400">Last synced {formatSyncedAt(lastSyncedAt)}</span>
+      {error && <span className="text-xs text-red-600">{error}</span>}
+    </div>
+  )
+}
+
 function PropertyCard({
   prop,
   cloudflareSite,
@@ -99,8 +165,12 @@ function PropertyCard({
   referers,
   appMetrics,
   days,
+  lastSyncedAt,
+  syncing,
+  syncError,
+  onSync,
   onSyncAppStore,
-  appSyncing,
+  appStoreSyncing,
   appSyncNote,
 }) {
   const edge = cloudflareSite ? siteTotals(cloudflareSite) : null
@@ -111,25 +181,37 @@ function PropertyCard({
   const appPageViews = appMetrics?.appstore?.pageViews || []
   const appPageViewSum = appPageViews.reduce((a, p) => a + (p.count || 0), 0)
   const rcMetrics = appMetrics?.revenuecat?.configured ? appMetrics.revenuecat.metrics || [] : []
+  const hasCachedData = Boolean(cloudflareSite || posthog || appMetrics)
 
   return (
     <section className="rounded-lg bg-white p-5 shadow-sm">
-      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-semibold text-gray-900">
             {prop.kind === 'app' ? 'App' : 'Website'} — {prop.title}
           </h2>
           <p className="mt-0.5 text-xs text-gray-400">{prop.domain}</p>
         </div>
-        {humanVisitors != null && (
-          <div className="text-right">
-            <div className="text-2xl font-semibold text-gray-900">{number(humanVisitors)}</div>
-            <div className="text-xs text-gray-500">human visitors (PostHog, {days}d)</div>
-          </div>
-        )}
+        <div className="flex flex-col items-end gap-2">
+          {humanVisitors != null && (
+            <div className="text-right">
+              <div className="text-2xl font-semibold text-gray-900">{number(humanVisitors)}</div>
+              <div className="text-xs text-gray-500">human visitors (PostHog, {days}d)</div>
+            </div>
+          )}
+          <SyncControls
+            syncing={syncing}
+            onSync={onSync}
+            lastSyncedAt={lastSyncedAt}
+            error={syncError}
+          />
+        </div>
       </div>
 
-      {/* Human visitors callout */}
+      {!hasCachedData && !syncing && (
+        <p className="mb-4 text-sm text-gray-400">No cached stats yet — hit Sync now to pull the latest.</p>
+      )}
+
       <div className="mb-6 rounded-md bg-gray-50 px-4 py-3">
         {prop.kind === 'app' ? (
           <p className="text-sm text-gray-700">
@@ -137,9 +219,8 @@ function PropertyCard({
             {appMetrics?.appstore?.configured
               ? appPageViews.length
                 ? `${number(appPageViewSum)} App Store product-page views in stored history (not the same as installs).`
-                : 'App Store connected — no page-view rows synced yet (hit Sync App Store on Overview).'
-              : 'App Store Connect not connected — cannot measure product-page views yet.'}
-            {' '}
+                : 'App Store connected — no page-view rows yet (use Sync App Store report below).'
+              : 'App Store Connect not connected — cannot measure product-page views yet.'}{' '}
             Subscription humans live in RevenueCat below.
           </p>
         ) : prop.posthog ? (
@@ -150,21 +231,21 @@ function PropertyCard({
               {number(humanSessions)} sessions · {number(humanPageviews)} pageviews
               <span className="text-gray-500">
                 {' '}
-                — PostHog counts real browsers with analytics loaded; bots excluded. Ad blockers still undercount some people.
+                — PostHog counts real browsers with analytics loaded; bots excluded.
               </span>
             </p>
           ) : (
             <p className="text-sm text-amber-800">
               <span className="font-medium">Human visitors: not available</span>
               {' — '}
-              PostHog is not connected for this dashboard (set POSTHOG_DASHBOARD_KEY). Edge numbers below include bots.
+              PostHog is not connected (set POSTHOG_DASHBOARD_KEY). Edge numbers include bots.
             </p>
           )
         ) : (
           <p className="text-sm text-amber-800">
             <span className="font-medium">Human visitors: not measured</span>
             {' — '}
-            PostHog is not installed on {prop.domain}. Cloudflare edge stats below include bots, crawlers, and assets — not people.
+            PostHog is not configured for this property.
           </p>
         )}
       </div>
@@ -217,7 +298,7 @@ function PropertyCard({
               {prop.rumReferers && (
                 <div>
                   <h4 className="text-sm font-semibold text-gray-700">Referrer sources (Cloudflare RUM)</h4>
-                  {referers === null || referers === undefined ? (
+                  {referers == null ? (
                     <p className="mt-1 text-xs text-gray-400">
                       Enable Cloudflare Web Analytics and set CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_RUM_SITE_TAG.
                     </p>
@@ -253,18 +334,22 @@ function PropertyCard({
                 <StatCard label="Human visitors" value={number(posthog.summary.visitors)} hint="people with $pageview" />
                 <StatCard label="Sessions" value={number(posthog.summary.sessions)} />
                 <StatCard label="Pageviews" value={number(posthog.summary.pageviews)} />
-                <StatCard
-                  label="Booking clicks"
-                  value={number(posthog.summary.bookingClicks)}
-                  hint={`${posthog.summary.bookingClickRate}% of visitors`}
-                />
-                <StatCard label="Added to cart" value={number(posthog.summary.cartAdds)} />
-                <StatCard label="Checkout starts" value={number(posthog.summary.checkoutStarts)} />
+                {prop.showCommerceEvents && (
+                  <>
+                    <StatCard
+                      label="Booking clicks"
+                      value={number(posthog.summary.bookingClicks)}
+                      hint={`${posthog.summary.bookingClickRate}% of visitors`}
+                    />
+                    <StatCard label="Added to cart" value={number(posthog.summary.cartAdds)} />
+                    <StatCard label="Checkout starts" value={number(posthog.summary.checkoutStarts)} />
+                  </>
+                )}
               </div>
 
               <div>
                 <h4 className="mb-2 text-sm font-semibold text-gray-700">Daily human visitors</h4>
-                {posthog.days.length ? (
+                {posthog.days?.length ? (
                   <BarChart
                     points={posthog.days.map((row) => ({ day: row.day, count: row.visitors }))}
                     label="human visitors"
@@ -275,9 +360,9 @@ function PropertyCard({
               </div>
 
               <div className="grid gap-6 md:grid-cols-3">
-                <RankedList title="Top pages" rows={posthog.topPages} labelKey="path" valueKey="pageviews" valueSuffix="views" />
-                <RankedList title="Traffic sources" rows={posthog.sources} labelKey="source" valueKey="visits" valueSuffix="views" />
-                <RankedList title="Devices" rows={posthog.devices} labelKey="device" valueKey="visits" valueSuffix="views" />
+                <RankedList title="Top pages" rows={posthog.topPages || []} labelKey="path" valueKey="pageviews" valueSuffix="views" />
+                <RankedList title="Traffic sources" rows={posthog.sources || []} labelKey="source" valueKey="visits" valueSuffix="views" />
+                <RankedList title="Devices" rows={posthog.devices || []} labelKey="device" valueKey="visits" valueSuffix="views" />
               </div>
             </>
           )}
@@ -286,23 +371,24 @@ function PropertyCard({
 
       {prop.kind === 'app' && (
         <div className="space-y-5">
-          <div className="flex justify-end">
-            {appMetrics?.appstore?.configured && onSyncAppStore && (
+          {appMetrics?.appstore?.configured && onSyncAppStore && (
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={onSyncAppStore}
-                disabled={appSyncing}
+                disabled={appStoreSyncing}
                 className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
-                {appSyncing ? 'Syncing…' : '↻ Sync App Store data'}
+                {appStoreSyncing ? 'Pulling report…' : '↻ Sync App Store report'}
               </button>
-            )}
-          </div>
+              <span className="text-xs text-gray-400">Pulls new ASC page-view rows into the DB</span>
+            </div>
+          )}
           {appSyncNote && (
             <div className="rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-700">{appSyncNote}</div>
           )}
           {!appMetrics ? (
-            <p className="text-sm text-gray-400">Loading app metrics…</p>
+            <p className="text-sm text-gray-400">No app metrics cached yet.</p>
           ) : (
             <>
               {appMetrics.revenuecat?.configured && !appMetrics.revenuecat.error && (
@@ -347,82 +433,131 @@ function PropertyCard({
 }
 
 export default function WebsiteBehaviour() {
-  const [days, setDays] = useState(7)
-  const [cloudflare, setCloudflare] = useState(null)
-  const [posthog, setPosthog] = useState(null)
-  const [appMetrics, setAppMetrics] = useState(null)
-  const [error, setError] = useState('')
-  const [syncing, setSyncing] = useState(false)
-  const [appSyncing, setAppSyncing] = useState(false)
+  const [days, setDays] = useState(() => {
+    const saved = Number(localStorage.getItem(DAYS_KEY))
+    return saved === 30 ? 30 : 7
+  })
+  const [cache, setCache] = useState(() => readCache())
+  const [syncingId, setSyncingId] = useState(null)
+  const [syncErrors, setSyncErrors] = useState({})
+  const [appStoreSyncing, setAppStoreSyncing] = useState(false)
   const [appSyncNote, setAppSyncNote] = useState('')
-  const [syncedAt, setSyncedAt] = useState(() => localStorage.getItem(LAST_SYNCED_KEY) || '')
 
-  const load = useCallback(async () => {
-    setSyncing(true)
-    setError('')
+  const cloudflare = cacheSlot(cache, 'cloudflare', days)?.data ?? null
+  const appMetrics = cacheSlot(cache, 'appMetrics', days)?.data ?? null
+
+  const syncedAtFor = useCallback(
+    (sources) =>
+      latestSyncedAt(
+        sources.map((source) => cacheSlot(cache, source, days)?.syncedAt)
+      ),
+    [cache, days]
+  )
+
+  const changeDays = (next) => {
+    setDays(next)
+    localStorage.setItem(DAYS_KEY, String(next))
+  }
+
+  const syncSources = async (sources, propId) => {
+    if (propId) setSyncingId(propId)
+    if (propId) setSyncErrors((prev) => ({ ...prev, [propId]: '' }))
+    let nextCache = readCache()
     const errors = []
-    const [cf, ph, app] = await Promise.all([
-      api('/api/site/analytics', { params: { days } }).catch((err) => {
-        errors.push(err.message)
-        return { configured: false }
-      }),
-      api('/api/site/posthog-analytics', { params: { days } }).catch((err) => {
-        errors.push(err.message)
-        return null
-      }),
-      api('/api/site/app-metrics').catch(() => null),
-    ])
-    setCloudflare(cf)
-    setPosthog(ph)
-    setAppMetrics(app)
-    if (errors.length) setError(errors.join(' · '))
-    const now = new Date().toISOString()
-    localStorage.setItem(LAST_SYNCED_KEY, now)
-    setSyncedAt(now)
-    setSyncing(false)
-  }, [days])
 
-  useEffect(() => {
-    load()
-  }, [load])
+    try {
+      if (sources.includes('cloudflare')) {
+        try {
+          const data = await api('/api/site/analytics', { params: { days } })
+          nextCache = setCacheSlot(nextCache, 'cloudflare', days, data).cache
+        } catch (err) {
+          errors.push(err.message)
+        }
+      }
+      if (sources.includes('posthogWbs')) {
+        try {
+          const data = await api('/api/site/posthog-analytics', { params: { days, project: 'wbs' } })
+          nextCache = setCacheSlot(nextCache, 'posthogWbs', days, data).cache
+        } catch (err) {
+          errors.push(err.message)
+        }
+      }
+      if (sources.includes('posthogBirdnest')) {
+        try {
+          const data = await api('/api/site/posthog-analytics', {
+            params: { days, project: 'birdnest' },
+          })
+          nextCache = setCacheSlot(nextCache, 'posthogBirdnest', days, data).cache
+        } catch (err) {
+          errors.push(err.message)
+        }
+      }
+      if (sources.includes('appMetrics')) {
+        try {
+          const data = await api('/api/site/app-metrics')
+          nextCache = setCacheSlot(nextCache, 'appMetrics', days, data).cache
+        } catch (err) {
+          errors.push(err.message)
+        }
+      }
+      setCache(nextCache)
+      if (propId && errors.length) {
+        setSyncErrors((prev) => ({ ...prev, [propId]: errors.join(' · ') }))
+      }
+      return errors
+    } finally {
+      if (propId) setSyncingId(null)
+    }
+  }
 
-  const syncAppStore = async () => {
-    setAppSyncing(true)
+  const syncCard = (prop) => syncSources(prop.sources, prop.id)
+
+  const syncAppStoreReport = async () => {
+    setAppStoreSyncing(true)
     setAppSyncNote('')
     try {
       const r = await api('/api/site/app-metrics/sync', { method: 'POST' })
       setAppSyncNote(
         r.note || (r.synced != null ? `Synced ${r.synced} day(s) from "${r.report}"` : 'Not configured')
       )
-      const app = await api('/api/site/app-metrics').catch(() => null)
-      setAppMetrics(app)
+      const data = await api('/api/site/app-metrics')
+      const result = setCacheSlot(readCache(), 'appMetrics', days, data)
+      setCache(result.cache)
     } catch (err) {
       setAppSyncNote(err.message)
     } finally {
-      setAppSyncing(false)
+      setAppStoreSyncing(false)
     }
   }
+
+  // First visit (or new range) with no cache: pull once so cards aren't blank.
+  useEffect(() => {
+    const hasAny =
+      cacheSlot(cache, 'cloudflare', days) ||
+      cacheSlot(cache, 'posthogWbs', days) ||
+      cacheSlot(cache, 'posthogBirdnest', days) ||
+      cacheSlot(cache, 'appMetrics', days)
+    if (hasAny) return
+    syncSources(['cloudflare', 'posthogWbs', 'posthogBirdnest', 'appMetrics'], null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot when this range has no cache
+  }, [days])
 
   const cards = useMemo(() => {
     const sites = cloudflare?.configured ? cloudflare.sites || [] : []
     return PROPERTIES.map((prop) => {
       const cfSite = findCloudflareSite(sites, prop)
-      const edge = cfSite ? siteTotals(cfSite) : null
-      const empty =
-        prop.hideIfEmpty &&
-        (!cfSite || ((edge?.requests || 0) === 0 && (edge?.uniques || 0) === 0))
+      const ph = prop.posthogCache ? cacheSlot(cache, prop.posthogCache, days)?.data ?? null : null
       return {
         prop,
         cloudflareSite: cfSite,
-        empty,
-        posthog: prop.posthog ? posthog : null,
+        posthog: prop.posthog ? ph : null,
         referers: prop.rumReferers ? cloudflare?.referers ?? null : null,
         appMetrics: prop.appMetrics ? appMetrics : null,
+        lastSyncedAt: syncedAtFor(prop.sources),
       }
-    }).filter((c) => !c.empty)
-  }, [cloudflare, posthog, appMetrics])
+    })
+  }, [cloudflare, appMetrics, cache, days, syncedAtFor])
 
-  const syncedLabel = formatSyncedAt(syncedAt)
   const unmatchedZones = useMemo(() => {
     const sites = cloudflare?.configured ? cloudflare.sites || [] : []
     return sites.filter(
@@ -438,58 +573,41 @@ export default function WebsiteBehaviour() {
         <div>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Sites &amp; apps</h2>
           <p className="mt-0.5 text-xs text-gray-400">
-            One card per property. Human visitors come from PostHog; Cloudflare is edge traffic (bots included).
+            Showing last synced stats. Use Sync now on a card to refresh it. Human visitors = PostHog; Cloudflare = edge (bots included).
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {syncedLabel && <span className="text-xs text-gray-400">Last synced {syncedLabel}</span>}
-          <div className="flex rounded-md border border-gray-200 bg-white p-0.5">
-            {[7, 30].map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setDays(option)}
-                className={`rounded px-3 py-1 text-xs font-medium ${
-                  days === option ? 'bg-brand-600 text-white' : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                {option} days
-              </button>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={load}
-            disabled={syncing}
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            {syncing ? 'Syncing…' : '↻ Sync'}
-          </button>
+        <div className="flex rounded-md border border-gray-200 bg-white p-0.5">
+          {[7, 30].map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => changeDays(option)}
+              className={`rounded px-3 py-1 text-xs font-medium ${
+                days === option ? 'bg-brand-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              {option} days
+            </button>
+          ))}
         </div>
       </div>
 
-      {error && <div className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
-
-      {!cards.length && !error && (
-        <section className="rounded-lg bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-400">
-            {syncing ? 'Loading…' : 'No properties to show yet.'}
-          </p>
-        </section>
-      )}
-
-      {cards.map(({ prop, cloudflareSite, posthog: ph, referers, appMetrics: am }) => (
+      {cards.map((card) => (
         <PropertyCard
-          key={prop.id}
-          prop={prop}
-          cloudflareSite={cloudflareSite}
-          posthog={ph}
-          referers={referers}
-          appMetrics={am}
+          key={card.prop.id}
+          prop={card.prop}
+          cloudflareSite={card.cloudflareSite}
+          posthog={card.posthog}
+          referers={card.referers}
+          appMetrics={card.appMetrics}
           days={days}
-          onSyncAppStore={prop.appMetrics ? syncAppStore : undefined}
-          appSyncing={appSyncing}
-          appSyncNote={prop.appMetrics ? appSyncNote : ''}
+          lastSyncedAt={card.lastSyncedAt}
+          syncing={syncingId === card.prop.id}
+          syncError={syncErrors[card.prop.id] || ''}
+          onSync={() => syncCard(card.prop)}
+          onSyncAppStore={card.prop.appMetrics ? syncAppStoreReport : undefined}
+          appStoreSyncing={appStoreSyncing}
+          appSyncNote={card.prop.appMetrics ? appSyncNote : ''}
         />
       ))}
 
