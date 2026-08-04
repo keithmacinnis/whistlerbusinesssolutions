@@ -6,6 +6,7 @@ import StatusPill from '../components/StatusPill'
 import BarChart from '../components/BarChart'
 import ActionItems from '../components/ActionItems'
 import WebsiteBehaviour from '../components/WebsiteBehaviour'
+import DashboardAiBrief from '../components/DashboardAiBrief'
 import { useAuth } from '../auth'
 
 const dollars = (cents) => `$${((cents || 0) / 100).toFixed(2)}`
@@ -231,6 +232,8 @@ export default function Overview() {
           </table>
         </div>
       )}
+
+      {isAdmin && <DashboardAiBrief voice={data} appMetrics={appMetrics} />}
     </div>
   )
 }
