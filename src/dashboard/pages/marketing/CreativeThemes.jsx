@@ -6,7 +6,7 @@ import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
 import AngleHintPicker from './AngleHintPicker'
-import SeriesSelect from './SeriesSelect'
+import SeriesSelect, { CreateSeriesPlus } from './SeriesSelect'
 
 const STATUS_STYLES = {
   idea: 'bg-amber-50 text-amber-800 ring-amber-200',
@@ -193,6 +193,12 @@ export default function CreativeThemes() {
             {s.name}
           </button>
         ))}
+        <CreateSeriesPlus
+          onCreated={(created) => {
+            setSeries((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)))
+            setSeriesFilter(created.slug)
+          }}
+        />
       </div>
 
       {error && !creating && (
