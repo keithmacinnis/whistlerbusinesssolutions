@@ -69,6 +69,20 @@ export default function CreativeThemes() {
       <CreativeStudioTabs />
       <CreativeStudioGuide focus="themes" />
 
+      <div className="mb-4 rounded-md border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600">
+        <p>
+          <strong className="text-gray-800">Kind</strong> is the <em>type</em> of theme:{' '}
+          <strong>Editorial</strong> = softer article/social story posts (presence, family circle,
+          safe nest). <strong>Campaign</strong> = more direct product videos meant to convert
+          (shared care, digital nest, command center).
+        </p>
+        <p className="mt-2">
+          <strong className="text-gray-800">Series</strong> is the <em>collection</em> they belong
+          to. Right now editorials live in “More Time for What Matters”; campaigns are standalone
+          (no series). Use Series to browse a collection; use Kind if you only care about tone.
+        </p>
+      </div>
+
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Kind</span>
         {[
