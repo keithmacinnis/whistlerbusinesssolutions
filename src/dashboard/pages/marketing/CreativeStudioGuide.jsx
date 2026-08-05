@@ -21,8 +21,8 @@ export default function CreativeStudioGuide({ focus = 'briefs' }) {
           <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">1. Theme</div>
           <p className="mt-1">
             A full story package: headline, article/caption, video outline, image concept, on-screen
-            text, CTA. Often part of a <strong>Series</strong> (e.g. “More Time for What Matters”)
-            or a standalone <strong>campaign concept</strong> (e.g. “Digital Nest”).
+            text, CTA. Themes live in a <strong>Series</strong> — a named collection like “More Time
+            for What Matters” or “Shared Care”.
           </p>
         </li>
         <li className={step('briefs')}>

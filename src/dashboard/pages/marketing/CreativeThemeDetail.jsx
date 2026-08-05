@@ -180,8 +180,7 @@ export default function CreativeThemeDetail() {
           {form.title}
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          {theme?.kind}
-          {series ? ` · ${series.name}` : ' · Campaign concept'}
+          {series ? series.name : 'Ungrouped theme'}
         </p>
       </div>
       <CreativeStudioTabs />
