@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const syncRainbowRails = () => {
     const header = document.querySelector('header');
     if (!header) return;
-    // Track the bar's viewport Y so rails grow upward on scroll and stay attached.
+    // Dock under header at rest; pin to viewport top once the header scrolls away.
     const top = Math.max(0, Math.round(header.getBoundingClientRect().bottom));
     document.documentElement.style.setProperty('--rainbow-rail-top', `${top}px`);
   };

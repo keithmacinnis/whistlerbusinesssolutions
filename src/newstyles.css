@@ -642,7 +642,7 @@ html, body {
    LAYOUT COMPONENTS
    ======================================== */
 
-/* Header — WBS sits on the rainbow bar */
+/* Header — WBS sits above the sticky rainbow bar */
 header {
   /* Mountain slate — fills corner-to-corner (no empty black wedges) */
   --header-eclipse: #2c3e50;
@@ -651,20 +651,21 @@ header {
   background: var(--header-eclipse);
 }
 
-header::before {
-  content: '';
-  position: absolute;
+/* Sticky rainbow bar: docks under the header at rest, pins to viewport top on scroll */
+.rainbow-bar--top {
+  position: fixed;
+  top: var(--rainbow-rail-top, 0px);
   left: 0;
-  bottom: 0;
-  width: 100%;
+  right: 0;
   height: 2px;
+  pointer-events: none;
+  z-index: 250;
   /* Full spectrum visible; hue-rotate keeps corners matched as colours shift */
   background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #00ffff, #0000ff, #8b00ff, #ff00ff);
   box-shadow:
     0 0 6px rgba(255, 0, 200, 0.55),
     0 0 14px rgba(0, 200, 255, 0.35);
   animation: rainbowHue 18s linear infinite;
-  z-index: 2;
 }
 
 .rainbow-rail {
