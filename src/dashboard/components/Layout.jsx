@@ -58,6 +58,7 @@ export default function Layout() {
                 Marketing
               </div>
               <NavLink to="/marketing/qr-codes" className={navLinkClass}>QR Codes</NavLink>
+              <NavLink to="/marketing/creative" className={navLinkClass}>Creative Studio</NavLink>
               <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Finance
               </div>

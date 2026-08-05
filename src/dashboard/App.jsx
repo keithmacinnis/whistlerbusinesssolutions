@@ -11,6 +11,8 @@ import MerchProducts from './pages/merch/MerchProducts'
 import MerchOrders from './pages/merch/MerchOrders'
 import OnlineStores from './pages/merch/OnlineStores'
 import QrCodes from './pages/marketing/QrCodes'
+import CreativeStudio from './pages/marketing/CreativeStudio'
+import CreativeBriefDetail from './pages/marketing/CreativeBriefDetail'
 import EducationResources from './pages/education/Resources'
 import EducationTeachers from './pages/education/Teachers'
 import EducationSessions from './pages/education/Sessions'
@@ -57,6 +59,8 @@ export default function App() {
           <Route path="merch/products" element={<MerchProducts />} />
           <Route path="merch/orders" element={<MerchOrders />} />
           <Route path="marketing/qr-codes" element={<QrCodes />} />
+          <Route path="marketing/creative" element={<CreativeStudio />} />
+          <Route path="marketing/creative/:id" element={<CreativeBriefDetail />} />
           <Route path="users" element={<Users />} />
           <Route path="education/resources" element={<EducationResources />} />
           <Route path="education/teachers" element={<EducationTeachers />} />
