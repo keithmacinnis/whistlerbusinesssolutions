@@ -4,6 +4,7 @@ import { api } from '../../api'
 import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
+import { ToneChip } from './ToneBanner'
 
 const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
@@ -149,6 +150,7 @@ export default function CreativeShip() {
                 >
                   {b.status}
                 </span>
+                <ToneChip tone={b.meta?.toneAnalysis} />
               </div>
               <p className="mt-1 text-sm text-gray-500">
                 {formatLabel(b.format)} · {b.angle}

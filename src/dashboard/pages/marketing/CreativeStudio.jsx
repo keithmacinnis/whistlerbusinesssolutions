@@ -5,6 +5,7 @@ import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
+import { ToneChip } from './ToneBanner'
 
 const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
@@ -187,6 +188,7 @@ export default function CreativeStudio() {
                 <th className="px-4 py-3">Angle</th>
                 <th className="px-4 py-3">Format</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Tone</th>
                 <th className="px-4 py-3">Updated</th>
                 <th className="px-4 py-3" />
               </tr>
@@ -213,6 +215,13 @@ export default function CreativeStudio() {
                     >
                       {b.status}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {b.meta?.toneAnalysis ? (
+                      <ToneChip tone={b.meta.toneAnalysis} />
+                    ) : (
+                      <span className="text-xs text-gray-400">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-gray-500">
                     {new Date(b.updatedAt).toLocaleString()}

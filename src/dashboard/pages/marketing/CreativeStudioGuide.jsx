@@ -27,15 +27,15 @@ export default function CreativeStudioGuide({ focus = 'ideas' }) {
         <li className={step('briefs')}>
           <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">2. Briefs</div>
           <p className="mt-1">
-            Remix an idea into hooks, beats, and a <strong>paste-ready prompt</strong> for CapCut /
-            Arcads (micro reaction, talking head, Seedance, captions).
+            Remix an idea into hooks, beats, and a <strong>paste-ready prompt</strong>. Each brief gets
+            a <strong>tone check</strong> — rewrite anything that reads as depressed/chaos-mom.
           </p>
         </li>
         <li className={step('ship')}>
           <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">3. Ship</div>
           <p className="mt-1">
-            Daily queue: copy the prompt, make the piece externally, mark it prompted when it’s out
-            the door.
+            Daily queue: skip low tone scores, copy the prompt, make the piece externally, mark
+            prompted when it’s out.
           </p>
         </li>
       </ol>

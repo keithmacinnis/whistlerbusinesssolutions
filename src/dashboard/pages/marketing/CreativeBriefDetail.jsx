@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api'
 import { useAuth } from '../../auth'
+import ToneBanner from './ToneBanner'
 
 const STATUSES = ['idea', 'briefed', 'prompted', 'archived']
 
@@ -39,6 +40,7 @@ export default function CreativeBriefDetail() {
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState('')
   const [dirty, setDirty] = useState(false)
+  const [checkingTone, setCheckingTone] = useState(false)
 
   const load = useCallback(() => {
     api(`/api/marketing/creative/briefs/${id}`)
@@ -106,10 +108,28 @@ export default function CreativeBriefDetail() {
       })
       setBrief(updated)
       setDirty(false)
+      return updated
+    } catch (err) {
+      setError(err.message)
+      throw err
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const recheckTone = async () => {
+    setCheckingTone(true)
+    setError('')
+    try {
+      if (dirty) await save()
+      const { brief: updated } = await api(`/api/marketing/creative/briefs/${id}/analyze-tone`, {
+        method: 'POST',
+      })
+      setBrief(updated)
     } catch (err) {
       setError(err.message)
     } finally {
-      setSaving(false)
+      setCheckingTone(false)
     }
   }
 
@@ -196,6 +216,12 @@ export default function CreativeBriefDetail() {
       </div>
 
       {error && <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
+
+      <ToneBanner
+        tone={brief?.meta?.toneAnalysis}
+        onRecheck={recheckTone}
+        checking={checkingTone}
+      />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-1">
