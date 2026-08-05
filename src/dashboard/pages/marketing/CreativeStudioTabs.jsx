@@ -10,11 +10,11 @@ const tabClass = ({ isActive }) =>
 export default function CreativeStudioTabs() {
   return (
     <div className="mb-6 flex flex-wrap gap-2">
-      <NavLink to="/marketing/creative" end className={tabClass}>
-        Briefs
-      </NavLink>
       <NavLink to="/marketing/creative/themes" className={tabClass}>
         Themes
+      </NavLink>
+      <NavLink to="/marketing/creative" end className={tabClass}>
+        Briefs
       </NavLink>
       <NavLink to="/marketing/creative/ship" className={tabClass}>
         Ship
