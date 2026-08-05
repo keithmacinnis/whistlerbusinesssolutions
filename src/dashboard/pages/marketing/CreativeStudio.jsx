@@ -14,6 +14,7 @@ const STATUS_STYLES = {
 function formatLabel(slug) {
   return (
     {
+      micro_reaction: 'Micro reaction',
       talking_head_screen: 'Talking head + screen',
       seedance_oner: 'Seedance one-take',
       caption_pack: 'Caption pack',
@@ -36,7 +37,7 @@ export default function CreativeStudio() {
   const [form, setForm] = useState({
     offerSlug: 'birdnest-app',
     angle: 'MOMENTS',
-    format: 'talking_head_screen',
+    format: 'micro_reaction',
     model: 'gpt-4o-mini',
     inputNote: '',
   })
@@ -84,7 +85,7 @@ export default function CreativeStudio() {
     setForm({
       offerSlug: offer?.slug || 'birdnest-app',
       angle: offer?.angles?.[0]?.code || 'MOMENTS',
-      format: formats[0]?.slug || 'talking_head_screen',
+      format: formats[0]?.slug || 'micro_reaction',
       model: defaultModel,
       inputNote: '',
     })
