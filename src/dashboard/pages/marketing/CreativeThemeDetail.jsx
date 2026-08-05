@@ -186,6 +186,12 @@ export default function CreativeThemeDetail() {
       </div>
       <CreativeStudioTabs />
 
+      <div className="mb-4 rounded-md border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-gray-700">
+        This is a <strong>theme</strong> — the story package (not the finished ad yet). Edit the
+        article/video ideas here, then hit <strong>Generate brief from theme</strong> to get hooks +
+        a paste-ready CapCut/Arcads prompt for today’s ship.
+      </div>
+
       <div className="mb-4 flex flex-wrap gap-2">
         <button
           type="button"

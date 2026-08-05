@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../../api'
 import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
+import CreativeStudioGuide from './CreativeStudioGuide'
 
 const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
@@ -66,6 +67,7 @@ export default function CreativeThemes() {
         </p>
       </div>
       <CreativeStudioTabs />
+      <CreativeStudioGuide focus="themes" />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Kind</span>
