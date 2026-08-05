@@ -29,6 +29,7 @@ const emptyForm = {
   angleHints: 'NEST',
   status: 'idea',
   notes: '',
+  author: 'Mom',
 }
 
 function StatusChip({ status }) {
@@ -144,6 +145,7 @@ export default function CreativeIdeas() {
           angleHints: form.angleHints,
           status: form.status,
           notes: form.notes.trim() || undefined,
+          author: form.author.trim() || 'Mom',
         },
       })
       const created = res.idea || res.theme
@@ -284,11 +286,19 @@ export default function CreativeIdeas() {
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-bold text-brand-700 ring-1 ring-brand-100">
                       {t.number != null ? String(t.number).padStart(2, '0') : '•'}
                     </div>
-                    <StatusChip status={t.status} />
+                    <div className="flex flex-col items-end gap-1">
+                      <StatusChip status={t.status} />
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                        {t.author || 'Mom'}
+                      </span>
+                    </div>
                   </div>
                   <h3 className="mt-3 text-base font-semibold text-gray-900 group-hover:text-brand-800">
                     {t.title}
                   </h3>
+                  {t.parentSlug ? (
+                    <p className="mt-1 text-[11px] text-violet-600">↳ from {t.parentSlug}</p>
+                  ) : null}
                   <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-600">
                     “{t.headline}”
                   </p>
@@ -349,7 +359,7 @@ export default function CreativeIdeas() {
               <div className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
             )}
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <SeriesSelect
                 series={series}
                 value={form.seriesSlug}
@@ -360,6 +370,15 @@ export default function CreativeIdeas() {
                   )
                 }
               />
+              <label className="block text-sm font-medium text-gray-700">
+                Author
+                <input
+                  value={form.author}
+                  onChange={(e) => setForm({ ...form, author: e.target.value })}
+                  placeholder="Mom"
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                />
+              </label>
               <label className="block text-sm font-medium text-gray-700">
                 Status
                 <select

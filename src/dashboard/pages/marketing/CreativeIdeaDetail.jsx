@@ -17,6 +17,8 @@ export default function CreativeIdeaDetail() {
   const [seriesMeta, setSeriesMeta] = useState(null)
   const [seriesList, setSeriesList] = useState([])
   const [briefs, setBriefs] = useState([])
+  const [lineage, setLineage] = useState([])
+  const [children, setChildren] = useState([])
   const [formats, setFormats] = useState([])
   const [models, setModels] = useState([])
   const [offers, setOffers] = useState([])
@@ -24,7 +26,9 @@ export default function CreativeIdeaDetail() {
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [generating, setGenerating] = useState(false)
+  const [deriving, setDeriving] = useState(false)
   const [showGenerate, setShowGenerate] = useState(false)
+  const [showDerive, setShowDerive] = useState(false)
   const [copied, setCopied] = useState('')
   const [form, setForm] = useState(null)
   const [genForm, setGenForm] = useState({
@@ -34,18 +38,24 @@ export default function CreativeIdeaDetail() {
     offerSlug: 'birdnest-app',
     inputNote: '',
   })
+  const [deriveForm, setDeriveForm] = useState({
+    model: 'gpt-4o-mini',
+    direction: '',
+  })
 
   const load = useCallback(() => {
     Promise.all([
       api(`/api/marketing/creative/ideas/${slug}`),
       api('/api/marketing/creative/series'),
     ])
-      .then(([{ idea, theme, series: s, briefs: b }, seriesRes]) => {
+      .then(([{ idea, theme, series: s, briefs: b, lineage: lin, children: kids }, seriesRes]) => {
         const t = idea || theme
         setIdea(t)
         setSeriesMeta(s)
         setSeriesList(seriesRes.series || [])
         setBriefs(b || [])
+        setLineage(lin || [])
+        setChildren(kids || [])
         setForm({
           title: t.title || '',
           headline: t.headline || '',
@@ -59,6 +69,7 @@ export default function CreativeIdeaDetail() {
           seriesSlug: t.seriesSlug || '',
           status: t.status || 'ready',
           notes: t.notes || '',
+          author: t.author || 'Mom',
         })
         setGenForm((prev) => ({
           ...prev,
@@ -131,6 +142,7 @@ export default function CreativeIdeaDetail() {
           seriesSlug: form.seriesSlug || null,
           status: form.status,
           notes: form.notes.trim() || null,
+          author: form.author.trim() || 'Mom',
         },
       })
       setIdea(updatedIdea || updatedTheme)
@@ -165,6 +177,26 @@ export default function CreativeIdeaDetail() {
     }
   }
 
+  const derive = async () => {
+    setError('')
+    setDeriving(true)
+    try {
+      const { idea: derived } = await api(`/api/marketing/creative/ideas/${slug}/derive`, {
+        method: 'POST',
+        body: {
+          model: deriveForm.model,
+          direction: deriveForm.direction.trim() || undefined,
+        },
+      })
+      setShowDerive(false)
+      navigate(`/marketing/creative/ideas/${derived.slug}`)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setDeriving(false)
+    }
+  }
+
   if (user?.role !== 'super_admin') {
     return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
   }
@@ -193,16 +225,31 @@ export default function CreativeIdeaDetail() {
           {idea?.number != null ? `${String(idea.number).padStart(2, '0')}. ` : ''}
           {form.title}
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {seriesMeta ? seriesMeta.name : 'Ungrouped idea'}
+        <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500">
+          <span>{seriesMeta ? seriesMeta.name : 'Ungrouped idea'}</span>
+          <span className="text-gray-300">·</span>
+          <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-700">
+            by {form.author || 'Mom'}
+          </span>
+          {idea?.parentSlug ? (
+            <>
+              <span className="text-gray-300">·</span>
+              <Link
+                to={`/marketing/creative/ideas/${idea.parentSlug}`}
+                className="text-xs font-medium text-brand-700 hover:underline"
+              >
+                derived from {idea.parentSlug}
+              </Link>
+            </>
+          ) : null}
         </p>
       </div>
       <CreativeStudioTabs />
 
       <div className="mb-4 rounded-md border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-gray-700">
-        This is an <strong>idea</strong> — the story package (not the finished ad yet). Edit the
-        article/video ideas here, then hit <strong>Generate brief from idea</strong> to get hooks +
-        a paste-ready CapCut/Arcads prompt for today’s ship.
+        This is an <strong>idea</strong> — the story package (not the finished ad yet). Edit here,
+        <strong> Derive with AI</strong> for a new branch, or <strong>Generate brief</strong> for a
+        paste-ready CapCut/Arcads prompt.
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -212,6 +259,13 @@ export default function CreativeIdeaDetail() {
           className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"
         >
           Generate brief from idea
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowDerive(true)}
+          className="rounded-md bg-violet-600 px-3 py-2 text-sm font-medium text-white hover:bg-violet-700"
+        >
+          Derive with AI
         </button>
         <button
           type="button"
@@ -266,6 +320,18 @@ export default function CreativeIdeaDetail() {
             }
           />
           <label className="block text-sm font-medium text-gray-700">
+            Author
+            <input
+              value={form.author}
+              onChange={(e) => updateField('author', e.target.value)}
+              placeholder="Mom, Keith, gpt-4o…"
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              Seed ideas are Mom. AI derivatives use the model name as author.
+            </p>
+          </label>
+          <label className="block text-sm font-medium text-gray-700">
             Status
             <select
               value={form.status}
@@ -310,28 +376,89 @@ export default function CreativeIdeaDetail() {
             />
           </label>
 
-          {briefs.length > 0 && (
-            <div>
-              <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Briefs from this idea
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+              History
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              This idea as the root of its branch — lineage, AI derivatives, and briefs generated
+              from it.
+            </p>
+
+            <div className="mt-4">
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                Lineage
               </div>
-              <ul className="space-y-1 text-sm">
-                {briefs.map((b) => (
-                  <li key={b.id}>
+              <ol className="space-y-1 border-l-2 border-brand-100 pl-3 text-sm">
+                {lineage.map((node) => (
+                  <li key={node.slug}>
                     <Link
-                      to={`/marketing/creative/${b.id}`}
-                      className="text-brand-700 hover:underline"
+                      to={`/marketing/creative/ideas/${node.slug}`}
+                      className="font-medium text-brand-700 hover:underline"
                     >
-                      {b.title}
+                      {node.title}
                     </Link>
-                    <span className="ml-2 text-xs text-gray-400">
-                      {b.format} · {b.status}
-                    </span>
+                    <span className="ml-1.5 text-xs text-gray-400">by {node.author}</span>
                   </li>
                 ))}
-              </ul>
+                <li>
+                  <span className="font-semibold text-gray-900">{form.title}</span>
+                  <span className="ml-1.5 text-xs text-gray-400">← you are here</span>
+                </li>
+              </ol>
             </div>
-          )}
+
+            <div className="mt-4">
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                Derivatives ({children.length})
+              </div>
+              {children.length === 0 ? (
+                <p className="text-xs text-gray-400">None yet — use Derive with AI to branch.</p>
+              ) : (
+                <ul className="space-y-1.5 text-sm">
+                  {children.map((c) => (
+                    <li key={c.id}>
+                      <Link
+                        to={`/marketing/creative/ideas/${c.slug}`}
+                        className="font-medium text-brand-700 hover:underline"
+                      >
+                        {c.title}
+                      </Link>
+                      <span className="ml-1.5 text-xs text-gray-400">by {c.author}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="mt-4">
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                Briefs generated ({briefs.length})
+              </div>
+              {briefs.length === 0 ? (
+                <p className="text-xs text-gray-400">No briefs from this idea yet.</p>
+              ) : (
+                <ul className="space-y-2 text-sm">
+                  {briefs.map((b) => (
+                    <li key={b.id} className="rounded-md bg-gray-50 px-2.5 py-2">
+                      <Link
+                        to={`/marketing/creative/${b.id}`}
+                        className="font-medium text-brand-700 hover:underline"
+                      >
+                        {b.title}
+                      </Link>
+                      <div className="mt-0.5 text-xs text-gray-400">
+                        {b.format} · {b.angle} · {b.status}
+                        {b.meta?.model ? ` · ${b.meta.model}` : ''}
+                        {' · '}
+                        {new Date(b.createdAt || b.updatedAt).toLocaleString()}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="space-y-4 lg:col-span-2">
@@ -382,6 +509,50 @@ export default function CreativeIdeaDetail() {
           </label>
         </div>
       </div>
+
+      {showDerive && (
+        <Modal title="Derive idea with AI" onClose={() => !deriving && setShowDerive(false)} wide>
+          <p className="mb-4 text-sm text-gray-500">
+            Creates a new idea branched from this one. Author will be the model you pick (e.g.{' '}
+            <span className="font-mono text-xs">gpt-4o-mini</span>).
+          </p>
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">
+              Model (author)
+              <select
+                value={deriveForm.model}
+                onChange={(e) => setDeriveForm({ ...deriveForm, model: e.target.value })}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+              >
+                {models.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.label}
+                    {m.hint ? ` — ${m.hint}` : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-sm font-medium text-gray-700">
+              Direction (optional)
+              <textarea
+                value={deriveForm.direction}
+                onChange={(e) => setDeriveForm({ ...deriveForm, direction: e.target.value })}
+                rows={3}
+                placeholder="e.g. same story, dad’s POV / lean into night-shift handoff / shorter, more playful"
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={derive}
+              disabled={deriving}
+              className="w-full rounded-md bg-violet-600 px-4 py-2 font-medium text-white hover:bg-violet-700 disabled:opacity-50"
+            >
+              {deriving ? 'Deriving… (may take ~15s)' : 'Create derivative idea'}
+            </button>
+          </div>
+        </Modal>
+      )}
 
       {showGenerate && (
         <Modal

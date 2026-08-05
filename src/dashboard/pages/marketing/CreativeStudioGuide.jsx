@@ -20,8 +20,8 @@ export default function CreativeStudioGuide({ focus = 'ideas' }) {
         <li className={step('ideas')}>
           <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">1. Ideas</div>
           <p className="mt-1">
-            Start here. Story packages in a <strong>Series</strong>: headline, article, video outline,
-            image, on-screen text, CTA.
+            Start here. Story packages in a <strong>Series</strong>, tagged by author (Mom / AI
+            model). Derive with AI to branch; history shows lineage + briefs.
           </p>
         </li>
         <li className={step('briefs')}>
