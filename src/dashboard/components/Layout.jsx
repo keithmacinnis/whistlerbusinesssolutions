@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
+import { useViewAsTeacher } from '../viewAsTeacher'
 
 const navLinkClass = ({ isActive }) =>
   `block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
@@ -8,8 +9,19 @@ const navLinkClass = ({ isActive }) =>
 
 export default function Layout() {
   const { user, logout } = useAuth()
+  const { viewAs, clearViewAs } = useViewAsTeacher()
+  const navigate = useNavigate()
   const isTeacher = user?.role === 'teacher'
   const isSuper = user?.role === 'super_admin'
+  const viewingAsTeacher = isSuper && !!viewAs
+  // When god-mode is on, show the teacher portal nav as that teacher would see it.
+  const showTeacherNav = isTeacher || viewingAsTeacher
+  const showAdminNav = isSuper && !viewingAsTeacher
+
+  const exitGodMode = () => {
+    clearViewAs()
+    navigate('/education/teachers')
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -19,7 +31,7 @@ export default function Layout() {
           <div className="text-xs text-gray-400">Commerce Platform</div>
         </div>
         <nav className="flex flex-1 flex-col gap-1">
-          {!isTeacher && (
+          {showAdminNav && (
             <>
               <NavLink to="/" end className={navLinkClass}>Overview</NavLink>
               <NavLink to="/businesses" className={navLinkClass}>Call Centres</NavLink>
@@ -35,7 +47,7 @@ export default function Layout() {
           <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
             Education
           </div>
-          {isSuper && (
+          {showAdminNav && (
             <>
               <NavLink to="/education/resources" className={navLinkClass}>Resources</NavLink>
               <NavLink to="/education/teachers" className={navLinkClass}>Teachers</NavLink>
@@ -43,7 +55,7 @@ export default function Layout() {
               <NavLink to="/education/settlements" className={navLinkClass}>Settlements</NavLink>
             </>
           )}
-          {isTeacher && (
+          {showTeacherNav && (
             <>
               <NavLink to="/education/my-courses" className={navLinkClass}>My courses</NavLink>
               <NavLink to="/education/availability" className={navLinkClass}>Availability</NavLink>
@@ -52,7 +64,7 @@ export default function Layout() {
             </>
           )}
 
-          {isSuper && (
+          {showAdminNav && (
             <>
               <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Marketing
@@ -81,9 +93,36 @@ export default function Layout() {
           </button>
         </div>
       </aside>
-      <main className="flex-1 overflow-x-auto p-8">
-        <Outlet />
-      </main>
+      <div className="flex flex-1 flex-col overflow-x-auto">
+        {viewingAsTeacher && (
+          <div className="flex items-center justify-between gap-4 bg-amber-500 px-6 py-2.5 text-sm text-amber-950">
+            <div>
+              <span className="font-semibold">God mode</span>
+              <span className="mx-2 opacity-60">·</span>
+              Viewing as{' '}
+              <span className="font-semibold">{viewAs.name || viewAs.email}</span>
+              {viewAs.email && viewAs.name && (
+                <span className="opacity-70"> ({viewAs.email})</span>
+              )}
+              {viewAs.status && viewAs.status !== 'approved' && (
+                <span className="ml-2 rounded bg-amber-900/20 px-1.5 py-0.5 text-xs font-medium">
+                  {viewAs.status}
+                </span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={exitGodMode}
+              className="shrink-0 rounded-md bg-amber-950 px-3 py-1 text-xs font-semibold text-amber-50 hover:bg-black"
+            >
+              Exit god mode
+            </button>
+          </div>
+        )}
+        <main className="flex-1 p-8">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

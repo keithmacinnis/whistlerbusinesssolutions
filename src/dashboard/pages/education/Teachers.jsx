@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
+import { useViewAsTeacher } from '../../viewAsTeacher'
 
 const EMPTY = { email: '', name: '', password: '', bio: '', teacherSharePct: 70, status: 'approved' }
 
@@ -8,6 +10,8 @@ export default function EducationTeachers() {
   const [teachers, setTeachers] = useState(null)
   const [error, setError] = useState('')
   const [form, setForm] = useState(null)
+  const { startViewAs } = useViewAsTeacher()
+  const navigate = useNavigate()
 
   const reload = useCallback(() => {
     api('/api/education/admin/teachers')
@@ -35,6 +39,11 @@ export default function EducationTeachers() {
     } catch (err) {
       setError(err.message)
     }
+  }
+
+  const enterGodMode = (teacher) => {
+    startViewAs(teacher)
+    navigate('/education/my-courses')
   }
 
   return (
@@ -80,7 +89,15 @@ export default function EducationTeachers() {
                       {t.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right space-x-2">
+                  <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                    <button
+                      type="button"
+                      onClick={() => enterGodMode(t)}
+                      className="text-amber-700 hover:underline"
+                      title={`View the teacher portal as ${t.user.name || t.user.email}`}
+                    >
+                      God mode
+                    </button>
                     {t.status !== 'approved' && (
                       <button onClick={() => setStatus(t.id, 'approved')} className="text-brand-600 hover:underline">Approve</button>
                     )}

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { api, getToken, setToken, clearToken } from './api'
+import { clearViewAsTeacherStorage } from './viewAsTeacher'
 
 const AuthContext = createContext(null)
 
@@ -16,6 +17,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (email, password) => {
+    clearViewAsTeacherStorage()
     const { token, user: loggedIn } = await api('/api/auth/login', { method: 'POST', body: { email, password } })
     setToken(token)
     // Refresh /me so teacherProfile (and businessIds) are present.
@@ -30,7 +32,7 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
-    clearToken()
+    clearToken() // also clears god-mode session
     setUser(null)
   }
 
