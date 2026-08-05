@@ -5,6 +5,8 @@ import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
+import AngleHintPicker from './AngleHintPicker'
+import SeriesSelect from './SeriesSelect'
 
 const STATUS_STYLES = {
   idea: 'bg-amber-50 text-amber-800 ring-amber-200',
@@ -46,6 +48,7 @@ export default function CreativeThemes() {
   const navigate = useNavigate()
   const [themes, setThemes] = useState(null)
   const [series, setSeries] = useState([])
+  const [angles, setAngles] = useState([])
   const [error, setError] = useState('')
   const [seriesFilter, setSeriesFilter] = useState('')
   const [creating, setCreating] = useState(false)
@@ -65,6 +68,15 @@ export default function CreativeThemes() {
   }, [seriesFilter])
 
   useEffect(reload, [reload])
+
+  useEffect(() => {
+    api('/api/marketing/creative/offers')
+      .then(({ offers }) => {
+        const birdnest = offers?.find((o) => o.slug === 'birdnest-app') || offers?.[0]
+        setAngles(birdnest?.angles || [])
+      })
+      .catch(() => {})
+  }, [])
 
   const seriesMeta = useMemo(() => {
     const map = Object.fromEntries((series || []).map((s) => [s.slug, s]))
@@ -285,21 +297,12 @@ export default function CreativeThemes() {
 
           <div className="space-y-5">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Series
-                <select
-                  value={form.seriesSlug}
-                  onChange={(e) => setForm({ ...form, seriesSlug: e.target.value })}
-                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-                >
-                  {series.map((s) => (
-                    <option key={s.slug} value={s.slug}>
-                      {s.name}
-                    </option>
-                  ))}
-                  <option value="">Ungrouped</option>
-                </select>
-              </label>
+              <SeriesSelect
+                series={series}
+                value={form.seriesSlug}
+                onChange={(seriesSlug) => setForm({ ...form, seriesSlug })}
+                onSeriesCreated={(created) => setSeries((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)))}
+              />
               <label className="block text-sm font-medium text-gray-700">
                 Status
                 <select
@@ -345,6 +348,11 @@ export default function CreativeThemes() {
                   onChange={(e) => setForm({ ...form, angleHints: e.target.value })}
                   placeholder="NEST, TOGETHER, MOMENTS"
                   className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 font-mono text-sm focus:border-brand-500 focus:outline-none"
+                />
+                <AngleHintPicker
+                  angles={angles}
+                  value={form.angleHints}
+                  onChange={(angleHints) => setForm({ ...form, angleHints })}
                 />
               </label>
             </div>

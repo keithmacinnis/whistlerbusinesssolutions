@@ -4,6 +4,8 @@ import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
+import AngleHintPicker from './AngleHintPicker'
+import SeriesSelect from './SeriesSelect'
 
 const THEME_STATUSES = ['idea', 'ready', 'in_production', 'shipped', 'archived']
 
@@ -12,11 +14,13 @@ export default function CreativeThemeDetail() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [theme, setTheme] = useState(null)
-  const [series, setSeries] = useState(null)
+  const [seriesMeta, setSeriesMeta] = useState(null)
+  const [seriesList, setSeriesList] = useState([])
   const [briefs, setBriefs] = useState([])
   const [formats, setFormats] = useState([])
   const [models, setModels] = useState([])
   const [offers, setOffers] = useState([])
+  const [angles, setAngles] = useState([])
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [generating, setGenerating] = useState(false)
@@ -32,10 +36,14 @@ export default function CreativeThemeDetail() {
   })
 
   const load = useCallback(() => {
-    api(`/api/marketing/creative/themes/${slug}`)
-      .then(({ theme: t, series: s, briefs: b }) => {
+    Promise.all([
+      api(`/api/marketing/creative/themes/${slug}`),
+      api('/api/marketing/creative/series'),
+    ])
+      .then(([{ theme: t, series: s, briefs: b }, seriesRes]) => {
         setTheme(t)
-        setSeries(s)
+        setSeriesMeta(s)
+        setSeriesList(seriesRes.series || [])
         setBriefs(b || [])
         setForm({
           title: t.title || '',
@@ -47,6 +55,7 @@ export default function CreativeThemeDetail() {
           cta: t.cta || '',
           shortCaption: t.shortCaption || '',
           angleHints: Array.isArray(t.angleHints) ? t.angleHints.join(', ') : '',
+          seriesSlug: t.seriesSlug || '',
           status: t.status || 'ready',
           notes: t.notes || '',
         })
@@ -70,6 +79,8 @@ export default function CreativeThemeDetail() {
         setFormats(f.formats || [])
         setModels(m.models || [])
         setOffers(o.offers || [])
+        const birdnest = o.offers?.find((x) => x.slug === 'birdnest-app') || o.offers?.[0]
+        setAngles(birdnest?.angles || [])
         setGenForm((prev) => ({
           ...prev,
           model: m.defaultModel || prev.model,
@@ -116,11 +127,13 @@ export default function CreativeThemeDetail() {
           cta: form.cta.trim() || null,
           shortCaption: form.shortCaption.trim() || null,
           angleHints,
+          seriesSlug: form.seriesSlug || null,
           status: form.status,
           notes: form.notes.trim() || null,
         },
       })
       setTheme(updated)
+      setSeriesMeta(seriesList.find((s) => s.slug === updated.seriesSlug) || null)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -180,7 +193,7 @@ export default function CreativeThemeDetail() {
           {form.title}
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          {series ? series.name : 'Ungrouped theme'}
+          {seriesMeta ? seriesMeta.name : 'Ungrouped theme'}
         </p>
       </div>
       <CreativeStudioTabs />
@@ -243,6 +256,14 @@ export default function CreativeThemeDetail() {
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
             />
           </label>
+          <SeriesSelect
+            series={seriesList}
+            value={form.seriesSlug}
+            onChange={(seriesSlug) => updateField('seriesSlug', seriesSlug)}
+            onSeriesCreated={(created) =>
+              setSeriesList((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)))
+            }
+          />
           <label className="block text-sm font-medium text-gray-700">
             Status
             <select
@@ -258,11 +279,16 @@ export default function CreativeThemeDetail() {
             </select>
           </label>
           <label className="block text-sm font-medium text-gray-700">
-            Angle hints (comma-separated)
+            Angle hints
             <input
               value={form.angleHints}
               onChange={(e) => updateField('angleHints', e.target.value)}
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm focus:border-brand-500 focus:outline-none"
+            />
+            <AngleHintPicker
+              angles={angles}
+              value={form.angleHints}
+              onChange={(angleHints) => updateField('angleHints', angleHints)}
             />
           </label>
           <label className="block text-sm font-medium text-gray-700">
