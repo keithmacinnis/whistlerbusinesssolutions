@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
+import CreativeStudioTabs from './CreativeStudioTabs'
 
 const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
@@ -131,7 +132,7 @@ export default function CreativeStudio() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div className="mb-2 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Creative Studio</h1>
           <p className="mt-1 text-sm text-gray-500">
@@ -145,6 +146,7 @@ export default function CreativeStudio() {
           + New brief
         </button>
       </div>
+      <CreativeStudioTabs />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Status</span>

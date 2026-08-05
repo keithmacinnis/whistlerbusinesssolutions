@@ -149,6 +149,17 @@ export default function CreativeBriefDetail() {
           <h1 className="mt-2 text-2xl font-bold text-gray-900">{form.title || 'Brief'}</h1>
           <p className="mt-1 text-sm text-gray-500">
             {brief?.offerSlug} · {brief?.angle} · {brief?.format}
+            {brief?.themeSlug && (
+              <>
+                {' · '}
+                <Link
+                  to={`/marketing/creative/themes/${brief.themeSlug}`}
+                  className="text-brand-700 hover:underline"
+                >
+                  theme: {brief.themeSlug}
+                </Link>
+              </>
+            )}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
