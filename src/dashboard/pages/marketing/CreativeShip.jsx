@@ -117,13 +117,13 @@ export default function CreativeShip() {
             {filter === 'briefed' ? 'Nothing ready to ship yet' : 'No briefs here'}
           </p>
           <p className="mt-1 text-sm text-gray-500">
-            Generate a brief from a theme, then come back here to copy and ship.
+            Generate a brief from an idea, then come back here to copy and ship.
           </p>
           <Link
-            to="/marketing/creative/themes"
+            to="/marketing/creative/ideas"
             className="mt-4 inline-block text-sm font-semibold text-brand-700 hover:underline"
           >
-            Browse themes →
+            Browse ideas →
           </Link>
         </div>
       )}
@@ -156,8 +156,8 @@ export default function CreativeShip() {
                   <>
                     {' · '}
                     <Link
-                      to={`/marketing/creative/themes/${b.themeSlug}`}
-                      className="text-brand-700 hover:underline"
+                      to={`/marketing/creative/ideas/${b.themeSlug}`}
+                    className="text-brand-700 hover:underline"
                     >
                       {b.themeSlug}
                     </Link>

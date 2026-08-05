@@ -1,8 +1,8 @@
 /**
- * Inline guide for Creative Studio — Themes → Briefs → Ship.
- * focus: 'briefs' | 'themes' | 'ship'
+ * Inline guide for Creative Studio — Ideas → Briefs → Ship.
+ * focus: 'briefs' | 'ideas' | 'ship'
  */
-export default function CreativeStudioGuide({ focus = 'briefs' }) {
+export default function CreativeStudioGuide({ focus = 'ideas' }) {
   const step = (id) =>
     `rounded-md border px-3 py-2 ${
       focus === id ? 'border-brand-300 bg-brand-50' : 'border-gray-200 bg-white'
@@ -17,8 +17,8 @@ export default function CreativeStudioGuide({ focus = 'briefs' }) {
       </p>
 
       <ol className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
-        <li className={step('themes')}>
-          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">1. Themes</div>
+        <li className={step('ideas')}>
+          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">1. Ideas</div>
           <p className="mt-1">
             Start here. Story packages in a <strong>Series</strong>: headline, article, video outline,
             image, on-screen text, CTA.
@@ -27,7 +27,7 @@ export default function CreativeStudioGuide({ focus = 'briefs' }) {
         <li className={step('briefs')}>
           <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">2. Briefs</div>
           <p className="mt-1">
-            Remix a theme into hooks, beats, and a <strong>paste-ready prompt</strong> for CapCut /
+            Remix an idea into hooks, beats, and a <strong>paste-ready prompt</strong> for CapCut /
             Arcads (micro reaction, talking head, Seedance, captions).
           </p>
         </li>
@@ -41,7 +41,7 @@ export default function CreativeStudioGuide({ focus = 'briefs' }) {
       </ol>
 
       <p className="mt-3 text-gray-600">
-        <strong>Flow:</strong> Themes → Briefs → Ship. Aim for 1–2/day.
+        <strong>Flow:</strong> Ideas → Briefs → Ship. Aim for 1–2/day.
       </p>
     </div>
   )

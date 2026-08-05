@@ -34,7 +34,7 @@ function CreateSeriesModal({ open, onClose, onCreated }) {
   return (
     <Modal title="Create a series" onClose={() => !saving && onClose?.()}>
       <p className="mb-4 text-sm text-gray-500">
-        A series is a named collection of themes — e.g. a seasonal story pack or a product push.
+        A series is a named collection of ideas — e.g. a seasonal story pack or a product push.
       </p>
       {error && (
         <div className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>

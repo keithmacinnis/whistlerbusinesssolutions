@@ -43,10 +43,27 @@ function StatusChip({ status }) {
   )
 }
 
-export default function CreativeThemes() {
+function Section({ n, title, hint, children }) {
+  return (
+    <section className="rounded-2xl border border-gray-100 bg-gradient-to-b from-gray-50/80 to-white p-5 shadow-sm">
+      <div className="mb-4 flex items-start gap-3">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
+          {n}
+        </span>
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+          {hint ? <p className="mt-0.5 text-xs text-gray-500">{hint}</p> : null}
+        </div>
+      </div>
+      <div className="space-y-3">{children}</div>
+    </section>
+  )
+}
+
+export default function CreativeIdeas() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [themes, setThemes] = useState(null)
+  const [ideas, setIdeas] = useState(null)
   const [series, setSeries] = useState([])
   const [angles, setAngles] = useState([])
   const [error, setError] = useState('')
@@ -59,10 +76,10 @@ export default function CreativeThemes() {
     const params = {}
     if (seriesFilter) params.seriesSlug = seriesFilter
 
-    api('/api/marketing/creative/themes', { params })
-      .then(({ themes: list, series: s }) => {
-        setThemes(list)
-        setSeries(s || [])
+    api('/api/marketing/creative/ideas', { params })
+      .then((res) => {
+        setIdeas(res.ideas || res.themes || [])
+        setSeries(res.series || [])
       })
       .catch((err) => setError(err.message))
   }, [seriesFilter])
@@ -84,10 +101,10 @@ export default function CreativeThemes() {
   }, [series])
 
   const grouped = useMemo(() => {
-    if (!themes) return []
+    if (!ideas) return []
     const order = (series || []).map((s) => s.slug)
     const buckets = new Map()
-    for (const t of themes) {
+    for (const t of ideas) {
       const key = t.seriesSlug || '__ungrouped__'
       if (!buckets.has(key)) buckets.set(key, [])
       buckets.get(key).push(t)
@@ -97,7 +114,7 @@ export default function CreativeThemes() {
       ...[...buckets.keys()].filter((k) => !order.includes(k)),
     ]
     return keys.map((key) => [key, buckets.get(key)])
-  }, [themes, series])
+  }, [ideas, series])
 
   const openCreate = (seriesSlug) => {
     setForm({
@@ -112,7 +129,7 @@ export default function CreativeThemes() {
     setError('')
     setSaving(true)
     try {
-      const { theme } = await api('/api/marketing/creative/themes', {
+      const res = await api('/api/marketing/creative/ideas', {
         method: 'POST',
         body: {
           seriesSlug: form.seriesSlug || null,
@@ -129,8 +146,9 @@ export default function CreativeThemes() {
           notes: form.notes.trim() || undefined,
         },
       })
+      const created = res.idea || res.theme
       setCreating(false)
-      navigate(`/marketing/creative/themes/${theme.slug}`)
+      navigate(`/marketing/creative/ideas/${created.slug}`)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -140,6 +158,13 @@ export default function CreativeThemes() {
 
   const canCreate =
     form.title.trim() && form.headline.trim() && form.article.trim() && form.videoOutline.trim()
+
+  const requiredLeft = [
+    !form.title.trim() && 'title',
+    !form.headline.trim() && 'headline',
+    !form.article.trim() && 'article',
+    !form.videoOutline.trim() && 'video outline',
+  ].filter(Boolean)
 
   if (user?.role !== 'super_admin') {
     return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
@@ -151,8 +176,7 @@ export default function CreativeThemes() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Creative Studio</h1>
           <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Themes are the heart of the pipeline — full story packages you can grow into briefs and
-            ship.
+            Ideas are the start of the pipeline — story packages you grow into briefs and ship.
           </p>
         </div>
         <button
@@ -160,11 +184,11 @@ export default function CreativeThemes() {
           onClick={() => openCreate(seriesFilter || undefined)}
           className="shrink-0 rounded-md bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
         >
-          + New theme
+          + New idea
         </button>
       </div>
       <CreativeStudioTabs />
-      <CreativeStudioGuide focus="themes" />
+      <CreativeStudioGuide focus="ideas" />
 
       <div className="mb-5 flex flex-wrap items-center gap-2">
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Series</span>
@@ -204,11 +228,11 @@ export default function CreativeThemes() {
       {error && !creating && (
         <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
       )}
-      {!themes && !error && <div className="text-gray-500">Loading…</div>}
+      {!ideas && !error && <div className="text-gray-500">Loading…</div>}
 
-      {themes?.length === 0 && (
+      {ideas?.length === 0 && (
         <div className="rounded-2xl border border-dashed border-gray-300 bg-gradient-to-b from-white to-gray-50 px-6 py-16 text-center">
-          <p className="text-base font-medium text-gray-800">No themes in this series yet</p>
+          <p className="text-base font-medium text-gray-800">No ideas in this series yet</p>
           <p className="mt-1 text-sm text-gray-500">
             Capture a headline, article, and video outline — then generate briefs from it.
           </p>
@@ -217,7 +241,7 @@ export default function CreativeThemes() {
             onClick={() => openCreate(seriesFilter || undefined)}
             className="mt-5 rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
           >
-            Create your first theme
+            Create your first idea
           </button>
         </div>
       )}
@@ -237,7 +261,7 @@ export default function CreativeThemes() {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs font-medium text-gray-400">
-                  {items.length} theme{items.length === 1 ? '' : 's'}
+                  {items.length} idea{items.length === 1 ? '' : 's'}
                 </span>
                 <button
                   type="button"
@@ -253,7 +277,7 @@ export default function CreativeThemes() {
               {items.map((t) => (
                 <Link
                   key={t.id}
-                  to={`/marketing/creative/themes/${t.slug}`}
+                  to={`/marketing/creative/ideas/${t.slug}`}
                   className="group flex flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -281,7 +305,7 @@ export default function CreativeThemes() {
                     </div>
                   )}
                   <div className="mt-auto pt-4 text-xs font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">
-                    Open theme →
+                    Open idea →
                   </div>
                 </Link>
               ))}
@@ -291,23 +315,50 @@ export default function CreativeThemes() {
       })}
 
       {creating && (
-        <Modal title="Create a theme" onClose={() => !saving && setCreating(false)} wide>
-          <p className="mb-5 text-sm text-gray-500">
-            Capture the story package the way you’d brief a writer or filmmaker — headline first,
-            then article, video, and CTA.
-          </p>
+        <Modal onClose={() => !saving && setCreating(false)} extraWide>
+          <div className="-mx-0 overflow-hidden rounded-t-2xl bg-gradient-to-br from-brand-700 via-brand-600 to-sky-700 px-6 pb-6 pt-5 text-white">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-100">
+                  New idea
+                </p>
+                <h2 className="mt-1 text-2xl font-semibold tracking-tight">
+                  {form.title.trim() || 'Untitled idea'}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => !saving && setCreating(false)}
+                className="text-2xl leading-none text-white/70 hover:text-white"
+              >
+                &times;
+              </button>
+            </div>
+            <blockquote className="mt-4 rounded-xl bg-white/10 px-4 py-3 text-base leading-relaxed text-white/95 ring-1 ring-white/15">
+              {form.headline.trim()
+                ? `“${form.headline.trim()}”`
+                : '“Your headline will preview here as you type…”'}
+            </blockquote>
+            <p className="mt-3 text-xs text-brand-100">
+              Capture the story first. Briefs and CapCut prompts come next.
+            </p>
+          </div>
 
-          {error && (
-            <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
-          )}
+          <div className="space-y-5 px-6 pb-2 pt-5">
+            {error && (
+              <div className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
+            )}
 
-          <div className="space-y-5">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <SeriesSelect
                 series={series}
                 value={form.seriesSlug}
                 onChange={(seriesSlug) => setForm({ ...form, seriesSlug })}
-                onSeriesCreated={(created) => setSeries((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)))}
+                onSeriesCreated={(created) =>
+                  setSeries((prev) =>
+                    [...prev, created].sort((a, b) => a.name.localeCompare(b.name))
+                  )
+                }
               />
               <label className="block text-sm font-medium text-gray-700">
                 Status
@@ -325,29 +376,26 @@ export default function CreativeThemes() {
               </label>
             </div>
 
-            <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
-              <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                The idea
-              </div>
-              <label className="mt-3 block text-sm font-medium text-gray-700">
+            <Section n="01" title="The spark" hint="Name it, give it a headline, pick the emotional angles.">
+              <label className="block text-sm font-medium text-gray-700">
                 Title *
                 <input
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   placeholder="e.g. Creating a Safe Nest Is a Skill"
-                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
                 />
               </label>
-              <label className="mt-3 block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700">
                 Headline *
                 <input
                   value={form.headline}
                   onChange={(e) => setForm({ ...form, headline: e.target.value })}
                   placeholder="The line that carries the post"
-                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
                 />
               </label>
-              <label className="mt-3 block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700">
                 Angle hints
                 <input
                   value={form.angleHints}
@@ -361,97 +409,103 @@ export default function CreativeThemes() {
                   onChange={(angleHints) => setForm({ ...form, angleHints })}
                 />
               </label>
-            </div>
+            </Section>
 
-            <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
-              <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Words
-              </div>
-              <label className="mt-3 block text-sm font-medium text-gray-700">
+            <Section n="02" title="The words" hint="Article for the feed, short cut for Stories, on-screen lines, CTA.">
+              <label className="block text-sm font-medium text-gray-700">
                 Article / social caption *
                 <textarea
                   value={form.article}
                   onChange={(e) => setForm({ ...form, article: e.target.value })}
                   rows={5}
-                  placeholder="The long-form story or post body"
-                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  placeholder="Wonder-forward story. What should a parent feel and understand?"
+                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm leading-relaxed focus:border-brand-500 focus:outline-none"
                 />
               </label>
-              <label className="mt-3 block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700">
                 Short caption
                 <textarea
                   value={form.shortCaption}
                   onChange={(e) => setForm({ ...form, shortCaption: e.target.value })}
                   rows={3}
                   placeholder="Optional shorter cut for Stories / ads primary text"
-                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
                 />
               </label>
-              <label className="mt-3 block text-sm font-medium text-gray-700">
-                On-screen text (one line per row)
-                <textarea
-                  value={form.onScreenText}
-                  onChange={(e) => setForm({ ...form, onScreenText: e.target.value })}
-                  rows={3}
-                  placeholder={'Not perfection.\nPresence.'}
-                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-                />
-              </label>
-              <label className="mt-3 block text-sm font-medium text-gray-700">
-                CTA
-                <input
-                  value={form.cta}
-                  onChange={(e) => setForm({ ...form, cta: e.target.value })}
-                  placeholder="Try BirdNest free for a month."
-                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-                />
-              </label>
-            </div>
-
-            <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
-              <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Visuals
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  On-screen text
+                  <textarea
+                    value={form.onScreenText}
+                    onChange={(e) => setForm({ ...form, onScreenText: e.target.value })}
+                    rows={3}
+                    placeholder={'Not perfection.\nPresence.'}
+                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
+                  />
+                  <span className="mt-1 block text-xs font-normal text-gray-400">One line per row</span>
+                </label>
+                <label className="block text-sm font-medium text-gray-700">
+                  CTA
+                  <input
+                    value={form.cta}
+                    onChange={(e) => setForm({ ...form, cta: e.target.value })}
+                    placeholder="Try BirdNest free for a month."
+                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
+                  />
+                  <span className="mt-1 block text-xs font-normal text-gray-400">
+                    Soft invite, not a hard sell
+                  </span>
+                </label>
               </div>
-              <label className="mt-3 block text-sm font-medium text-gray-700">
+            </Section>
+
+            <Section n="03" title="The picture" hint="How it looks and moves — enough to shoot or prompt later.">
+              <label className="block text-sm font-medium text-gray-700">
                 Video outline *
                 <textarea
                   value={form.videoOutline}
                   onChange={(e) => setForm({ ...form, videoOutline: e.target.value })}
                   rows={5}
-                  placeholder="Scene-by-scene: opening, product moment, close…"
-                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  placeholder="Opening → product/care moment → close. Keep it human."
+                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm leading-relaxed focus:border-brand-500 focus:outline-none"
                 />
               </label>
-              <label className="mt-3 block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700">
                 Image concept
                 <textarea
                   value={form.imageConcept}
                   onChange={(e) => setForm({ ...form, imageConcept: e.target.value })}
                   rows={2}
-                  placeholder="Still / thumbnail direction"
-                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  placeholder="Still / thumbnail direction — light, people, mood"
+                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
                 />
               </label>
+              <label className="block text-sm font-medium text-gray-700">
+                Notes
+                <input
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  placeholder="Optional — source, owner, shoot date…"
+                  className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
+                />
+              </label>
+            </Section>
+
+            <div className="sticky bottom-0 -mx-6 flex flex-col gap-2 border-t border-gray-100 bg-white/95 px-6 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-gray-500">
+                {canCreate
+                  ? 'Ready to save — you can generate a brief right after.'
+                  : `Still need: ${requiredLeft.join(', ')}`}
+              </p>
+              <button
+                type="button"
+                onClick={create}
+                disabled={!canCreate || saving}
+                className="rounded-md bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-50"
+              >
+                {saving ? 'Creating…' : 'Create idea'}
+              </button>
             </div>
-
-            <label className="block text-sm font-medium text-gray-700">
-              Notes
-              <input
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                placeholder="Optional — source, owner, shoot date…"
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-              />
-            </label>
-
-            <button
-              type="button"
-              onClick={create}
-              disabled={!canCreate || saving}
-              className="w-full rounded-md bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
-            >
-              {saving ? 'Creating…' : 'Create theme'}
-            </button>
           </div>
         </Modal>
       )}

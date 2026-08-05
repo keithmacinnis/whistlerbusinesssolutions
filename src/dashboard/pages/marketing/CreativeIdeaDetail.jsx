@@ -9,11 +9,11 @@ import SeriesSelect from './SeriesSelect'
 
 const THEME_STATUSES = ['idea', 'ready', 'in_production', 'shipped', 'archived']
 
-export default function CreativeThemeDetail() {
+export default function CreativeIdeaDetail() {
   const { slug } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [theme, setTheme] = useState(null)
+  const [idea, setIdea] = useState(null)
   const [seriesMeta, setSeriesMeta] = useState(null)
   const [seriesList, setSeriesList] = useState([])
   const [briefs, setBriefs] = useState([])
@@ -37,11 +37,12 @@ export default function CreativeThemeDetail() {
 
   const load = useCallback(() => {
     Promise.all([
-      api(`/api/marketing/creative/themes/${slug}`),
+      api(`/api/marketing/creative/ideas/${slug}`),
       api('/api/marketing/creative/series'),
     ])
-      .then(([{ theme: t, series: s, briefs: b }, seriesRes]) => {
-        setTheme(t)
+      .then(([{ idea, theme, series: s, briefs: b }, seriesRes]) => {
+        const t = idea || theme
+        setIdea(t)
         setSeriesMeta(s)
         setSeriesList(seriesRes.series || [])
         setBriefs(b || [])
@@ -115,7 +116,7 @@ export default function CreativeThemeDetail() {
         .split('\n')
         .map((t) => t.trim())
         .filter(Boolean)
-      const { theme: updated } = await api(`/api/marketing/creative/themes/${slug}`, {
+      const { idea: updatedIdea, theme: updatedTheme } = await api(`/api/marketing/creative/ideas/${slug}`, {
         method: 'PATCH',
         body: {
           title: form.title.trim(),
@@ -132,8 +133,8 @@ export default function CreativeThemeDetail() {
           notes: form.notes.trim() || null,
         },
       })
-      setTheme(updated)
-      setSeriesMeta(seriesList.find((s) => s.slug === updated.seriesSlug) || null)
+      setIdea(updatedIdea || updatedTheme)
+      setSeriesMeta(seriesList.find((s) => s.slug === (updatedIdea || updatedTheme).seriesSlug) || null)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -145,7 +146,7 @@ export default function CreativeThemeDetail() {
     setError('')
     setGenerating(true)
     try {
-      const { brief } = await api(`/api/marketing/creative/themes/${slug}/generate-brief`, {
+      const { brief } = await api(`/api/marketing/creative/ideas/${slug}/generate-brief`, {
         method: 'POST',
         body: {
           offerSlug: genForm.offerSlug,
@@ -173,8 +174,8 @@ export default function CreativeThemeDetail() {
     return (
       <div>
         <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
-        <Link to="/marketing/creative/themes" className="text-sm text-brand-700 hover:underline">
-          ← Themes
+        <Link to="/marketing/creative/ideas" className="text-sm text-brand-700 hover:underline">
+          ← Ideas
         </Link>
       </div>
     )
@@ -185,22 +186,22 @@ export default function CreativeThemeDetail() {
   return (
     <div>
       <div className="mb-2">
-        <Link to="/marketing/creative/themes" className="text-sm text-brand-700 hover:underline">
-          ← Themes
+        <Link to="/marketing/creative/ideas" className="text-sm text-brand-700 hover:underline">
+          ← Ideas
         </Link>
         <h1 className="mt-2 text-2xl font-bold text-gray-900">
-          {theme?.number != null ? `${String(theme.number).padStart(2, '0')}. ` : ''}
+          {idea?.number != null ? `${String(idea.number).padStart(2, '0')}. ` : ''}
           {form.title}
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          {seriesMeta ? seriesMeta.name : 'Ungrouped theme'}
+          {seriesMeta ? seriesMeta.name : 'Ungrouped idea'}
         </p>
       </div>
       <CreativeStudioTabs />
 
       <div className="mb-4 rounded-md border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-gray-700">
-        This is a <strong>theme</strong> — the story package (not the finished ad yet). Edit the
-        article/video ideas here, then hit <strong>Generate brief from theme</strong> to get hooks +
+        This is an <strong>idea</strong> — the story package (not the finished ad yet). Edit the
+        article/video ideas here, then hit <strong>Generate brief from idea</strong> to get hooks +
         a paste-ready CapCut/Arcads prompt for today’s ship.
       </div>
 
@@ -210,7 +211,7 @@ export default function CreativeThemeDetail() {
           onClick={() => setShowGenerate(true)}
           className="rounded-md bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700"
         >
-          Generate brief from theme
+          Generate brief from idea
         </button>
         <button
           type="button"
@@ -312,7 +313,7 @@ export default function CreativeThemeDetail() {
           {briefs.length > 0 && (
             <div>
               <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
-                Briefs from this theme
+                Briefs from this idea
               </div>
               <ul className="space-y-1 text-sm">
                 {briefs.map((b) => (
@@ -384,12 +385,12 @@ export default function CreativeThemeDetail() {
 
       {showGenerate && (
         <Modal
-          title="Generate brief from theme"
+          title="Generate brief from idea"
           onClose={() => !generating && setShowGenerate(false)}
           wide
         >
           <p className="mb-4 text-sm text-gray-500">
-            Uses this theme’s headline, article, and video outline as the brief’s vibe note, then
+            Uses this idea’s headline, article, and video outline as the brief’s vibe note, then
             builds a paste-ready {genForm.format.replace(/_/g, ' ')} package.
           </p>
           <div className="space-y-3">

@@ -150,6 +150,7 @@ export default function CreativeStudio() {
       <CreativeStudioTabs />
       <CreativeStudioGuide focus="briefs" />
 
+
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Status</span>
         {['', 'briefed', 'prompted', 'idea', 'archived'].map((s) => (

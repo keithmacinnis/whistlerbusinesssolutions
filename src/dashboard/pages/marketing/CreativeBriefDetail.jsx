@@ -153,10 +153,10 @@ export default function CreativeBriefDetail() {
               <>
                 {' · '}
                 <Link
-                  to={`/marketing/creative/themes/${brief.themeSlug}`}
+                  to={`/marketing/creative/ideas/${brief.themeSlug}`}
                   className="text-brand-700 hover:underline"
                 >
-                  theme: {brief.themeSlug}
+                  idea: {brief.themeSlug}
                 </Link>
               </>
             )}

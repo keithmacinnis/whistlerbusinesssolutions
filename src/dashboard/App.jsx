@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './auth'
 import Layout from './components/Layout'
 import Login from './pages/Login'
@@ -13,8 +13,8 @@ import OnlineStores from './pages/merch/OnlineStores'
 import QrCodes from './pages/marketing/QrCodes'
 import CreativeStudio from './pages/marketing/CreativeStudio'
 import CreativeBriefDetail from './pages/marketing/CreativeBriefDetail'
-import CreativeThemes from './pages/marketing/CreativeThemes'
-import CreativeThemeDetail from './pages/marketing/CreativeThemeDetail'
+import CreativeIdeas from './pages/marketing/CreativeIdeas'
+import CreativeIdeaDetail from './pages/marketing/CreativeIdeaDetail'
 import CreativeShip from './pages/marketing/CreativeShip'
 import EducationResources from './pages/education/Resources'
 import EducationTeachers from './pages/education/Teachers'
@@ -41,6 +41,11 @@ function TeacherHomeRedirect() {
   return <Overview />
 }
 
+function IdeaSlugRedirect() {
+  const { slug } = useParams()
+  return <Navigate to={`/marketing/creative/ideas/${slug}`} replace />
+}
+
 export default function App() {
   return (
     <AuthProvider>
@@ -62,8 +67,10 @@ export default function App() {
           <Route path="merch/products" element={<MerchProducts />} />
           <Route path="merch/orders" element={<MerchOrders />} />
           <Route path="marketing/qr-codes" element={<QrCodes />} />
-          <Route path="marketing/creative/themes" element={<CreativeThemes />} />
-          <Route path="marketing/creative/themes/:slug" element={<CreativeThemeDetail />} />
+          <Route path="marketing/creative/ideas" element={<CreativeIdeas />} />
+          <Route path="marketing/creative/ideas/:slug" element={<CreativeIdeaDetail />} />
+          <Route path="marketing/creative/themes" element={<Navigate to="/marketing/creative/ideas" replace />} />
+          <Route path="marketing/creative/themes/:slug" element={<IdeaSlugRedirect />} />
           <Route path="marketing/creative/ship" element={<CreativeShip />} />
           <Route path="marketing/creative" element={<CreativeStudio />} />
           <Route path="marketing/creative/:id" element={<CreativeBriefDetail />} />
