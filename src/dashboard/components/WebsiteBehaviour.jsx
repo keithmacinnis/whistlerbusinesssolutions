@@ -252,6 +252,63 @@ function PropertyCard({
 
       {prop.kind === 'website' && (
         <div className="space-y-6">
+          {/* PostHog first — human visitors are the decision metric */}
+          {prop.posthog && (
+            <>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-800">Human behaviour — PostHog</h3>
+                <p className="mt-0.5 text-xs text-gray-400">
+                  People who loaded the site with analytics. This is your real visitor count.
+                </p>
+              </div>
+
+              {posthog?.configured ? (
+                <>
+                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
+                    <StatCard label="Human visitors" value={number(posthog.summary.visitors)} hint="people with $pageview" />
+                    <StatCard label="Sessions" value={number(posthog.summary.sessions)} />
+                    <StatCard label="Pageviews" value={number(posthog.summary.pageviews)} />
+                    {prop.showCommerceEvents && (
+                      <>
+                        <StatCard
+                          label="Booking clicks"
+                          value={number(posthog.summary.bookingClicks)}
+                          hint={`${posthog.summary.bookingClickRate}% of visitors`}
+                        />
+                        <StatCard label="Added to cart" value={number(posthog.summary.cartAdds)} />
+                        <StatCard label="Checkout starts" value={number(posthog.summary.checkoutStarts)} />
+                      </>
+                    )}
+                  </div>
+
+                  <div>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700">Daily human visitors</h4>
+                    {posthog.days?.length ? (
+                      <BarChart
+                        points={posthog.days.map((row) => ({ day: row.day, count: row.visitors }))}
+                        label="human visitors"
+                      />
+                    ) : (
+                      <p className="text-sm text-gray-400">No PostHog traffic for this period yet.</p>
+                    )}
+                  </div>
+
+                  <div className="grid gap-6 md:grid-cols-3">
+                    <RankedList title="Top pages" rows={posthog.topPages || []} labelKey="path" valueKey="pageviews" valueSuffix="views" />
+                    <RankedList title="Traffic sources" rows={posthog.sources || []} labelKey="source" valueKey="visits" valueSuffix="views" />
+                    <RankedList title="Devices" rows={posthog.devices || []} labelKey="device" valueKey="visits" valueSuffix="views" />
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-amber-800">
+                  PostHog not connected for this property — Sync now after the read key is set on the server.
+                </p>
+              )}
+
+              <div className="border-t border-gray-100 pt-6" />
+            </>
+          )}
+
           <div>
             <h3 className="text-sm font-semibold text-gray-800">Edge traffic — Cloudflare</h3>
             <p className="mt-0.5 text-xs text-gray-400">
@@ -318,52 +375,6 @@ function PropertyCard({
                   )}
                 </div>
               )}
-            </>
-          )}
-
-          {prop.posthog && posthog?.configured && (
-            <>
-              <div className="border-t border-gray-100 pt-6">
-                <h3 className="text-sm font-semibold text-gray-800">Human behaviour — PostHog</h3>
-                <p className="mt-0.5 text-xs text-gray-400">
-                  People who loaded the site with analytics. This is your real visitor count.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
-                <StatCard label="Human visitors" value={number(posthog.summary.visitors)} hint="people with $pageview" />
-                <StatCard label="Sessions" value={number(posthog.summary.sessions)} />
-                <StatCard label="Pageviews" value={number(posthog.summary.pageviews)} />
-                {prop.showCommerceEvents && (
-                  <>
-                    <StatCard
-                      label="Booking clicks"
-                      value={number(posthog.summary.bookingClicks)}
-                      hint={`${posthog.summary.bookingClickRate}% of visitors`}
-                    />
-                    <StatCard label="Added to cart" value={number(posthog.summary.cartAdds)} />
-                    <StatCard label="Checkout starts" value={number(posthog.summary.checkoutStarts)} />
-                  </>
-                )}
-              </div>
-
-              <div>
-                <h4 className="mb-2 text-sm font-semibold text-gray-700">Daily human visitors</h4>
-                {posthog.days?.length ? (
-                  <BarChart
-                    points={posthog.days.map((row) => ({ day: row.day, count: row.visitors }))}
-                    label="human visitors"
-                  />
-                ) : (
-                  <p className="text-sm text-gray-400">No PostHog traffic for this period yet.</p>
-                )}
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-3">
-                <RankedList title="Top pages" rows={posthog.topPages || []} labelKey="path" valueKey="pageviews" valueSuffix="views" />
-                <RankedList title="Traffic sources" rows={posthog.sources || []} labelKey="source" valueKey="visits" valueSuffix="views" />
-                <RankedList title="Devices" rows={posthog.devices || []} labelKey="device" valueKey="visits" valueSuffix="views" />
-              </div>
             </>
           )}
         </div>

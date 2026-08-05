@@ -1,0 +1,49 @@
+# Allow major search and AI crawlers to read public marketing pages.
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+
+User-agent: Bytespider
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+
+Sitemap: https://whistlerbusinesssolutions.com/sitemap.xml
+# AI-oriented site summary
+# https://whistlerbusinesssolutions.com/llms.txt
