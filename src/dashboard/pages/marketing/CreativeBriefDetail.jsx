@@ -4,7 +4,7 @@ import { api } from '../../api'
 import { useAuth } from '../../auth'
 import ToneBanner from './ToneBanner'
 
-const STATUSES = ['idea', 'briefed', 'prompted', 'archived']
+const STATUSES = ['idea', 'briefed', 'prompted', 'shipped', 'archived']
 
 function beatsToText(beats) {
   if (!Array.isArray(beats)) return ''
@@ -197,6 +197,12 @@ export default function CreativeBriefDetail() {
           >
             {copied === 'prompt' ? 'Copied' : 'Copy prompt'}
           </button>
+          <Link
+            to="/marketing/creative/videos"
+            className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          >
+            Flip on Videos →
+          </Link>
           <button
             type="button"
             onClick={save}
@@ -247,7 +253,8 @@ export default function CreativeBriefDetail() {
               ))}
             </select>
             <span className="mt-1 block text-xs font-normal text-gray-400">
-              Set to <code>prompted</code> after you paste into CapCut / Arcads.
+              <code>prompted</code> = pasted into CapCut; <code>shipped</code> = video uploaded on
+              Videos.
             </span>
           </label>
           <label className="block text-sm font-medium text-gray-700">

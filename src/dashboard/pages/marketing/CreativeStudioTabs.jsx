@@ -16,8 +16,8 @@ export default function CreativeStudioTabs() {
       <NavLink to="/marketing/creative" end className={tabClass}>
         Briefs
       </NavLink>
-      <NavLink to="/marketing/creative/ship" className={tabClass}>
-        Ship
+      <NavLink to="/marketing/creative/videos" className={tabClass}>
+        Videos
       </NavLink>
     </div>
   )

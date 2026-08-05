@@ -11,6 +11,7 @@ const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
   briefed: 'bg-blue-50 text-blue-700',
   prompted: 'bg-emerald-50 text-emerald-700',
+  shipped: 'bg-violet-50 text-violet-800',
   archived: 'bg-amber-50 text-amber-800',
 }
 
@@ -154,7 +155,7 @@ export default function CreativeStudio() {
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Status</span>
-        {['', 'briefed', 'prompted', 'idea', 'archived'].map((s) => (
+        {['', 'briefed', 'prompted', 'shipped', 'idea', 'archived'].map((s) => (
           <button
             key={s || 'all'}
             type="button"

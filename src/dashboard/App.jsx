@@ -15,7 +15,7 @@ import CreativeStudio from './pages/marketing/CreativeStudio'
 import CreativeBriefDetail from './pages/marketing/CreativeBriefDetail'
 import CreativeIdeas from './pages/marketing/CreativeIdeas'
 import CreativeIdeaDetail from './pages/marketing/CreativeIdeaDetail'
-import CreativeShip from './pages/marketing/CreativeShip'
+import CreativeVideos from './pages/marketing/CreativeVideos'
 import EducationResources from './pages/education/Resources'
 import EducationTeachers from './pages/education/Teachers'
 import EducationSessions from './pages/education/Sessions'
@@ -71,7 +71,8 @@ export default function App() {
           <Route path="marketing/creative/ideas/:slug" element={<CreativeIdeaDetail />} />
           <Route path="marketing/creative/themes" element={<Navigate to="/marketing/creative/ideas" replace />} />
           <Route path="marketing/creative/themes/:slug" element={<IdeaSlugRedirect />} />
-          <Route path="marketing/creative/ship" element={<CreativeShip />} />
+          <Route path="marketing/creative/videos" element={<CreativeVideos />} />
+          <Route path="marketing/creative/ship" element={<Navigate to="/marketing/creative/videos" replace />} />
           <Route path="marketing/creative" element={<CreativeStudio />} />
           <Route path="marketing/creative/:id" element={<CreativeBriefDetail />} />
           <Route path="users" element={<Users />} />

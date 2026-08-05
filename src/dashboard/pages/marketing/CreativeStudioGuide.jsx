@@ -1,11 +1,12 @@
 /**
- * Inline guide for Creative Studio — Ideas → Briefs → Ship.
- * focus: 'briefs' | 'ideas' | 'ship'
+ * Inline guide for Creative Studio — Ideas → Briefs → Videos.
+ * focus: 'briefs' | 'ideas' | 'videos' | 'ship' (ship alias → videos)
  */
 export default function CreativeStudioGuide({ focus = 'ideas' }) {
+  const active = focus === 'ship' ? 'videos' : focus
   const step = (id) =>
     `rounded-md border px-3 py-2 ${
-      focus === id ? 'border-brand-300 bg-brand-50' : 'border-gray-200 bg-white'
+      active === id ? 'border-brand-300 bg-brand-50' : 'border-gray-200 bg-white'
     }`
 
   return (
@@ -13,7 +14,7 @@ export default function CreativeStudioGuide({ focus = 'ideas' }) {
       <h2 className="text-sm font-semibold text-gray-900">How Creative Studio works</h2>
       <p className="mt-1 text-gray-600">
         Pipeline from <strong>story idea</strong> → <strong>paste-ready brief</strong> →{' '}
-        <strong>shipped today</strong>.
+        <strong>video file</strong>.
       </p>
 
       <ol className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
@@ -31,17 +32,17 @@ export default function CreativeStudioGuide({ focus = 'ideas' }) {
             a <strong>tone check</strong> — rewrite anything that reads as depressed/chaos-mom.
           </p>
         </li>
-        <li className={step('ship')}>
-          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">3. Ship</div>
+        <li className={step('videos')}>
+          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">3. Videos</div>
           <p className="mt-1">
-            Daily queue: skip low tone scores, copy the prompt, make the piece externally, mark
-            prompted when it’s out.
+            Flip a ready brief into a real file — <strong>upload</strong> the cut (or paste a link).
+            Finished videos sit above candidates waiting to flip.
           </p>
         </li>
       </ol>
 
       <p className="mt-3 text-gray-600">
-        <strong>Flow:</strong> Ideas → Briefs → Ship. Aim for 1–2/day.
+        <strong>Flow:</strong> Ideas → Briefs → Videos. Aim for 1–2/day.
       </p>
     </div>
   )
