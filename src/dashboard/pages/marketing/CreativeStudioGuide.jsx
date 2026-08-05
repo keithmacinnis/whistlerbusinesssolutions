@@ -1,6 +1,6 @@
 /**
- * Inline guide for Creative Studio — Series → Themes → Briefs.
- * focus: 'briefs' | 'themes' highlights the matching step.
+ * Inline guide for Creative Studio — Themes → Briefs → Ship.
+ * focus: 'briefs' | 'themes' | 'ship'
  */
 export default function CreativeStudioGuide({ focus = 'briefs' }) {
   const step = (id) =>
@@ -12,46 +12,38 @@ export default function CreativeStudioGuide({ focus = 'briefs' }) {
     <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
       <h2 className="text-sm font-semibold text-gray-900">How Creative Studio works</h2>
       <p className="mt-1 text-gray-600">
-        Think of it as a pipeline from <strong>story idea</strong> to <strong>something you can
-        paste into CapCut / Arcads today</strong>.
+        Pipeline from <strong>story idea</strong> → <strong>paste-ready brief</strong> →{' '}
+        <strong>shipped today</strong>.
       </p>
 
       <ol className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
         <li className={step('themes')}>
-          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">1. Theme</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">1. Themes</div>
           <p className="mt-1">
-            A full story package: headline, article/caption, video outline, image concept, on-screen
-            text, CTA. Themes live in a <strong>Series</strong> — a named collection like “More Time
-            for What Matters” or “Shared Care”.
+            Story packages in a <strong>Series</strong>: headline, article, video outline, image,
+            on-screen text, CTA. Create new ones anytime.
           </p>
         </li>
         <li className={step('briefs')}>
-          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">2. Brief</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">2. Briefs</div>
           <p className="mt-1">
-            A shippable remix of a theme (or a fresh spark): hooks, timed beats, and a{' '}
-            <strong>paste-ready prompt</strong> for a specific format — micro reaction, talking head,
-            Seedance one-take, or caption pack.
+            Shippable remixes with hooks, beats, and a <strong>paste-ready prompt</strong> for CapCut /
+            Arcads (micro reaction, talking head, Seedance, captions).
           </p>
         </li>
         <li className={step('ship')}>
           <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">3. Ship</div>
           <p className="mt-1">
-            Copy the prompt → make the video/post externally → mark the brief{' '}
-            <code className="text-xs">prompted</code> when you’ve pasted it into CapCut/Arcads.
+            Your daily queue: copy the prompt, make the piece externally, mark it prompted when it’s
+            out the door.
           </p>
         </li>
       </ol>
 
-      <div className="mt-3 space-y-1 text-gray-600">
-        <p>
-          <strong>Recommended flow:</strong> open <em>Themes</em> → pick a story →{' '}
-          <em>Generate brief from theme</em> → tweak → Copy prompt → ship 1–2/day.
-        </p>
-        <p>
-          <strong>Skip themes when:</strong> you already know the vibe and just want a quick
-          blank-page brief from offer + angle + format.
-        </p>
-      </div>
+      <p className="mt-3 text-gray-600">
+        <strong>Recommended:</strong> Themes → Generate brief → Ship tab → copy → CapCut → mark
+        prompted. Aim for 1–2/day.
+      </p>
     </div>
   )
 }

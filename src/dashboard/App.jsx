@@ -15,6 +15,7 @@ import CreativeStudio from './pages/marketing/CreativeStudio'
 import CreativeBriefDetail from './pages/marketing/CreativeBriefDetail'
 import CreativeThemes from './pages/marketing/CreativeThemes'
 import CreativeThemeDetail from './pages/marketing/CreativeThemeDetail'
+import CreativeShip from './pages/marketing/CreativeShip'
 import EducationResources from './pages/education/Resources'
 import EducationTeachers from './pages/education/Teachers'
 import EducationSessions from './pages/education/Sessions'
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="marketing/qr-codes" element={<QrCodes />} />
           <Route path="marketing/creative/themes" element={<CreativeThemes />} />
           <Route path="marketing/creative/themes/:slug" element={<CreativeThemeDetail />} />
+          <Route path="marketing/creative/ship" element={<CreativeShip />} />
           <Route path="marketing/creative" element={<CreativeStudio />} />
           <Route path="marketing/creative/:id" element={<CreativeBriefDetail />} />
           <Route path="users" element={<Users />} />
