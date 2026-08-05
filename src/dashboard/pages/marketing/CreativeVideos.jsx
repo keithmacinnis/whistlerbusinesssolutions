@@ -42,18 +42,26 @@ function formatBytes(n) {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`
 }
 
+function ordinal(n) {
+  const s = ['th', 'st', 'nd', 'rd']
+  const v = n % 100
+  return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`
+}
+
 const emptyFlip = {
   briefId: '',
   title: '',
   externalUrl: '',
   notes: '',
   file: null,
+  nextCut: null,
 }
 
 export default function CreativeVideos() {
   const { user } = useAuth()
   const [videos, setVideos] = useState(null)
   const [candidates, setCandidates] = useState([])
+  const [flipped, setFlipped] = useState([])
   const [error, setError] = useState('')
   const [busyId, setBusyId] = useState('')
   const [copiedId, setCopiedId] = useState('')
@@ -63,20 +71,24 @@ export default function CreativeVideos() {
 
   const reload = useCallback(() => {
     api('/api/marketing/creative/videos/board')
-      .then(({ videos: v, candidates: c }) => {
+      .then(({ videos: v, candidates: c, flipped: f }) => {
         setVideos(v || [])
         setCandidates(c || [])
+        setFlipped(f || [])
       })
       .catch((err) => setError(err.message))
   }, [])
 
   useEffect(reload, [reload])
 
-  const openFlip = (brief) => {
+  const openFlip = (brief, { nextCut } = {}) => {
+    const cut = nextCut || brief?.nextCut || null
+    const baseTitle = brief?.title || ''
     setFlip({
       ...emptyFlip,
       briefId: brief?.id || '',
-      title: brief?.title || '',
+      title: cut && cut > 1 ? `${baseTitle} (cut ${cut})` : baseTitle,
+      nextCut: cut,
     })
     setShowFlip(true)
     setError('')
@@ -108,22 +120,24 @@ export default function CreativeVideos() {
     }
   }
 
-  const playVideo = async (video) => {
+  const downloadVideo = async (video) => {
     setError('')
     try {
-      const { url } = await api(`/api/marketing/creative/videos/${video.id}/play-url`)
+      const { url } = await api(`/api/marketing/creative/videos/${video.id}/play-url`, {
+        params: { download: '1' },
+      })
       window.open(url, '_blank', 'noopener,noreferrer')
     } catch (err) {
       setError(err.message)
     }
   }
 
-  const removeVideo = async (video) => {
-    if (!confirm(`Delete “${video.title}”?`)) return
+  const archiveVideo = async (video) => {
+    if (!confirm(`Archive “${video.title}”? It leaves Ready to Post.`)) return
     setBusyId(video.id)
     setError('')
     try {
-      await api(`/api/marketing/creative/videos/${video.id}`, { method: 'DELETE' })
+      await api(`/api/marketing/creative/videos/${video.id}/archive`, { method: 'POST' })
       reload()
     } catch (err) {
       setError(err.message)
@@ -176,7 +190,7 @@ export default function CreativeVideos() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Creative Studio</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Flip a ready brief into a real video file — upload preferred, link optional.
+            Flip briefs into video files — then head to Post when a cut is ready to publish.
           </p>
         </div>
         <button
@@ -193,22 +207,21 @@ export default function CreativeVideos() {
       {error && <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
       {loading && <div className="text-gray-500">Loading…</div>}
 
-      {/* ── Finished videos ── */}
       <section className="mb-10">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Videos</h2>
-            <p className="text-sm text-gray-500">Finished pieces you’ve uploaded or linked.</p>
+            <p className="text-sm text-gray-500">
+              Active cuts. Download the file, or archive when you’re done with it here.
+            </p>
           </div>
           <span className="text-xs font-medium text-gray-400">{videos?.length || 0}</span>
         </div>
 
         {videos?.length === 0 && (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center">
-            <p className="font-medium text-gray-800">No videos yet</p>
-            <p className="mt-1 text-sm text-gray-500">
-              Flip a brief below, or upload a standalone cut.
-            </p>
+            <p className="font-medium text-gray-800">No active videos</p>
+            <p className="mt-1 text-sm text-gray-500">Flip a brief below to upload your first cut.</p>
           </div>
         )}
 
@@ -226,9 +239,9 @@ export default function CreativeVideos() {
                       Uploaded
                     </span>
                   )}
-                  {v.hasLink && (
+                  {v.hasLink && !v.hasFile && (
                     <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold uppercase text-sky-800">
-                      Link
+                      Link only
                     </span>
                   )}
                 </div>
@@ -247,35 +260,23 @@ export default function CreativeVideos() {
                       </Link>
                     </>
                   ) : null}
-                  {v.themeSlug ? (
-                    <>
-                      {' · '}
-                      <Link
-                        to={`/marketing/creative/ideas/${v.themeSlug}`}
-                        className="text-brand-700 hover:underline"
-                      >
-                        {v.themeSlug}
-                      </Link>
-                    </>
-                  ) : null}
                 </p>
-                {v.notes && <p className="mt-2 line-clamp-2 text-sm text-gray-600">{v.notes}</p>}
               </div>
               <div className="flex shrink-0 flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={() => playVideo(v)}
+                  onClick={() => downloadVideo(v)}
                   className="rounded-md bg-violet-600 px-3 py-2 text-sm font-semibold text-white hover:bg-violet-700"
                 >
-                  Open
+                  {v.hasFile ? 'Download video' : 'Open link'}
                 </button>
                 <button
                   type="button"
-                  onClick={() => removeVideo(v)}
+                  onClick={() => archiveVideo(v)}
                   disabled={busyId === v.id}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
                 >
-                  Delete
+                  Archive
                 </button>
               </div>
             </div>
@@ -283,114 +284,88 @@ export default function CreativeVideos() {
         </div>
       </section>
 
-      {/* ── Flip candidates ── */}
-      <section>
+      <section className="mb-10">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Ready to flip</h2>
             <p className="text-sm text-gray-500">
-              Briefs waiting for a video file — copy the prompt, make it, then upload.
+              Briefs that haven’t become a video yet — copy the prompt, make it, upload.
             </p>
           </div>
           <span className="text-xs font-medium text-gray-400">{candidates.length}</span>
         </div>
 
         {candidates.length === 0 && videos !== null && (
-          <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center">
-            <p className="font-medium text-gray-800">No briefs waiting</p>
-            <p className="mt-1 text-sm text-gray-500">
-              Generate a brief from an idea, then flip it into a video here.
-            </p>
-            <Link
-              to="/marketing/creative/ideas"
-              className="mt-4 inline-block text-sm font-semibold text-brand-700 hover:underline"
-            >
-              Browse ideas →
-            </Link>
+          <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-10 text-center text-sm text-gray-500">
+            No new briefs waiting — check Flipped below to cut another version.
           </div>
         )}
 
         <div className="space-y-3">
           {candidates.map((b) => (
-            <div
+            <BriefRow
               key={b.id}
-              className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    to={`/marketing/creative/${b.id}`}
-                    className="truncate text-base font-semibold text-gray-900 hover:text-brand-700"
-                  >
-                    {b.title}
-                  </Link>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase ${
-                      STATUS_STYLES[b.status] || STATUS_STYLES.idea
-                    }`}
-                  >
-                    {b.status}
-                  </span>
-                  <ToneChip tone={b.meta?.toneAnalysis} />
-                </div>
-                <p className="mt-1 text-sm text-gray-500">
-                  {formatLabel(b.format)} · {b.angle}
-                  {b.themeSlug ? (
-                    <>
-                      {' · '}
-                      <Link
-                        to={`/marketing/creative/ideas/${b.themeSlug}`}
-                        className="text-brand-700 hover:underline"
-                      >
-                        {b.themeSlug}
-                      </Link>
-                    </>
-                  ) : null}
-                </p>
-                {b.hooks?.[0] && (
-                  <p className="mt-2 line-clamp-1 text-sm italic text-gray-600">“{b.hooks[0]}”</p>
-                )}
-              </div>
-              <div className="flex shrink-0 flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => copyPrompt(b)}
-                  className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  {copiedId === b.id ? 'Copied' : 'Copy prompt'}
-                </button>
-                {b.status === 'briefed' && (
-                  <button
-                    type="button"
-                    onClick={() => markPrompted(b)}
-                    disabled={busyId === b.id}
-                    className="rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  >
-                    Mark prompted
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => openFlip(b)}
-                  className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
-                >
-                  Flip to video
-                </button>
-              </div>
-            </div>
+              brief={b}
+              copiedId={copiedId}
+              busyId={busyId}
+              onCopy={copyPrompt}
+              onMarkPrompted={markPrompted}
+              primaryLabel="Flip to video"
+              onPrimary={() => openFlip(b, { nextCut: 1 })}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Flipped</h2>
+            <p className="text-sm text-gray-500">
+              Briefs you’ve already turned into at least one cut — make another anytime.
+            </p>
+          </div>
+          <span className="text-xs font-medium text-gray-400">{flipped.length}</span>
+        </div>
+
+        {flipped.length === 0 && videos !== null && (
+          <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-10 text-center text-sm text-gray-500">
+            Nothing flipped yet.
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {flipped.map((b) => (
+            <BriefRow
+              key={b.id}
+              brief={b}
+              copiedId={copiedId}
+              busyId={busyId}
+              onCopy={copyPrompt}
+              showMarkPrompted={false}
+              meta={`${b.videoCount} video${b.videoCount === 1 ? '' : 's'} so far`}
+              primaryLabel={`Make a ${ordinal(b.nextCut)} video`}
+              onPrimary={() => openFlip(b, { nextCut: b.nextCut })}
+            />
           ))}
         </div>
       </section>
 
       {showFlip && (
         <Modal
-          title={flip.briefId ? 'Flip brief → video' : 'Add video'}
+          title={
+            flip.nextCut && flip.nextCut > 1
+              ? `Make a ${ordinal(flip.nextCut)} video`
+              : flip.briefId
+                ? 'Flip brief → video'
+                : 'Add video'
+          }
           onClose={() => !saving && setShowFlip(false)}
           wide
         >
           <p className="mb-4 text-sm text-gray-500">
             Upload the finished cut (preferred, max 80MB) or paste a CapCut / Drive / hosting link.
-            {flip.briefId ? ' This marks the brief as shipped.' : ''}
+            {flip.briefId ? ' The brief stays available under Flipped for more cuts.' : ''}
           </p>
           <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700">
@@ -398,7 +373,6 @@ export default function CreativeVideos() {
               <input
                 value={flip.title}
                 onChange={(e) => setFlip({ ...flip, title: e.target.value })}
-                placeholder="Optional — defaults to brief title"
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
               />
             </label>
@@ -417,7 +391,7 @@ export default function CreativeVideos() {
               )}
             </label>
             <div className="relative py-1 text-center text-xs font-semibold uppercase tracking-wide text-gray-400">
-              <span className="bg-white px-2 relative z-10">or</span>
+              <span className="relative z-10 bg-white px-2">or</span>
               <span className="absolute inset-x-0 top-1/2 border-t border-gray-200" />
             </div>
             <label className="block text-sm font-medium text-gray-700">
@@ -435,7 +409,6 @@ export default function CreativeVideos() {
                 value={flip.notes}
                 onChange={(e) => setFlip({ ...flip, notes: e.target.value })}
                 rows={2}
-                placeholder="e.g. TikTok cut v2, 9:16"
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
               />
             </label>
@@ -450,7 +423,85 @@ export default function CreativeVideos() {
           </div>
         </Modal>
       )}
+    </div>
+  )
+}
 
+function BriefRow({
+  brief: b,
+  copiedId,
+  busyId,
+  onCopy,
+  onMarkPrompted,
+  onPrimary,
+  primaryLabel,
+  showMarkPrompted = true,
+  meta,
+}) {
+  return (
+    <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to={`/marketing/creative/${b.id}`}
+            className="truncate text-base font-semibold text-gray-900 hover:text-brand-700"
+          >
+            {b.title}
+          </Link>
+          <span
+            className={`rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase ${
+              STATUS_STYLES[b.status] || STATUS_STYLES.idea
+            }`}
+          >
+            {b.status}
+          </span>
+          <ToneChip tone={b.meta?.toneAnalysis} />
+        </div>
+        <p className="mt-1 text-sm text-gray-500">
+          {formatLabel(b.format)} · {b.angle}
+          {meta ? ` · ${meta}` : ''}
+          {b.themeSlug ? (
+            <>
+              {' · '}
+              <Link
+                to={`/marketing/creative/ideas/${b.themeSlug}`}
+                className="text-brand-700 hover:underline"
+              >
+                {b.themeSlug}
+              </Link>
+            </>
+          ) : null}
+        </p>
+        {b.hooks?.[0] && (
+          <p className="mt-2 line-clamp-1 text-sm italic text-gray-600">“{b.hooks[0]}”</p>
+        )}
+      </div>
+      <div className="flex shrink-0 flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => onCopy(b)}
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          {copiedId === b.id ? 'Copied' : 'Copy prompt'}
+        </button>
+        {showMarkPrompted && b.status === 'briefed' && onMarkPrompted && (
+          <button
+            type="button"
+            onClick={() => onMarkPrompted(b)}
+            disabled={busyId === b.id}
+            className="rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
+          >
+            Mark prompted
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onPrimary}
+          className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+        >
+          {primaryLabel}
+        </button>
+      </div>
     </div>
   )
 }

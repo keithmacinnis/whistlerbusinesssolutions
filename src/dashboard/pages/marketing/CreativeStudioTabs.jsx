@@ -19,6 +19,9 @@ export default function CreativeStudioTabs() {
       <NavLink to="/marketing/creative/videos" className={tabClass}>
         Videos
       </NavLink>
+      <NavLink to="/marketing/creative/posts" className={tabClass}>
+        Post
+      </NavLink>
     </div>
   )
 }
