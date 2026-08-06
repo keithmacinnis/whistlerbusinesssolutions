@@ -6,6 +6,7 @@ import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
 import { ToneChip } from './ToneBanner'
+import AssetPreview from './AssetPreview'
 
 const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
@@ -242,7 +243,7 @@ export default function CreativeText() {
               key={s.id}
               className="flex flex-col gap-4 rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/40 to-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="truncate text-base font-semibold text-gray-900">{s.title}</h3>
                   <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold uppercase text-amber-900">
@@ -268,6 +269,13 @@ export default function CreativeText() {
                 {s.bodyText && (
                   <p className="mt-2 line-clamp-2 text-sm text-gray-600">{s.bodyText}</p>
                 )}
+                <AssetPreview
+                  assetType="still"
+                  id={s.id}
+                  title={s.title}
+                  hasFile={s.hasFile}
+                  hasLink={s.hasLink}
+                />
               </div>
               <div className="flex shrink-0 flex-wrap gap-2">
                 {s.bodyText && (

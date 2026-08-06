@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api'
 import { useAuth } from '../../auth'
 import ToneBanner from './ToneBanner'
+import CreativeStudioTabs from './CreativeStudioTabs'
+import QualityBanner from './QualityBanner'
 
 const STATUSES = ['idea', 'briefed', 'prompted', 'ready_to_post', 'posted', 'archived']
 
@@ -23,6 +25,8 @@ const PLATFORM_LABELS = {
   x: 'X.com',
   other: 'X.com',
 }
+
+const STILL_FORMATS = new Set(['caption_pack', 'story_post', 'meme_still'])
 
 function beatsToText(beats) {
   if (!Array.isArray(beats)) return ''
@@ -48,12 +52,27 @@ function parseBeats(text) {
   })
 }
 
+function briefToForm(brief) {
+  return {
+    title: brief.title || '',
+    status: brief.status || 'briefed',
+    inputNote: brief.inputNote || '',
+    hooksText: Array.isArray(brief.hooks) ? brief.hooks.join('\n') : '',
+    beatsText: beatsToText(brief.beats),
+    onScreenText: Array.isArray(brief.onScreenText) ? brief.onScreenText.join('\n') : '',
+    caption: brief.caption || '',
+    visualRecipe: brief.visualRecipe || '',
+    generationPrompt: brief.generationPrompt || '',
+  }
+}
+
 export default function CreativeBriefDetail() {
   const { id } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
   const [brief, setBrief] = useState(null)
   const [videos, setVideos] = useState([])
+  const [stills, setStills] = useState([])
   const [posts, setPosts] = useState([])
   const [form, setForm] = useState(null)
   const [error, setError] = useState('')
@@ -61,24 +80,17 @@ export default function CreativeBriefDetail() {
   const [copied, setCopied] = useState('')
   const [dirty, setDirty] = useState(false)
   const [checkingTone, setCheckingTone] = useState(false)
+  const [improving, setImproving] = useState(false)
+  const [improvementResult, setImprovementResult] = useState(null)
 
   const load = useCallback(() => {
     api(`/api/marketing/creative/briefs/${id}`)
-      .then(({ brief: b, videos: v, posts: p }) => {
+      .then(({ brief: b, videos: v, stills: s, posts: p }) => {
         setBrief(b)
         setVideos(v || [])
+        setStills(s || [])
         setPosts(p || [])
-        setForm({
-          title: b.title || '',
-          status: b.status || 'briefed',
-          inputNote: b.inputNote || '',
-          hooksText: Array.isArray(b.hooks) ? b.hooks.join('\n') : '',
-          beatsText: beatsToText(b.beats),
-          onScreenText: Array.isArray(b.onScreenText) ? b.onScreenText.join('\n') : '',
-          caption: b.caption || '',
-          visualRecipe: b.visualRecipe || '',
-          generationPrompt: b.generationPrompt || '',
-        })
+        setForm(briefToForm(b))
         setDirty(false)
       })
       .catch((err) => setError(err.message))
@@ -155,6 +167,26 @@ export default function CreativeBriefDetail() {
     }
   }
 
+  const selfImprove = async () => {
+    setImproving(true)
+    setError('')
+    setImprovementResult(null)
+    try {
+      if (dirty) await save()
+      const result = await api(`/api/marketing/creative/briefs/${id}/self-improve`, {
+        method: 'POST',
+      })
+      setBrief(result.brief)
+      setForm(briefToForm(result.brief))
+      setDirty(false)
+      setImprovementResult(result)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setImproving(false)
+    }
+  }
+
   const remove = async () => {
     if (!confirm('Delete this brief?')) return
     try {
@@ -180,6 +212,10 @@ export default function CreativeBriefDetail() {
       </div>
     )
   }
+
+  const isStillBrief = STILL_FORMATS.has(brief?.format)
+  const flipPath = isStillBrief ? '/marketing/creative/text' : '/marketing/creative/videos'
+  const flipLabel = isStillBrief ? 'Flip on Text →' : 'Flip on Videos →'
 
   return (
     <div>
@@ -220,11 +256,20 @@ export default function CreativeBriefDetail() {
             {copied === 'prompt' ? 'Copied' : 'Copy prompt'}
           </button>
           <Link
-            to="/marketing/creative/videos"
+            to={flipPath}
             className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"
           >
-            Flip on Videos →
+            {flipLabel}
           </Link>
+          <button
+            type="button"
+            onClick={selfImprove}
+            disabled={improving || saving}
+            className="rounded-md bg-violet-600 px-3 py-2 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-50"
+            title="Review and rewrite this brief against brand, format, product, hook, and production rules"
+          >
+            {improving ? 'Self-improving…' : '✦ Self-improve'}
+          </button>
           <button
             type="button"
             onClick={save}
@@ -243,13 +288,33 @@ export default function CreativeBriefDetail() {
         </div>
       </div>
 
+      <CreativeStudioTabs />
+
       {error && <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
+      {improvementResult && (
+        <div className="mb-4 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-950">
+          <strong>
+            {improvementResult.accepted ? 'Self-improved' : 'Kept the stronger original'}:{' '}
+            {improvementResult.scoreBefore} → {improvementResult.scoreAfter}
+          </strong>
+          <span className="ml-2">
+            {improvementResult.accepted
+              ? `Changed ${
+                  improvementResult.changedFields.length
+                    ? improvementResult.changedFields.join(', ')
+                    : 'no content fields'
+                }.`
+              : 'The candidate rewrite scored worse and was discarded.'}
+          </span>
+        </div>
+      )}
 
       <ToneBanner
         tone={brief?.meta?.toneAnalysis}
         onRecheck={recheckTone}
         checking={checkingTone}
       />
+      <QualityBanner review={brief?.meta?.selfReview} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-1">
@@ -329,6 +394,40 @@ export default function CreativeBriefDetail() {
             )}
           </div>
 
+          <div className="rounded-xl border border-amber-100 bg-amber-50/30 p-4 shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Related text & stills ({stills.length})
+              </div>
+              <Link
+                to="/marketing/creative/text"
+                className="text-xs font-semibold text-brand-700 hover:underline"
+              >
+                Text →
+              </Link>
+            </div>
+            {stills.length === 0 ? (
+              <p className="mt-2 text-xs text-gray-400">
+                No text or still assets flipped from this brief yet.
+              </p>
+            ) : (
+              <ul className="mt-2 space-y-2 text-sm">
+                {stills.map((s) => (
+                  <li key={s.id} className="rounded-md bg-white px-2.5 py-2">
+                    <div className="font-medium text-gray-900">{s.title}</div>
+                    <div className="mt-0.5 text-xs text-gray-400">
+                      {s.status === 'archived' ? 'archived · ' : ''}
+                      {new Date(s.createdAt).toLocaleString()}
+                      {s.hasFile ? ' · uploaded' : ''}
+                      {s.hasLink ? ' · link' : ''}
+                      {s.bodyText ? ' · text' : ''}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           <div className="rounded-xl border border-emerald-100 bg-emerald-50/30 p-4 shadow-sm">
             <div className="flex items-center justify-between gap-2">
               <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -343,7 +442,7 @@ export default function CreativeBriefDetail() {
             </div>
             {posts.length === 0 ? (
               <p className="mt-2 text-xs text-gray-400">
-                No posts recorded for videos from this brief yet.
+                No posts recorded for assets from this brief yet.
               </p>
             ) : (
               <ul className="mt-2 space-y-2 text-sm">
@@ -356,6 +455,11 @@ export default function CreativeBriefDetail() {
                       {p.video?.title && (
                         <span className="text-xs text-gray-400 truncate max-w-[12rem]">
                           {p.video.title}
+                        </span>
+                      )}
+                      {p.still?.title && (
+                        <span className="text-xs text-gray-400 truncate max-w-[12rem]">
+                          {p.still.title}
                         </span>
                       )}
                     </div>

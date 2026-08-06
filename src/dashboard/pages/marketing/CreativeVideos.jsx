@@ -6,6 +6,7 @@ import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
 import { ToneChip } from './ToneBanner'
+import AssetPreview from './AssetPreview'
 
 const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
@@ -244,7 +245,7 @@ export default function CreativeVideos() {
               key={v.id}
               className="flex flex-col gap-4 rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50/40 to-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="truncate text-base font-semibold text-gray-900">{v.title}</h3>
                   {v.hasFile && (
@@ -274,6 +275,13 @@ export default function CreativeVideos() {
                     </>
                   ) : null}
                 </p>
+                <AssetPreview
+                  assetType="video"
+                  id={v.id}
+                  title={v.title}
+                  hasFile={v.hasFile}
+                  hasLink={v.hasLink}
+                />
               </div>
               <div className="flex shrink-0 flex-wrap gap-2">
                 <button

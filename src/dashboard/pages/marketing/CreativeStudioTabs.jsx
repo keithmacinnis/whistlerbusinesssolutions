@@ -19,13 +19,21 @@ export default function CreativeStudioTabs() {
   const mediaActive =
     pathname.includes('/marketing/creative/videos') ||
     pathname.includes('/marketing/creative/text')
+  const briefDetailActive =
+    /^\/marketing\/creative\/(?!ideas(?:\/|$)|videos(?:\/|$)|text(?:\/|$)|posts(?:\/|$)|ship(?:\/|$))[^/]+\/?$/.test(
+      pathname,
+    )
 
   return (
     <div className="mb-6 flex flex-wrap items-center gap-2">
       <NavLink to="/marketing/creative/ideas" className={tabClass}>
         Ideas
       </NavLink>
-      <NavLink to="/marketing/creative" end className={tabClass}>
+      <NavLink
+        to="/marketing/creative"
+        end
+        className={({ isActive }) => tabClass({ isActive: isActive || briefDetailActive })}
+      >
         Briefs
       </NavLink>
 
