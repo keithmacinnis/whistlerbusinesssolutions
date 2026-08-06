@@ -11,8 +11,18 @@ const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
   briefed: 'bg-blue-50 text-blue-700',
   prompted: 'bg-emerald-50 text-emerald-700',
-  shipped: 'bg-violet-50 text-violet-800',
+  ready_to_post: 'bg-violet-50 text-violet-800',
+  posted: 'bg-sky-50 text-sky-800',
   archived: 'bg-amber-50 text-amber-800',
+}
+
+const STATUS_LABELS = {
+  idea: 'idea',
+  briefed: 'briefed',
+  prompted: 'prompted',
+  ready_to_post: 'ready to post',
+  posted: 'posted',
+  archived: 'archived',
 }
 
 function formatLabel(slug) {
@@ -453,7 +463,7 @@ function BriefRow({
               STATUS_STYLES[b.status] || STATUS_STYLES.idea
             }`}
           >
-            {b.status}
+            {STATUS_LABELS[b.status] || b.status}
           </span>
           <ToneChip tone={b.meta?.toneAnalysis} />
         </div>

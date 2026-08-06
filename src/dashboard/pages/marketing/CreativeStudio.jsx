@@ -11,8 +11,18 @@ const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
   briefed: 'bg-blue-50 text-blue-700',
   prompted: 'bg-emerald-50 text-emerald-700',
-  shipped: 'bg-violet-50 text-violet-800',
+  ready_to_post: 'bg-violet-50 text-violet-800',
+  posted: 'bg-sky-50 text-sky-800',
   archived: 'bg-amber-50 text-amber-800',
+}
+
+const STATUS_LABELS = {
+  idea: 'idea',
+  briefed: 'briefed',
+  prompted: 'prompted',
+  ready_to_post: 'ready to post',
+  posted: 'posted',
+  archived: 'archived',
 }
 
 function formatLabel(slug) {
@@ -155,7 +165,7 @@ export default function CreativeStudio() {
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium uppercase tracking-wide text-gray-400">Status</span>
-        {['', 'briefed', 'prompted', 'shipped', 'idea', 'archived'].map((s) => (
+        {['', 'briefed', 'prompted', 'ready_to_post', 'posted', 'idea', 'archived'].map((s) => (
           <button
             key={s || 'all'}
             type="button"
@@ -166,7 +176,7 @@ export default function CreativeStudio() {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            {s || 'All'}
+            {s ? STATUS_LABELS[s] || s : 'All'}
           </button>
         ))}
       </div>
@@ -214,7 +224,7 @@ export default function CreativeStudio() {
                         STATUS_STYLES[b.status] || STATUS_STYLES.idea
                       }`}
                     >
-                      {b.status}
+                      {STATUS_LABELS[b.status] || b.status}
                     </span>
                   </td>
                   <td className="px-4 py-3">

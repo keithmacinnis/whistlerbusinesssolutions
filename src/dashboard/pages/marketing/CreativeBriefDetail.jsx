@@ -4,7 +4,16 @@ import { api } from '../../api'
 import { useAuth } from '../../auth'
 import ToneBanner from './ToneBanner'
 
-const STATUSES = ['idea', 'briefed', 'prompted', 'shipped', 'archived']
+const STATUSES = ['idea', 'briefed', 'prompted', 'ready_to_post', 'posted', 'archived']
+
+const STATUS_LABELS = {
+  idea: 'idea',
+  briefed: 'briefed',
+  prompted: 'prompted',
+  ready_to_post: 'ready to post',
+  posted: 'posted',
+  archived: 'archived',
+}
 
 function beatsToText(beats) {
   if (!Array.isArray(beats)) return ''
@@ -248,13 +257,13 @@ export default function CreativeBriefDetail() {
             >
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
-                  {s}
+                  {STATUS_LABELS[s] || s}
                 </option>
               ))}
             </select>
             <span className="mt-1 block text-xs font-normal text-gray-400">
-              <code>prompted</code> = pasted into CapCut; <code>shipped</code> = video uploaded on
-              Videos.
+              <code>prompted</code> = pasted into CapCut; <code>ready to post</code> = video
+              uploaded; <code>posted</code> = recorded on Post.
             </span>
           </label>
           <label className="block text-sm font-medium text-gray-700">
