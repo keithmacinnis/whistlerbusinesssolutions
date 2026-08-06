@@ -5,6 +5,7 @@ import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
+import FormatSelect from './FormatSelect'
 import { ToneChip } from './ToneBanner'
 
 const STATUS_STYLES = {
@@ -32,6 +33,7 @@ function formatLabel(slug) {
       talking_head_screen: 'Talking head + screen',
       seedance_oner: 'Seedance one-take',
       caption_pack: 'Caption pack',
+      broll_caption: 'B-roll captions',
       story_post: 'Story post',
       meme_still: 'Meme still',
     }[slug] || slug
@@ -299,26 +301,12 @@ export default function CreativeStudio() {
               </select>
             </label>
 
-            <label className="block text-sm font-medium text-gray-700">
-              Format
-              <select
-                value={form.format}
-                onChange={(e) => setForm({ ...form, format: e.target.value })}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-              >
-                {formats.map((f) => (
-                  <option key={f.slug} value={f.slug}>
-                    {f.name}
-                    {f.lengthHint ? ` (${f.lengthHint})` : ''}
-                  </option>
-                ))}
-              </select>
-              {formats.find((f) => f.slug === form.format)?.description && (
-                <span className="mt-1 block text-xs font-normal text-gray-400">
-                  {formats.find((f) => f.slug === form.format).description}
-                </span>
-              )}
-            </label>
+            <FormatSelect
+              formats={formats}
+              value={form.format}
+              onChange={(format) => setForm({ ...form, format })}
+              id="studio-format"
+            />
 
             <label className="block text-sm font-medium text-gray-700">
               Model

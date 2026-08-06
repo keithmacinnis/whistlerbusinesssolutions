@@ -6,6 +6,7 @@ import { useAuth } from '../../auth'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import AngleHintPicker from './AngleHintPicker'
 import SeriesSelect from './SeriesSelect'
+import FormatSelect from './FormatSelect'
 
 const THEME_STATUSES = ['idea', 'ready', 'in_production', 'posted', 'archived']
 
@@ -601,20 +602,12 @@ export default function CreativeIdeaDetail() {
                 ))}
               </select>
             </label>
-            <label className="block text-sm font-medium text-gray-700">
-              Format
-              <select
-                value={genForm.format}
-                onChange={(e) => setGenForm({ ...genForm, format: e.target.value })}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-              >
-                {formats.map((f) => (
-                  <option key={f.slug} value={f.slug}>
-                    {f.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <FormatSelect
+              formats={formats}
+              value={genForm.format}
+              onChange={(format) => setGenForm({ ...genForm, format })}
+              id="idea-gen-format"
+            />
             <label className="block text-sm font-medium text-gray-700">
               Model
               <select
