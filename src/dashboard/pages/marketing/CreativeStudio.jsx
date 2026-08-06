@@ -32,6 +32,8 @@ function formatLabel(slug) {
       talking_head_screen: 'Talking head + screen',
       seedance_oner: 'Seedance one-take',
       caption_pack: 'Caption pack',
+      story_post: 'Story post',
+      meme_still: 'Meme still',
     }[slug] || slug
   )
 }

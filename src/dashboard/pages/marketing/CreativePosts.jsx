@@ -35,7 +35,9 @@ export default function CreativePosts() {
   const [showPost, setShowPost] = useState(false)
   const [form, setForm] = useState({
     videoId: '',
-    videoTitle: '',
+    stillId: '',
+    assetTitle: '',
+    assetType: 'video',
     platform: 'tiktok',
     postUrl: '',
     notes: '',
@@ -53,10 +55,13 @@ export default function CreativePosts() {
 
   useEffect(reload, [reload])
 
-  const openPost = (video) => {
+  const openPost = (asset) => {
+    const isStill = asset.assetType === 'still'
     setForm({
-      videoId: video.id,
-      videoTitle: video.title,
+      videoId: isStill ? '' : asset.id,
+      stillId: isStill ? asset.id : '',
+      assetTitle: asset.title,
+      assetType: isStill ? 'still' : 'video',
       platform: 'tiktok',
       postUrl: '',
       notes: '',
@@ -66,12 +71,14 @@ export default function CreativePosts() {
     setError('')
   }
 
-  const downloadVideo = async (video) => {
+  const downloadAsset = async (asset) => {
     setError('')
     try {
-      const { url } = await api(`/api/marketing/creative/videos/${video.id}/play-url`, {
-        params: { download: '1' },
-      })
+      const path =
+        asset.assetType === 'still'
+          ? `/api/marketing/creative/stills/${asset.id}/play-url`
+          : `/api/marketing/creative/videos/${asset.id}/play-url`
+      const { url } = await api(path, { params: { download: '1' } })
       window.open(url, '_blank', 'noopener,noreferrer')
     } catch (err) {
       setError(err.message)
@@ -85,7 +92,8 @@ export default function CreativePosts() {
       await api('/api/marketing/creative/posts', {
         method: 'POST',
         body: {
-          videoId: form.videoId,
+          videoId: form.videoId || undefined,
+          stillId: form.stillId || undefined,
           platform: form.platform || undefined,
           postUrl: form.postUrl.trim() || undefined,
           notes: form.notes.trim() || undefined,
@@ -102,7 +110,7 @@ export default function CreativePosts() {
   }
 
   const removePost = async (post) => {
-    if (!confirm('Remove this post record? (The video file stays.)')) return
+    if (!confirm('Remove this post record? (The asset file stays.)')) return
     setBusyId(post.id)
     setError('')
     try {
@@ -126,7 +134,7 @@ export default function CreativePosts() {
       <div className="mb-2">
         <h1 className="text-2xl font-bold text-gray-900">Creative Studio</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Publish uploaded cuts. The same video can be posted more than once (TikTok + Reels, etc.).
+          Publish videos and text/stills. The same asset can post more than once.
         </p>
       </div>
       <CreativeStudioTabs />
@@ -140,7 +148,7 @@ export default function CreativePosts() {
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Ready to post</h2>
             <p className="text-sm text-gray-500">
-              Uploaded videos waiting to go live — post the same cut to multiple platforms.
+              Flipped videos and text/stills waiting to go live.
             </p>
           </div>
           <span className="text-xs font-medium text-gray-400">{ready?.length || 0}</span>
@@ -149,25 +157,30 @@ export default function CreativePosts() {
         {ready?.length === 0 && (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center">
             <p className="font-medium text-gray-800">Nothing ready to post</p>
-            <p className="mt-1 text-sm text-gray-500">Flip and upload a video first.</p>
-            <Link
-              to="/marketing/creative/videos"
-              className="mt-4 inline-block text-sm font-semibold text-brand-700 hover:underline"
-            >
-              Go to Videos →
-            </Link>
+            <p className="mt-1 text-sm text-gray-500">Flip a video or text/still first.</p>
+            <div className="mt-4 flex justify-center gap-4 text-sm font-semibold">
+              <Link to="/marketing/creative/videos" className="text-brand-700 hover:underline">
+                Videos →
+              </Link>
+              <Link to="/marketing/creative/text" className="text-brand-700 hover:underline">
+                Text →
+              </Link>
+            </div>
           </div>
         )}
 
         <div className="space-y-3">
           {ready?.map((v) => (
             <div
-              key={v.id}
+              key={`${v.assetType}-${v.id}`}
               className="flex flex-col gap-4 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/40 to-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="truncate text-base font-semibold text-gray-900">{v.title}</h3>
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold uppercase text-gray-600">
+                    {v.assetType === 'still' ? 'text/still' : 'video'}
+                  </span>
                   {v.postCount > 0 && (
                     <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold uppercase text-amber-800">
                       Posted {v.postCount}×
@@ -193,10 +206,10 @@ export default function CreativePosts() {
               <div className="flex shrink-0 flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={() => downloadVideo(v)}
+                  onClick={() => downloadAsset(v)}
                   className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  {v.hasFile ? 'Download' : 'Open link'}
+                  {v.hasFile ? 'Download' : v.hasLink ? 'Open link' : 'Open'}
                 </button>
                 <button
                   type="button"
@@ -235,7 +248,7 @@ export default function CreativePosts() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="truncate text-base font-semibold text-gray-900">
-                    {p.video?.title || 'Video'}
+                    {p.video?.title || p.still?.title || 'Asset'}
                   </h3>
                   <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold uppercase text-sky-800">
                     {platformLabel(p.platform)}
@@ -280,8 +293,8 @@ export default function CreativePosts() {
       {showPost && (
         <Modal title="Record a post" onClose={() => !saving && setShowPost(false)} wide>
           <p className="mb-4 text-sm text-gray-500">
-            Logging a publish for <strong>{form.videoTitle}</strong>. You can record another post for
-            the same video anytime.
+            Logging a publish for <strong>{form.assetTitle}</strong>. You can record another post for
+            the same asset anytime.
           </p>
           <div className="space-y-3">
             <label className="block text-sm font-medium text-gray-700">

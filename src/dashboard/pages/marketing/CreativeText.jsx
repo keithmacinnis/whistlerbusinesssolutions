@@ -28,12 +28,9 @@ const STATUS_LABELS = {
 function formatLabel(slug) {
   return (
     {
-      micro_reaction: 'Micro reaction',
-      talking_head_screen: 'Talking head + screen',
-      seedance_oner: 'Seedance one-take',
-      caption_pack: 'Caption pack',
       story_post: 'Story post',
       meme_still: 'Meme still',
+      caption_pack: 'Caption pack',
     }[slug] || slug
   )
 }
@@ -63,15 +60,17 @@ function ordinal(n) {
 const emptyFlip = {
   briefId: '',
   title: '',
+  format: 'story_post',
+  bodyText: '',
   externalUrl: '',
   notes: '',
   file: null,
   nextCut: null,
 }
 
-export default function CreativeVideos() {
+export default function CreativeText() {
   const { user } = useAuth()
-  const [videos, setVideos] = useState(null)
+  const [stills, setStills] = useState(null)
   const [candidates, setCandidates] = useState([])
   const [flipped, setFlipped] = useState([])
   const [error, setError] = useState('')
@@ -82,9 +81,9 @@ export default function CreativeVideos() {
   const [flip, setFlip] = useState(emptyFlip)
 
   const reload = useCallback(() => {
-    api('/api/marketing/creative/videos/board')
-      .then(({ videos: v, candidates: c, flipped: f }) => {
-        setVideos(v || [])
+    api('/api/marketing/creative/stills/board')
+      .then(({ stills: s, candidates: c, flipped: f }) => {
+        setStills(s || [])
         setCandidates(c || [])
         setFlipped(f || [])
       })
@@ -100,6 +99,8 @@ export default function CreativeVideos() {
       ...emptyFlip,
       briefId: brief?.id || '',
       title: cut && cut > 1 ? `${baseTitle} (cut ${cut})` : baseTitle,
+      format: brief?.format || 'story_post',
+      bodyText: '',
       nextCut: cut,
     })
     setShowFlip(true)
@@ -116,26 +117,20 @@ export default function CreativeVideos() {
     }
   }
 
-  const markPrompted = async (brief) => {
-    setBusyId(brief.id)
-    setError('')
+  const copyBody = async (still) => {
     try {
-      await api(`/api/marketing/creative/briefs/${brief.id}`, {
-        method: 'PATCH',
-        body: { status: 'prompted' },
-      })
-      reload()
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setBusyId('')
+      await navigator.clipboard.writeText(still.bodyText || '')
+      setCopiedId(still.id)
+      setTimeout(() => setCopiedId(''), 1500)
+    } catch {
+      setError('Could not copy to clipboard')
     }
   }
 
-  const downloadVideo = async (video) => {
+  const downloadStill = async (still) => {
     setError('')
     try {
-      const { url } = await api(`/api/marketing/creative/videos/${video.id}/play-url`, {
+      const { url } = await api(`/api/marketing/creative/stills/${still.id}/play-url`, {
         params: { download: '1' },
       })
       window.open(url, '_blank', 'noopener,noreferrer')
@@ -144,12 +139,12 @@ export default function CreativeVideos() {
     }
   }
 
-  const archiveVideo = async (video) => {
-    if (!confirm(`Archive “${video.title}”? It leaves Ready to Post.`)) return
-    setBusyId(video.id)
+  const archiveStill = async (still) => {
+    if (!confirm(`Archive “${still.title}”?`)) return
+    setBusyId(still.id)
     setError('')
     try {
-      await api(`/api/marketing/creative/videos/${video.id}/archive`, { method: 'POST' })
+      await api(`/api/marketing/creative/stills/${still.id}/archive`, { method: 'POST' })
       reload()
     } catch (err) {
       setError(err.message)
@@ -165,21 +160,23 @@ export default function CreativeVideos() {
       const body = {
         briefId: flip.briefId || undefined,
         title: flip.title.trim() || undefined,
+        format: flip.format,
+        bodyText: flip.bodyText.trim() || undefined,
         externalUrl: flip.externalUrl.trim() || undefined,
         notes: flip.notes.trim() || undefined,
       }
       if (flip.file) {
-        if (flip.file.size > 80 * 1024 * 1024) {
-          throw new Error('Video too large (max 80MB). Paste a link instead.')
+        if (flip.file.size > 20 * 1024 * 1024) {
+          throw new Error('Image too large (max 20MB). Paste a link instead.')
         }
         body.contentBase64 = await fileToBase64(flip.file)
         body.filename = flip.file.name
-        body.mimeType = flip.file.type || 'video/mp4'
+        body.mimeType = flip.file.type || 'image/jpeg'
       }
-      if (!body.contentBase64 && !body.externalUrl) {
-        throw new Error('Upload a video file or paste an external URL')
+      if (!body.contentBase64 && !body.externalUrl && !body.bodyText) {
+        throw new Error('Add final caption text, an image, or a link')
       }
-      await api('/api/marketing/creative/videos', { method: 'POST', body })
+      await api('/api/marketing/creative/stills', { method: 'POST', body })
       setShowFlip(false)
       setFlip(emptyFlip)
       reload()
@@ -194,7 +191,7 @@ export default function CreativeVideos() {
     return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
   }
 
-  const loading = videos === null && !error
+  const loading = stills === null && !error
 
   return (
     <div>
@@ -202,7 +199,7 @@ export default function CreativeVideos() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Creative Studio</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Flip briefs into video files — then head to Post when a cut is ready to publish.
+            Flip story posts & meme stills into publishable text + image — then Post when ready.
           </p>
         </div>
         <button
@@ -210,11 +207,11 @@ export default function CreativeVideos() {
           onClick={() => openFlip(null)}
           className="rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700"
         >
-          + Add video
+          + Add text/still
         </button>
       </div>
       <CreativeStudioTabs />
-      <CreativeStudioGuide focus="videos" />
+      <CreativeStudioGuide focus="text" />
 
       {error && <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
       {loading && <div className="text-gray-500">Loading…</div>}
@@ -222,70 +219,79 @@ export default function CreativeVideos() {
       <section className="mb-10">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Videos</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Text & stills</h2>
             <p className="text-sm text-gray-500">
-              Active cuts. Download the file, or archive when you’re done with it here.
+              Finished captions and images. Download the asset or archive when done.
             </p>
           </div>
-          <span className="text-xs font-medium text-gray-400">{videos?.length || 0}</span>
+          <span className="text-xs font-medium text-gray-400">{stills?.length || 0}</span>
         </div>
 
-        {videos?.length === 0 && (
+        {stills?.length === 0 && (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center">
-            <p className="font-medium text-gray-800">No active videos</p>
-            <p className="mt-1 text-sm text-gray-500">Flip a brief below to upload your first cut.</p>
+            <p className="font-medium text-gray-800">No text/stills yet</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Flip a story post or meme brief below.
+            </p>
           </div>
         )}
 
         <div className="space-y-3">
-          {videos?.map((v) => (
+          {stills?.map((s) => (
             <div
-              key={v.id}
-              className="flex flex-col gap-4 rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50/40 to-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+              key={s.id}
+              className="flex flex-col gap-4 rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/40 to-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="truncate text-base font-semibold text-gray-900">{v.title}</h3>
-                  {v.hasFile && (
-                    <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-semibold uppercase text-violet-800">
-                      Uploaded
-                    </span>
-                  )}
-                  {v.hasLink && !v.hasFile && (
-                    <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold uppercase text-sky-800">
-                      Link only
-                    </span>
-                  )}
+                  <h3 className="truncate text-base font-semibold text-gray-900">{s.title}</h3>
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold uppercase text-amber-900">
+                    {formatLabel(s.format)}
+                  </span>
                 </div>
                 <p className="mt-1 text-sm text-gray-500">
-                  {new Date(v.createdAt).toLocaleString()}
-                  {v.filename ? ` · ${v.filename}` : ''}
-                  {v.sizeBytes != null ? ` · ${formatBytes(v.sizeBytes)}` : ''}
-                  {v.brief ? (
+                  {new Date(s.createdAt).toLocaleString()}
+                  {s.filename ? ` · ${s.filename}` : ''}
+                  {s.sizeBytes != null ? ` · ${formatBytes(s.sizeBytes)}` : ''}
+                  {s.brief ? (
                     <>
                       {' · '}
                       <Link
-                        to={`/marketing/creative/${v.brief.id}`}
+                        to={`/marketing/creative/${s.brief.id}`}
                         className="text-brand-700 hover:underline"
                       >
-                        {v.brief.title}
+                        {s.brief.title}
                       </Link>
                     </>
                   ) : null}
                 </p>
+                {s.bodyText && (
+                  <p className="mt-2 line-clamp-2 text-sm text-gray-600">{s.bodyText}</p>
+                )}
               </div>
               <div className="flex shrink-0 flex-wrap gap-2">
+                {s.bodyText && (
+                  <button
+                    type="button"
+                    onClick={() => copyBody(s)}
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    {copiedId === s.id ? 'Copied' : 'Copy caption'}
+                  </button>
+                )}
+                {(s.hasFile || s.hasLink) && (
+                  <button
+                    type="button"
+                    onClick={() => downloadStill(s)}
+                    className="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-800"
+                  >
+                    {s.hasFile ? 'Download image' : 'Open link'}
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => downloadVideo(v)}
-                  className="rounded-md bg-violet-600 px-3 py-2 text-sm font-semibold text-white hover:bg-violet-700"
-                >
-                  {v.hasFile ? 'Download video' : 'Open link'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => archiveVideo(v)}
-                  disabled={busyId === v.id}
+                  onClick={() => archiveStill(s)}
+                  disabled={busyId === s.id}
                   className="rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
                 >
                   Archive
@@ -301,15 +307,15 @@ export default function CreativeVideos() {
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Ready to flip</h2>
             <p className="text-sm text-gray-500">
-              Briefs that haven’t become a video yet — copy the prompt, make it, upload.
+              Story posts & meme stills waiting for a final caption / image.
             </p>
           </div>
           <span className="text-xs font-medium text-gray-400">{candidates.length}</span>
         </div>
 
-        {candidates.length === 0 && videos !== null && (
+        {candidates.length === 0 && stills !== null && (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-10 text-center text-sm text-gray-500">
-            No new briefs waiting — check Flipped below to cut another version.
+            No new text briefs waiting — generate a Story post or Meme still from Briefs / Ideas.
           </div>
         )}
 
@@ -319,10 +325,8 @@ export default function CreativeVideos() {
               key={b.id}
               brief={b}
               copiedId={copiedId}
-              busyId={busyId}
               onCopy={copyPrompt}
-              onMarkPrompted={markPrompted}
-              primaryLabel="Flip to video"
+              primaryLabel="Flip to text"
               onPrimary={() => openFlip(b, { nextCut: 1 })}
             />
           ))}
@@ -334,13 +338,13 @@ export default function CreativeVideos() {
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Flipped</h2>
             <p className="text-sm text-gray-500">
-              Briefs you’ve already turned into at least one cut — make another anytime.
+              Briefs already turned into at least one still — make another anytime.
             </p>
           </div>
           <span className="text-xs font-medium text-gray-400">{flipped.length}</span>
         </div>
 
-        {flipped.length === 0 && videos !== null && (
+        {flipped.length === 0 && stills !== null && (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-10 text-center text-sm text-gray-500">
             Nothing flipped yet.
           </div>
@@ -352,11 +356,9 @@ export default function CreativeVideos() {
               key={b.id}
               brief={b}
               copiedId={copiedId}
-              busyId={busyId}
               onCopy={copyPrompt}
-              showMarkPrompted={false}
-              meta={`${b.videoCount} video${b.videoCount === 1 ? '' : 's'} so far`}
-              primaryLabel={`Make a ${ordinal(b.nextCut)} video`}
+              meta={`${b.stillCount} still${b.stillCount === 1 ? '' : 's'} so far`}
+              primaryLabel={`Make a ${ordinal(b.nextCut)} still`}
               onPrimary={() => openFlip(b, { nextCut: b.nextCut })}
             />
           ))}
@@ -367,19 +369,33 @@ export default function CreativeVideos() {
         <Modal
           title={
             flip.nextCut && flip.nextCut > 1
-              ? `Make a ${ordinal(flip.nextCut)} video`
+              ? `Make a ${ordinal(flip.nextCut)} still`
               : flip.briefId
-                ? 'Flip brief → video'
-                : 'Add video'
+                ? 'Flip brief → text/still'
+                : 'Add text/still'
           }
           onClose={() => !saving && setShowFlip(false)}
           wide
         >
           <p className="mb-4 text-sm text-gray-500">
-            Upload the finished cut (preferred, max 80MB) or paste a CapCut / Drive / hosting link.
-            {flip.briefId ? ' The brief stays available under Flipped for more cuts.' : ''}
+            Save the final caption and/or image (upload preferred, max 20MB). Head to Post when
+            it’s live-ready.
           </p>
           <div className="space-y-3">
+            {!flip.briefId && (
+              <label className="block text-sm font-medium text-gray-700">
+                Format
+                <select
+                  value={flip.format}
+                  onChange={(e) => setFlip({ ...flip, format: e.target.value })}
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                >
+                  <option value="story_post">Story post</option>
+                  <option value="meme_still">Meme still</option>
+                  <option value="caption_pack">Caption pack</option>
+                </select>
+              </label>
+            )}
             <label className="block text-sm font-medium text-gray-700">
               Title
               <input
@@ -389,10 +405,20 @@ export default function CreativeVideos() {
               />
             </label>
             <label className="block text-sm font-medium text-gray-700">
-              Upload video
+              Final caption / overlay text
+              <textarea
+                value={flip.bodyText}
+                onChange={(e) => setFlip({ ...flip, bodyText: e.target.value })}
+                rows={5}
+                placeholder="Paste the publishable caption (or meme overlay line)"
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+              />
+            </label>
+            <label className="block text-sm font-medium text-gray-700">
+              Upload image
               <input
                 type="file"
-                accept="video/mp4,video/quicktime,video/webm,video/x-m4v,.mp4,.mov,.webm"
+                accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp"
                 onChange={(e) => setFlip({ ...flip, file: e.target.files?.[0] || null })}
                 className="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100"
               />
@@ -402,12 +428,8 @@ export default function CreativeVideos() {
                 </p>
               )}
             </label>
-            <div className="relative py-1 text-center text-xs font-semibold uppercase tracking-wide text-gray-400">
-              <span className="relative z-10 bg-white px-2">or</span>
-              <span className="absolute inset-x-0 top-1/2 border-t border-gray-200" />
-            </div>
             <label className="block text-sm font-medium text-gray-700">
-              External link
+              External image link
               <input
                 value={flip.externalUrl}
                 onChange={(e) => setFlip({ ...flip, externalUrl: e.target.value })}
@@ -430,7 +452,7 @@ export default function CreativeVideos() {
               disabled={saving}
               className="w-full rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
             >
-              {saving ? 'Saving… (large uploads can take a minute)' : 'Save video'}
+              {saving ? 'Saving…' : 'Save text/still'}
             </button>
           </div>
         </Modal>
@@ -439,17 +461,7 @@ export default function CreativeVideos() {
   )
 }
 
-function BriefRow({
-  brief: b,
-  copiedId,
-  busyId,
-  onCopy,
-  onMarkPrompted,
-  onPrimary,
-  primaryLabel,
-  showMarkPrompted = true,
-  meta,
-}) {
+function BriefRow({ brief: b, copiedId, onCopy, onPrimary, primaryLabel, meta }) {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
@@ -467,10 +479,13 @@ function BriefRow({
           >
             {STATUS_LABELS[b.status] || b.status}
           </span>
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold uppercase text-amber-800">
+            {formatLabel(b.format)}
+          </span>
           <ToneChip tone={b.meta?.toneAnalysis} />
         </div>
         <p className="mt-1 text-sm text-gray-500">
-          {formatLabel(b.format)} · {b.angle}
+          {b.angle}
           {meta ? ` · ${meta}` : ''}
           {b.themeSlug ? (
             <>
@@ -496,16 +511,6 @@ function BriefRow({
         >
           {copiedId === b.id ? 'Copied' : 'Copy prompt'}
         </button>
-        {showMarkPrompted && b.status === 'briefed' && onMarkPrompted && (
-          <button
-            type="button"
-            onClick={() => onMarkPrompted(b)}
-            disabled={busyId === b.id}
-            className="rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-          >
-            Mark prompted
-          </button>
-        )}
         <button
           type="button"
           onClick={onPrimary}
