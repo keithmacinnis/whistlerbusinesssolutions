@@ -11,10 +11,11 @@ const PLATFORMS = [
   { id: 'instagram', label: 'Instagram' },
   { id: 'facebook', label: 'Facebook' },
   { id: 'youtube', label: 'YouTube' },
-  { id: 'other', label: 'Other' },
+  { id: 'x', label: 'X.com' },
 ]
 
 function platformLabel(id) {
+  if (id === 'other') return 'X.com'
   return PLATFORMS.find((p) => p.id === id)?.label || id || '—'
 }
 
