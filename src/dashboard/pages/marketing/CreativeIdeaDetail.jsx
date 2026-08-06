@@ -7,7 +7,15 @@ import CreativeStudioTabs from './CreativeStudioTabs'
 import AngleHintPicker from './AngleHintPicker'
 import SeriesSelect from './SeriesSelect'
 
-const THEME_STATUSES = ['idea', 'ready', 'in_production', 'shipped', 'archived']
+const THEME_STATUSES = ['idea', 'ready', 'in_production', 'posted', 'archived']
+
+const THEME_STATUS_LABELS = {
+  idea: 'idea',
+  ready: 'ready',
+  in_production: 'in production',
+  posted: 'posted',
+  archived: 'archived',
+}
 
 export default function CreativeIdeaDetail() {
   const { slug } = useParams()
@@ -340,7 +348,7 @@ export default function CreativeIdeaDetail() {
             >
               {THEME_STATUSES.map((s) => (
                 <option key={s} value={s}>
-                  {s}
+                  {THEME_STATUS_LABELS[s] || s}
                 </option>
               ))}
             </select>

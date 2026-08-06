@@ -12,8 +12,16 @@ const STATUS_STYLES = {
   idea: 'bg-amber-50 text-amber-800 ring-amber-200',
   ready: 'bg-sky-50 text-sky-800 ring-sky-200',
   in_production: 'bg-violet-50 text-violet-800 ring-violet-200',
-  shipped: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
+  posted: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
   archived: 'bg-gray-100 text-gray-600 ring-gray-200',
+}
+
+const STATUS_LABELS = {
+  idea: 'idea',
+  ready: 'ready',
+  in_production: 'in production',
+  posted: 'posted',
+  archived: 'archived',
 }
 
 const emptyForm = {
@@ -39,7 +47,7 @@ function StatusChip({ status }) {
         STATUS_STYLES[status] || STATUS_STYLES.idea
       }`}
     >
-      {status.replace(/_/g, ' ')}
+      {STATUS_LABELS[status] || status.replace(/_/g, ' ')}
     </span>
   )
 }
@@ -386,9 +394,9 @@ export default function CreativeIdeas() {
                   onChange={(e) => setForm({ ...form, status: e.target.value })}
                   className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  {['idea', 'ready', 'in_production', 'shipped', 'archived'].map((s) => (
+                  {['idea', 'ready', 'in_production', 'posted', 'archived'].map((s) => (
                     <option key={s} value={s}>
-                      {s}
+                      {STATUS_LABELS[s] || s}
                     </option>
                   ))}
                 </select>
