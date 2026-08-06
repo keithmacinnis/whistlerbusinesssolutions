@@ -15,6 +15,15 @@ const STATUS_LABELS = {
   archived: 'archived',
 }
 
+const PLATFORM_LABELS = {
+  tiktok: 'TikTok',
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+  youtube: 'YouTube',
+  x: 'X.com',
+  other: 'X.com',
+}
+
 function beatsToText(beats) {
   if (!Array.isArray(beats)) return ''
   return beats
@@ -44,6 +53,8 @@ export default function CreativeBriefDetail() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [brief, setBrief] = useState(null)
+  const [videos, setVideos] = useState([])
+  const [posts, setPosts] = useState([])
   const [form, setForm] = useState(null)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -53,8 +64,10 @@ export default function CreativeBriefDetail() {
 
   const load = useCallback(() => {
     api(`/api/marketing/creative/briefs/${id}`)
-      .then(({ brief: b }) => {
+      .then(({ brief: b, videos: v, posts: p }) => {
         setBrief(b)
+        setVideos(v || [])
+        setPosts(p || [])
         setForm({
           title: b.title || '',
           status: b.status || 'briefed',
@@ -284,6 +297,90 @@ export default function CreativeBriefDetail() {
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
             />
           </label>
+
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Related videos ({videos.length})
+              </div>
+              <Link
+                to="/marketing/creative/videos"
+                className="text-xs font-semibold text-brand-700 hover:underline"
+              >
+                Videos →
+              </Link>
+            </div>
+            {videos.length === 0 ? (
+              <p className="mt-2 text-xs text-gray-400">No videos flipped from this brief yet.</p>
+            ) : (
+              <ul className="mt-2 space-y-2 text-sm">
+                {videos.map((v) => (
+                  <li key={v.id} className="rounded-md bg-gray-50 px-2.5 py-2">
+                    <div className="font-medium text-gray-900">{v.title}</div>
+                    <div className="mt-0.5 text-xs text-gray-400">
+                      {v.status === 'archived' ? 'archived · ' : ''}
+                      {new Date(v.createdAt).toLocaleString()}
+                      {v.hasFile ? ' · uploaded' : ''}
+                      {v.hasLink ? ' · link' : ''}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-emerald-100 bg-emerald-50/30 p-4 shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Postings ({posts.length})
+              </div>
+              <Link
+                to="/marketing/creative/posts"
+                className="text-xs font-semibold text-brand-700 hover:underline"
+              >
+                Post →
+              </Link>
+            </div>
+            {posts.length === 0 ? (
+              <p className="mt-2 text-xs text-gray-400">
+                No posts recorded for videos from this brief yet.
+              </p>
+            ) : (
+              <ul className="mt-2 space-y-2 text-sm">
+                {posts.map((p) => (
+                  <li key={p.id} className="rounded-md bg-white px-2.5 py-2 ring-1 ring-emerald-100">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium text-gray-900">
+                        {PLATFORM_LABELS[p.platform] || p.platform || 'Post'}
+                      </span>
+                      {p.video?.title && (
+                        <span className="text-xs text-gray-400 truncate max-w-[12rem]">
+                          {p.video.title}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-0.5 text-xs text-gray-400">
+                      {new Date(p.postedAt).toLocaleString()}
+                      {p.postUrl ? (
+                        <>
+                          {' · '}
+                          <a
+                            href={p.postUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-brand-700 hover:underline"
+                          >
+                            View post
+                          </a>
+                        </>
+                      ) : null}
+                    </div>
+                    {p.notes && <p className="mt-1 text-xs text-gray-600">{p.notes}</p>}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           {brief?.meta?.model && (
             <div className="rounded-md bg-gray-50 px-3 py-2 text-xs text-gray-500">
               Model: {brief.meta.model}
