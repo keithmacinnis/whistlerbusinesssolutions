@@ -83,6 +83,11 @@ function buildBrief({ generatedAt, voice, cloudflare, posthogWbs, posthogBirdnes
       match: /birdnestfamilies/i,
       posthog: posthogBirdnest,
     },
+    {
+      title: 'The Adorn List',
+      match: /theadornlist/i,
+      posthog: null,
+    },
   ]
   let anySite = false
   for (const item of catalog) {
@@ -103,12 +108,22 @@ function buildBrief({ generatedAt, voice, cloudflare, posthogWbs, posthogBirdnes
             .join(' · ')}`
         )
       }
+      if (site.referers?.length) {
+        lines.push(
+          `- Traffic sources (RUM): ${site.referers
+            .slice(0, 5)
+            .map((r) => `${r.referer} (${n(r.visits)})`)
+            .join(' · ')}`
+        )
+      }
     } else {
       lines.push('- Cloudflare: no matching zone')
     }
     if (item.posthog?.configured) appendPosthog(lines, item.posthog)
     else if (item.posthog && item.posthog.configured === false) {
       lines.push('- Human visitors (PostHog): not connected')
+    } else if (item.posthog === null) {
+      lines.push('- Human visitors (PostHog): not configured — use Cloudflare edge uniques')
     } else {
       lines.push('- Human visitors (PostHog): not loaded')
     }
@@ -132,16 +147,6 @@ function buildBrief({ generatedAt, voice, cloudflare, posthogWbs, posthogBirdnes
     lines.push('No website analytics connected.')
     lines.push('')
   }
-  if (cloudflare?.referers?.length) {
-    lines.push(
-      `Cloudflare RUM referrers: ${cloudflare.referers
-        .slice(0, 5)
-        .map((r) => `${r.referer} (${n(r.visits)} visits)`)
-        .join(' · ')}`
-    )
-    lines.push('')
-  }
-
   // App
   lines.push('## App performance — BirdNest Families')
   if (!appMetrics) {

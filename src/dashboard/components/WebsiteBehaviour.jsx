@@ -39,7 +39,19 @@ const PROPERTIES = [
     posthogProject: 'birdnest',
     posthogCache: 'posthogBirdnest',
     showCommerceEvents: false,
+    rumReferers: true,
     sources: ['cloudflare', 'posthogBirdnest'],
+  },
+  {
+    id: 'adorn-web',
+    title: 'The Adorn List',
+    kind: 'website',
+    domain: 'theadornlist.com',
+    match: /theadornlist/i,
+    posthog: false,
+    showCommerceEvents: false,
+    rumReferers: true,
+    sources: ['cloudflare'],
   },
   {
     id: 'birdnest-app',
@@ -242,10 +254,12 @@ function PropertyCard({
             </p>
           )
         ) : (
-          <p className="text-sm text-amber-800">
-            <span className="font-medium">Human visitors: not measured</span>
-            {' — '}
-            PostHog is not configured for this property.
+          <p className="text-sm text-gray-700">
+            <span className="font-medium">Visitors:</span> Cloudflare edge uniques below
+            <span className="text-gray-500">
+              {' '}
+              — includes bots/crawlers. Add PostHog later for human-only counts.
+            </span>
           </p>
         )}
       </div>
@@ -354,14 +368,20 @@ function PropertyCard({
 
               {prop.rumReferers && (
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-700">Referrer sources (Cloudflare RUM)</h4>
+                  <h4 className="text-sm font-semibold text-gray-700">Traffic sources (Cloudflare RUM)</h4>
+                  <p className="mt-0.5 text-xs text-gray-400">
+                    Where real browsers came from — needs Web Analytics / auto beacon on this site.
+                    {typeof cloudflareSite.rumVisits === 'number' && cloudflareSite.rumVisits > 0
+                      ? ` ${number(cloudflareSite.rumVisits)} RUM visits in range.`
+                      : ''}
+                  </p>
                   {referers == null ? (
                     <p className="mt-1 text-xs text-gray-400">
-                      Enable Cloudflare Web Analytics and set CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_RUM_SITE_TAG.
+                      RUM not available yet — enable Web Analytics (Automatic or JS snippet) for this domain.
                     </p>
                   ) : (
                     <div className="mt-2 space-y-1.5">
-                      {(referers || []).slice(0, 5).map((r) => (
+                      {(referers || []).slice(0, 8).map((r) => (
                         <div key={r.referer} className="flex justify-between text-sm">
                           <span className="truncate text-gray-600">{r.referer}</span>
                           <span className="font-medium text-gray-900">
@@ -370,7 +390,9 @@ function PropertyCard({
                           </span>
                         </div>
                       ))}
-                      {!referers?.length && <p className="text-sm text-gray-400">No referrer data yet.</p>}
+                      {!referers?.length && (
+                        <p className="text-sm text-gray-400">No referrer data yet — visit the site once, then Sync now.</p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -562,7 +584,7 @@ export default function WebsiteBehaviour() {
         prop,
         cloudflareSite: cfSite,
         posthog: prop.posthog ? ph : null,
-        referers: prop.rumReferers ? cloudflare?.referers ?? null : null,
+        referers: prop.rumReferers ? (cfSite ? cfSite.referers ?? [] : null) : null,
         appMetrics: prop.appMetrics ? appMetrics : null,
         lastSyncedAt: syncedAtFor(prop.sources),
       }
