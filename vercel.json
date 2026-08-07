@@ -6,6 +6,10 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/r/:code",
+      "destination": "https://api.whistlerbusinesssolutions.com/r/:code"
+    },
+    {
       "source": "/therapists-services",
       "destination": "/therapists-services.html"
     },

@@ -17,9 +17,11 @@ export default function AmbassadorHub() {
 
   useEffect(reload, [reload])
 
-  const primaryUrl = data?.ambassador?.code
-    ? `${data.referralBase || 'https://api.whistlerbusinesssolutions.com'}/r/${data.ambassador.code}`
-    : ''
+  const primaryUrl =
+    data?.shopUrl ||
+    (data?.ambassador?.code
+      ? `${data.referralBase || 'https://theadornlist.com'}/r/${data.ambassador.code}`
+      : '')
 
   const copyPrimary = async () => {
     if (!primaryUrl) return
