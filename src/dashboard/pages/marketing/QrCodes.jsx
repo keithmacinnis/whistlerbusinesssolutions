@@ -13,6 +13,7 @@ const emptyAppStore = {
   providerToken: '117854023',
   mediaType: '8',
   notes: '',
+  ambassadorId: '',
 }
 
 const emptyWebsite = {
@@ -97,19 +98,30 @@ export default function QrCodes() {
   const { user } = useAuth()
   const { viewAs: viewAsAmb } = useViewAsAmbassador()
   const [campaigns, setCampaigns] = useState(null)
+  const [qrRequests, setQrRequests] = useState([])
+  const [ambassadors, setAmbassadors] = useState([])
   const [error, setError] = useState('')
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState(emptyAppStore)
   const [copiedId, setCopiedId] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [fulfillingId, setFulfillingId] = useState(null)
 
   const isAmbassadorView =
     user?.role === 'ambassador' || (user?.role === 'super_admin' && !!viewAsAmb)
 
   const reload = useCallback(() => {
     if (isAmbassadorView) return
-    api('/api/marketing/campaigns')
-      .then(({ campaigns: list }) => setCampaigns(list))
+    Promise.all([
+      api('/api/marketing/campaigns'),
+      api('/api/ambassadors/admin/qr-requests?status=pending'),
+      api('/api/ambassadors'),
+    ])
+      .then(([camp, reqs, ambs]) => {
+        setCampaigns(camp.campaigns || [])
+        setQrRequests(reqs.requests || [])
+        setAmbassadors(ambs.ambassadors || [])
+      })
       .catch((err) => setError(err.message))
   }, [isAmbassadorView])
 
@@ -138,6 +150,7 @@ export default function QrCodes() {
               campaignToken: form.name.trim(),
               mediaType: form.mediaType,
               notes: form.notes,
+              ambassadorId: form.ambassadorId || undefined,
             }
           : {
               type: 'website',
@@ -158,6 +171,35 @@ export default function QrCodes() {
       setError(err.message)
     } finally {
       setSaving(false)
+    }
+  }
+
+  const fulfillRequest = async (request) => {
+    setError('')
+    setFulfillingId(request.id)
+    try {
+      await api(`/api/ambassadors/admin/qr-requests/${request.id}/fulfill`, {
+        method: 'POST',
+        body: { campaignToken: request.ambassador?.code },
+      })
+      reload()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setFulfillingId(null)
+    }
+  }
+
+  const assignCampaign = async (campaignId, ambassadorId) => {
+    setError('')
+    try {
+      await api(`/api/marketing/campaigns/${campaignId}/assign`, {
+        method: 'POST',
+        body: { ambassadorId: ambassadorId || null },
+      })
+      reload()
+    } catch (err) {
+      setError(err.message)
     }
   }
 
@@ -197,6 +239,7 @@ export default function QrCodes() {
           <h1 className="text-2xl font-bold text-gray-900">QR Codes</h1>
           <p className="mt-1 text-sm text-gray-500">
             Create App Store or website campaign links, then download a QR code for print and ads.
+            Assign App Store campaigns to family sellers when they request a print QR.
           </p>
         </div>
         <button
@@ -211,6 +254,40 @@ export default function QrCodes() {
       </div>
 
       {error && <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
+
+      {qrRequests.length > 0 && (
+        <div className="mb-8">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+            Pending App Store QR requests
+          </h2>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {qrRequests.map((r) => (
+              <div key={r.id} className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <div className="font-semibold text-gray-900">
+                  {r.ambassador?.displayName || r.ambassador?.user?.name || 'Ambassador'}
+                </div>
+                <div className="mt-0.5 font-mono text-xs text-gray-600">
+                  code={r.ambassador?.code} · {r.ambassador?.user?.email}
+                </div>
+                {r.note && <p className="mt-2 text-sm text-gray-600">{r.note}</p>}
+                <p className="mt-2 text-xs text-gray-500">
+                  Fulfill creates/updates an App Store campaign with ct=
+                  {r.ambassador?.code} and syncs their install link.
+                </p>
+                <button
+                  type="button"
+                  disabled={fulfillingId === r.id}
+                  onClick={() => fulfillRequest(r)}
+                  className="mt-3 rounded-md bg-brand-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  {fulfillingId === r.id ? 'Assigning…' : 'Assign App Store QR'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {!campaigns && !error && <div className="text-gray-500">Loading…</div>}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
@@ -222,6 +299,11 @@ export default function QrCodes() {
                 <span className="mt-1 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
                   {typeLabel(c.type)}
                 </span>
+                {c.ambassador && (
+                  <div className="mt-1 text-xs text-brand-700">
+                    Assigned: {c.ambassador.displayName || c.ambassador.user?.email || c.ambassador.code}
+                  </div>
+                )}
               </div>
               <button
                 onClick={() => remove(c.id)}
@@ -252,6 +334,23 @@ export default function QrCodes() {
                 Open ↗
               </a>
             </div>
+            {c.type === 'app_store' && (
+              <label className="mt-3 block text-xs font-medium text-gray-500">
+                Assign to ambassador
+                <select
+                  className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800"
+                  value={c.ambassadorId || ''}
+                  onChange={(e) => assignCampaign(c.id, e.target.value)}
+                >
+                  <option value="">— Unassigned —</option>
+                  {ambassadors.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.displayName || a.user?.name || a.code} ({a.code})
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <CampaignQr url={c.targetUrl} name={c.name} />
           </div>
         ))}
@@ -308,32 +407,49 @@ export default function QrCodes() {
             </label>
 
             {form.type === 'app_store' ? (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    App ID
+                    <input
+                      value={form.appId}
+                      onChange={(e) => setForm({ ...form, appId: e.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm focus:border-brand-500 focus:outline-none"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Provider token (pt)
+                    <input
+                      value={form.providerToken}
+                      onChange={(e) => setForm({ ...form, providerToken: e.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm focus:border-brand-500 focus:outline-none"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Media type (mt)
+                    <input
+                      value={form.mediaType}
+                      onChange={(e) => setForm({ ...form, mediaType: e.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm focus:border-brand-500 focus:outline-none"
+                    />
+                  </label>
+                </div>
                 <label className="block text-sm font-medium text-gray-700">
-                  App ID
-                  <input
-                    value={form.appId}
-                    onChange={(e) => setForm({ ...form, appId: e.target.value })}
-                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm focus:border-brand-500 focus:outline-none"
-                  />
+                  Assign to ambassador (optional)
+                  <select
+                    value={form.ambassadorId || ''}
+                    onChange={(e) => setForm({ ...form, ambassadorId: e.target.value })}
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                  >
+                    <option value="">— None —</option>
+                    {ambassadors.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.displayName || a.user?.name || a.code} ({a.code})
+                      </option>
+                    ))}
+                  </select>
                 </label>
-                <label className="block text-sm font-medium text-gray-700">
-                  Provider token (pt)
-                  <input
-                    value={form.providerToken}
-                    onChange={(e) => setForm({ ...form, providerToken: e.target.value })}
-                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm focus:border-brand-500 focus:outline-none"
-                  />
-                </label>
-                <label className="block text-sm font-medium text-gray-700">
-                  Media type (mt)
-                  <input
-                    value={form.mediaType}
-                    onChange={(e) => setForm({ ...form, mediaType: e.target.value })}
-                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm focus:border-brand-500 focus:outline-none"
-                  />
-                </label>
-              </div>
+              </>
             ) : (
               <>
                 <label className="block text-sm font-medium text-gray-700">

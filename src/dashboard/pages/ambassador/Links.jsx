@@ -2,6 +2,16 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { api } from '../../api'
 
+function channelBadge(channel) {
+  if (channel === 'birdnest_appstore') return 'App Store'
+  if (channel === 'birdnest') return 'Get page'
+  if (channel === 'birdnest_shop') return 'BirdNest shop'
+  if (channel === 'shop') return 'Adorn shop'
+  if (channel === 'booking') return 'Booking.com'
+  if (channel === 'product') return 'Product'
+  return channel || 'Link'
+}
+
 function LinkQr({ url, name }) {
   const canvasRef = useRef(null)
 
@@ -10,7 +20,7 @@ function LinkQr({ url, name }) {
     QRCode.toCanvas(canvasRef.current, url, {
       errorCorrectionLevel: 'H',
       margin: 2,
-      width: 160,
+      width: 220,
       color: { dark: '#111827', light: '#ffffff' },
     }).catch(() => {})
   }, [url])
@@ -29,53 +39,91 @@ function LinkQr({ url, name }) {
   }
 
   return (
-    <div className="flex flex-col items-start gap-2">
-      <canvas ref={canvasRef} className="rounded border border-gray-100 bg-white" />
-      <button type="button" onClick={download} className="text-xs font-medium text-brand-600 hover:underline">
+    <div className="mt-4 flex flex-col items-start gap-3">
+      <canvas ref={canvasRef} className="rounded-md border border-gray-100 bg-white" />
+      <button
+        type="button"
+        onClick={download}
+        className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+      >
         Download PNG
       </button>
     </div>
   )
 }
 
-function LinkCard({ link, copied, onCopy }) {
+function LinkCard({ link, copied, onCopy, children, hint }) {
   return (
-    <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow-sm sm:flex-row sm:items-start">
-      <LinkQr url={link.url} name={link.code} />
-      <div className="min-w-0 flex-1">
-        <div className="text-sm font-semibold text-gray-900">{link.label || link.channel}</div>
-        {link.destinationUrl && (
-          <div className="mt-0.5 truncate text-xs text-gray-500" title={link.destinationUrl}>
-            → {link.destinationUrl.replace(/^https?:\/\/(www\.)?/, '')}
-          </div>
-        )}
-        <div className="mt-1 break-all font-mono text-xs text-gray-600">{link.url}</div>
-        <div className="mt-2 text-xs text-gray-500">{link.clicks} clicks</div>
+    <div className="rounded-lg bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">{link.label || link.channel}</h2>
+          <span className="mt-1 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+            {channelBadge(link.channel)}
+          </span>
+        </div>
+        <span className="shrink-0 text-xs text-gray-400">{link.clicks} clicks</span>
+      </div>
+      {hint && <p className="mt-2 text-sm text-gray-500">{hint}</p>}
+      {link.destinationUrl && (
+        <p className="mt-2 truncate text-xs text-gray-500" title={link.destinationUrl}>
+          → {link.destinationUrl.replace(/^https?:\/\/(www\.)?/, '')}
+        </p>
+      )}
+      <div className="mt-3 break-all rounded-md bg-gray-50 px-3 py-2 font-mono text-xs text-gray-700">
+        {link.url}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => onCopy(link.url, link.id)}
-          className="mt-3 rounded-md bg-brand-600 px-3 py-1.5 text-xs font-medium text-white"
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
-          {copied === link.id ? 'Copied!' : 'Copy link'}
+          {copied === link.id ? 'Copied' : 'Copy link'}
         </button>
+        <a
+          href={link.url}
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Open ↗
+        </a>
+        {children}
       </div>
+      <LinkQr url={link.url} name={link.code} />
     </div>
+  )
+}
+
+function Section({ title, hint, children, empty }) {
+  return (
+    <section className="mb-10">
+      <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">{title}</h2>
+      {hint && <p className="mb-4 text-sm text-gray-500">{hint}</p>}
+      {!hint && <div className="mb-4" />}
+      {children}
+      {empty}
+    </section>
   )
 }
 
 export default function AmbassadorLinks() {
   const [links, setLinks] = useState([])
   const [destinations, setDestinations] = useState([])
+  const [qrRequest, setQrRequest] = useState(null)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState('')
   const [customUrl, setCustomUrl] = useState('')
   const [adding, setAdding] = useState(false)
+  const [requestingQr, setRequestingQr] = useState(false)
 
   const reload = useCallback(() => {
     api('/api/ambassadors/me/links')
       .then((d) => {
         setLinks(d.links || [])
         setDestinations(d.bookingDestinations || [])
+        setQrRequest(d.qrRequest || null)
       })
       .catch((err) => setError(err.message))
   }, [])
@@ -105,9 +153,23 @@ export default function AmbassadorLinks() {
     }
   }
 
-  const birdnest = links.filter((l) => l.channel === 'birdnest' || l.channel === 'birdnest_appstore')
+  const requestQr = async () => {
+    setError('')
+    setRequestingQr(true)
+    try {
+      const res = await api('/api/ambassadors/me/qr-request', { method: 'POST', body: {} })
+      setQrRequest(res.request)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setRequestingQr(false)
+    }
+  }
+
+  const shops = links.filter((l) => l.channel === 'shop' || l.channel === 'birdnest_shop')
+  const appStore = links.find((l) => l.channel === 'birdnest_appstore')
+  const getPage = links.find((l) => l.channel === 'birdnest')
   const booking = links.filter((l) => l.channel === 'booking')
-  const shop = links.filter((l) => l.channel === 'shop')
   const products = links.filter((l) => l.channel === 'product')
 
   const existingBookingDests = new Set(
@@ -118,117 +180,164 @@ export default function AmbassadorLinks() {
   )
   const unusedPresets = destinations.filter((d) => !existingBookingDests.has(d.pageUrl.replace(/\/$/, '')))
 
+  const ctFromTarget = (() => {
+    try {
+      return appStore?.targetUrl ? new URL(appStore.targetUrl).searchParams.get('ct') : null
+    } catch {
+      return null
+    }
+  })()
+
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-bold text-gray-900">My links &amp; QR codes</h1>
-      <p className="mb-6 text-sm text-gray-500">
-        Paste these into TikTok, Instagram, or texts. Every tap is tracked to you.
-      </p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">My links &amp; QR codes</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Paste these into TikTok, Instagram, or texts. Every tap is tracked to you.
+        </p>
+      </div>
 
       {error && <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
 
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">Shop</h2>
-      <div className="mb-8 grid gap-4">
-        {shop.map((l) => (
-          <LinkCard key={l.id} link={l} copied={copied} onCopy={copy} />
-        ))}
-      </div>
+      <Section
+        title="Shops"
+        hint="Send people to browse — Adorn jewelry edit, or BirdNest baby clothes. Purchases attribute back to you."
+      >
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          {shops.map((l) => (
+            <LinkCard
+              key={l.id}
+              link={l}
+              copied={copied}
+              onCopy={copy}
+              hint={
+                l.channel === 'birdnest_shop'
+                  ? 'BirdNest Families merch shop (clothes & more).'
+                  : 'The Adorn List editorial shop — jewelry picks.'
+              }
+            />
+          ))}
+        </div>
+        {!shops.length && !error && <div className="text-sm text-gray-400">Loading shop links…</div>}
+      </Section>
 
-      <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">BirdNest app</h2>
-      <p className="mb-3 text-xs text-gray-500">
-        Use the get page when you want commission tracking (sets a cookie before install). App Store is a direct install link —
-        great for ads; commissions need the get page or in-app claim.
-      </p>
-      <div className="mb-8 grid gap-4">
-        {birdnest.map((l) => (
-          <LinkCard key={l.id} link={l} copied={copied} onCopy={copy} />
-        ))}
-        {!birdnest.length && !error && <div className="text-gray-500">Loading…</div>}
-      </div>
-
-      <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">Booking.com</h2>
-      <p className="mb-3 text-xs text-gray-500">
-        Default is Whistler. Add more cities for trip posts — each gets its own trackable link + QR.
-      </p>
-      <div className="mb-4 grid gap-4">
-        {booking.map((l) => (
-          <LinkCard key={l.id} link={l} copied={copied} onCopy={copy} />
-        ))}
-      </div>
-
-      <div className="mb-8 rounded-lg border border-gray-200 bg-white p-4">
-        <div className="mb-2 text-sm font-medium text-gray-900">Add a destination</div>
-        {unusedPresets.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-2">
-            {unusedPresets.map((d) => (
-              <button
-                key={d.slug}
-                type="button"
-                disabled={adding}
-                onClick={() => addBooking({ slug: d.slug })}
-                className="rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-800 hover:bg-gray-100 disabled:opacity-50"
-              >
-                + {d.label}
-              </button>
-            ))}
-          </div>
-        )}
-        <form
-          className="flex flex-col gap-2 sm:flex-row sm:items-center"
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (customUrl.trim()) addBooking({ pageUrl: customUrl.trim() })
-          }}
-        >
-          <input
-            type="url"
-            value={customUrl}
-            onChange={(e) => setCustomUrl(e.target.value)}
-            placeholder="Or paste any booking.com city / hotel URL"
-            className="min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
-          />
-          <button
-            type="submit"
-            disabled={adding || !customUrl.trim()}
-            className="rounded-md bg-brand-600 px-3 py-2 text-xs font-medium text-white disabled:opacity-50"
-          >
-            {adding ? 'Adding…' : 'Add link'}
-          </button>
-        </form>
-      </div>
-
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">Product links</h2>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {products.map((l) => (
-          <div key={l.id} className="rounded-lg bg-white p-4 shadow-sm">
-            <div className="flex gap-3">
-              {l.product?.imageUrl && (
-                <img src={l.product.imageUrl} alt="" className="h-16 w-16 rounded object-cover" />
+      <Section
+        title="BirdNest App Store"
+        hint="One clear install link. Apple tracks downloads by campaign token (ct=) in App Store Connect — same style as business-card campaigns."
+      >
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          {appStore && (
+            <LinkCard
+              link={{ ...appStore, label: 'App Store install link' }}
+              copied={copied}
+              onCopy={copy}
+              hint={
+                ctFromTarget
+                  ? `Campaign token ct=${ctFromTarget}. Check performance in App Store Connect → Campaigns.`
+                  : 'Opens the BirdNest: Baby Tracker App Store page with your campaign token.'
+              }
+            >
+              {qrRequest?.status === 'pending' ? (
+                <span className="rounded-md bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-800">
+                  Print QR requested
+                </span>
+              ) : qrRequest?.status === 'fulfilled' ? (
+                <span className="rounded-md bg-green-50 px-3 py-1.5 text-sm font-medium text-green-800">
+                  Print QR ready (ct={qrRequest.campaignToken || ctFromTarget})
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  disabled={requestingQr}
+                  onClick={requestQr}
+                  className="rounded-md bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+                >
+                  {requestingQr ? 'Requesting…' : 'Request print QR'}
+                </button>
               )}
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-gray-900">{l.product?.name || l.label || l.code}</div>
-                <div className="mt-1 break-all font-mono text-xs text-gray-500">{l.url}</div>
-                <div className="mt-2 flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => copy(l.url, l.id)}
-                    className="text-xs font-medium text-brand-600 hover:underline"
-                  >
-                    {copied === l.id ? 'Copied!' : 'Copy'}
-                  </button>
-                  <span className="text-xs text-gray-400">{l.clicks} clicks</span>
-                </div>
-              </div>
+            </LinkCard>
+          )}
+          {getPage && (
+            <LinkCard
+              link={{ ...getPage, label: 'Get / signup page' }}
+              copied={copied}
+              onCopy={copy}
+              hint="Optional soft landing before install — sets a cookie so BirdNest subscription commissions can attribute to you."
+            />
+          )}
+        </div>
+        {!appStore && !error && <div className="text-sm text-gray-400">Loading App Store link…</div>}
+      </Section>
+
+      <Section
+        title="Booking.com"
+        hint="Default is Whistler. Add more cities for trip posts — each gets its own trackable link + QR."
+      >
+        <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          {booking.map((l) => (
+            <LinkCard key={l.id} link={l} copied={copied} onCopy={copy} />
+          ))}
+        </div>
+
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="mb-2 text-sm font-medium text-gray-900">Add a destination</div>
+          {unusedPresets.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {unusedPresets.map((d) => (
+                <button
+                  key={d.slug}
+                  type="button"
+                  disabled={adding}
+                  onClick={() => addBooking({ slug: d.slug })}
+                  className="rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-800 hover:bg-gray-100 disabled:opacity-50"
+                >
+                  + {d.label}
+                </button>
+              ))}
             </div>
-            <div className="mt-3">
-              <LinkQr url={l.url} name={l.code} />
-            </div>
-          </div>
-        ))}
+          )}
+          <form
+            className="flex flex-col gap-2 sm:flex-row sm:items-center"
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (customUrl.trim()) addBooking({ pageUrl: customUrl.trim() })
+            }}
+          >
+            <input
+              type="url"
+              value={customUrl}
+              onChange={(e) => setCustomUrl(e.target.value)}
+              placeholder="Or paste any booking.com city / hotel URL"
+              className="min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
+            />
+            <button
+              type="submit"
+              disabled={adding || !customUrl.trim()}
+              className="rounded-md bg-brand-600 px-3 py-2 text-xs font-medium text-white disabled:opacity-50"
+            >
+              {adding ? 'Adding…' : 'Add link'}
+            </button>
+          </form>
+        </div>
+      </Section>
+
+      <Section title="Product links" hint="Direct Buy links for Adorn catalog picks — hard-sell posts.">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          {products.map((l) => (
+            <LinkCard
+              key={l.id}
+              link={{ ...l, label: l.product?.name || l.label || l.code }}
+              copied={copied}
+              onCopy={copy}
+            />
+          ))}
+        </div>
         {!products.length && (
-          <div className="text-sm text-gray-400">No product links yet — catalog may be empty.</div>
+          <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-500">
+            No product links yet — catalog may be empty.
+          </div>
         )}
-      </div>
+      </Section>
     </div>
   )
 }

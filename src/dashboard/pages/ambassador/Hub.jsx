@@ -4,10 +4,30 @@ import { api } from '../../api'
 
 const dollars = (cents) => `$${((cents || 0) / 100).toFixed(2)}`
 
+const RATE_CARDS = [
+  {
+    key: 'birdnestSharePct',
+    title: 'BirdNest app subscriptions',
+    blurb: 'Your cut of each BirdNest subscription payment attributed to you.',
+    accent: 'from-rose-50 to-white',
+  },
+  {
+    key: 'networkSharePct',
+    title: 'Affiliate sales',
+    blurb: 'Your share of network commissions (Awin, Booking.com, jewelry, and more).',
+    accent: 'from-amber-50 to-white',
+  },
+  {
+    key: 'ownStoreSharePct',
+    title: 'Own-store merch',
+    blurb: 'Your share of profit after cost on BirdNest / WBS shop orders you send.',
+    accent: 'from-sky-50 to-white',
+  },
+]
+
 export default function AmbassadorHub() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
-  const [copied, setCopied] = useState(false)
 
   const reload = useCallback(() => {
     api('/api/ambassadors/me')
@@ -17,24 +37,13 @@ export default function AmbassadorHub() {
 
   useEffect(reload, [reload])
 
-  const primaryUrl =
-    data?.shopUrl ||
-    (data?.ambassador?.code
-      ? `${data.referralBase || 'https://theadornlist.com'}/r/${data.ambassador.code}`
-      : '')
-
-  const copyPrimary = async () => {
-    if (!primaryUrl) return
-    await navigator.clipboard.writeText(primaryUrl)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
-  }
+  const rates = data?.rates || data?.ambassador || {}
 
   return (
     <div>
       <h1 className="mb-1 text-2xl font-bold text-gray-900">Your selling hub</h1>
       <p className="mb-6 text-sm text-gray-500">
-        Share your links, track clicks and commissions, climb the family leaderboard.
+        Share links, earn commissions, climb the family leaderboard.
       </p>
 
       {error && <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
@@ -42,30 +51,28 @@ export default function AmbassadorHub() {
 
       {data && (
         <>
-          <div className="mb-6 rounded-lg bg-white p-5 shadow-sm">
-            <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Your shop link</div>
-            <div className="mt-2 break-all font-mono text-sm text-gray-900">{primaryUrl}</div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={copyPrimary}
-                className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white"
-              >
-                {copied ? 'Copied!' : 'Copy my link'}
-              </button>
-              <Link
-                to="/ambassador/links"
-                className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
-              >
-                All links &amp; QR codes
-              </Link>
-            </div>
+          <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Your commission rates</h2>
             {data.month?.rank != null && (
-              <p className="mt-3 text-sm text-gray-600">
-                You&apos;re <span className="font-semibold">#{data.month.rank}</span> on the family board this month
-                {data.month.rank === 1 ? ' — nice!' : '. Keep sharing!'}
+              <p className="text-sm text-gray-600">
+                Ranked <span className="font-semibold">#{data.month.rank}</span> this month
+                {data.month.rank === 1 ? ' — nice!' : ''}
               </p>
             )}
+          </div>
+          <div className="mb-8 grid gap-4 sm:grid-cols-3">
+            {RATE_CARDS.map((card) => (
+              <div
+                key={card.key}
+                className={`rounded-lg bg-gradient-to-b ${card.accent} p-5 shadow-sm ring-1 ring-gray-100`}
+              >
+                <div className="text-4xl font-bold tracking-tight text-gray-900">
+                  {Number(rates[card.key] ?? 0)}%
+                </div>
+                <div className="mt-2 text-sm font-semibold text-gray-900">{card.title}</div>
+                <p className="mt-1 text-xs leading-relaxed text-gray-500">{card.blurb}</p>
+              </div>
+            ))}
           </div>
 
           <div className="mb-6 grid gap-3 sm:grid-cols-4">
@@ -94,8 +101,8 @@ export default function AmbassadorHub() {
               <div className="mt-1 text-xs text-gray-500">This month&apos;s family rankings</div>
             </Link>
             <Link to="/ambassador/links" className="rounded-lg bg-white p-4 shadow-sm hover:bg-gray-50">
-              <div className="text-sm font-semibold text-gray-900">QR codes</div>
-              <div className="mt-1 text-xs text-gray-500">Download PNGs for your shop &amp; product links</div>
+              <div className="text-sm font-semibold text-gray-900">Links &amp; QR codes</div>
+              <div className="mt-1 text-xs text-gray-500">Shops, App Store, Booking &amp; products</div>
             </Link>
           </div>
         </>
