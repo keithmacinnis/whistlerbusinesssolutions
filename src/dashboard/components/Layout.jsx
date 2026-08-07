@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { useViewAsTeacher } from '../viewAsTeacher'
+import { useViewAsAmbassador } from '../viewAsAmbassador'
 
 const navLinkClass = ({ isActive }) =>
   `block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
@@ -10,15 +11,24 @@ const navLinkClass = ({ isActive }) =>
 export default function Layout() {
   const { user, logout } = useAuth()
   const { viewAs, clearViewAs } = useViewAsTeacher()
+  const { viewAs: viewAsAmb, clearViewAs: clearViewAsAmb } = useViewAsAmbassador()
   const navigate = useNavigate()
   const isTeacher = user?.role === 'teacher'
+  const isAmbassador = user?.role === 'ambassador'
   const isSuper = user?.role === 'super_admin'
   const viewingAsTeacher = isSuper && !!viewAs
-  // When god-mode is on, show the teacher portal nav as that teacher would see it.
+  const viewingAsAmbassador = isSuper && !!viewAsAmb
+  // When god-mode is on, show the teacher/ambassador portal nav as they would see it.
   const showTeacherNav = isTeacher || viewingAsTeacher
-  const showAdminNav = isSuper && !viewingAsTeacher
+  const showAmbassadorNav = (isAmbassador || viewingAsAmbassador) && !viewingAsTeacher
+  const showAdminNav = isSuper && !viewingAsTeacher && !viewingAsAmbassador
 
   const exitGodMode = () => {
+    if (viewingAsAmbassador) {
+      clearViewAsAmb()
+      navigate('/ambassadors')
+      return
+    }
     clearViewAs()
     navigate('/education/teachers')
   }
@@ -44,9 +54,11 @@ export default function Layout() {
             </>
           )}
 
-          <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-            Education
-          </div>
+          {(showAdminNav || showTeacherNav) && (
+            <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Education
+            </div>
+          )}
           {showAdminNav && (
             <>
               <NavLink to="/education/resources" className={navLinkClass}>Resources</NavLink>
@@ -64,8 +76,27 @@ export default function Layout() {
             </>
           )}
 
+          {showAmbassadorNav && (
+            <>
+              <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Selling
+              </div>
+              <NavLink to="/ambassador" end className={navLinkClass}>Hub</NavLink>
+              <NavLink to="/ambassador/links" className={navLinkClass}>Links &amp; QR</NavLink>
+              <NavLink to="/ambassador/earnings" className={navLinkClass}>Earnings</NavLink>
+              <NavLink to="/ambassador/leaderboard" className={navLinkClass}>Leaderboard</NavLink>
+              <NavLink to="/marketing/qr-codes" className={navLinkClass}>QR Codes</NavLink>
+            </>
+          )}
+
           {showAdminNav && (
             <>
+              <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Ambassadors
+              </div>
+              <NavLink to="/ambassadors" end className={navLinkClass}>Family sellers</NavLink>
+              <NavLink to="/ambassadors/settlements" className={navLinkClass}>Seller payouts</NavLink>
+              <NavLink to="/ambassadors/leaderboard" className={navLinkClass}>Leaderboard</NavLink>
               <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Marketing
               </div>
@@ -94,20 +125,18 @@ export default function Layout() {
         </div>
       </aside>
       <div className="flex flex-1 flex-col overflow-x-auto">
-        {viewingAsTeacher && (
+        {(viewingAsTeacher || viewingAsAmbassador) && (
           <div className="flex items-center justify-between gap-4 bg-amber-500 px-6 py-2.5 text-sm text-amber-950">
             <div>
               <span className="font-semibold">God mode</span>
               <span className="mx-2 opacity-60">·</span>
               Viewing as{' '}
-              <span className="font-semibold">{viewAs.name || viewAs.email}</span>
-              {viewAs.email && viewAs.name && (
-                <span className="opacity-70"> ({viewAs.email})</span>
-              )}
-              {viewAs.status && viewAs.status !== 'approved' && (
-                <span className="ml-2 rounded bg-amber-900/20 px-1.5 py-0.5 text-xs font-medium">
-                  {viewAs.status}
-                </span>
+              <span className="font-semibold">
+                {(viewingAsAmbassador ? viewAsAmb : viewAs)?.name ||
+                  (viewingAsAmbassador ? viewAsAmb : viewAs)?.email}
+              </span>
+              {viewingAsAmbassador && viewAsAmb?.code && (
+                <span className="opacity-70"> (@{viewAsAmb.code})</span>
               )}
             </div>
             <button

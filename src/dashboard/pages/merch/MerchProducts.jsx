@@ -27,6 +27,7 @@ const EMPTY_AFFILIATE = {
   network: 'awin',
   ctaLabel: '',
   priceCents: '',
+  costCents: '',
   commissionPct: '',
 }
 
@@ -108,6 +109,8 @@ export default function MerchProducts() {
             ? `cost ${dollars(p.supplierPriceCents)} · ${p.markupPct ?? 0}% markup`
             : null,
           priceCents: p.priceCents,
+          costCents: p.costCents ?? null,
+          supplierPriceCents: p.supplierPriceCents ?? null,
           commissionPct: null,
           commission: null,
           active: p.active,
@@ -131,6 +134,7 @@ export default function MerchProducts() {
           typeLabel: `Affiliate${p.network ? ` · ${p.network}` : ''}`,
           detail: p.partnerName,
           priceCents: p.priceCents,
+          costCents: p.costCents ?? null,
           commissionPct: p.commissionPct,
           commission: p.commissionPct != null ? `${p.commissionPct}%` : null,
           active: p.active,
@@ -156,6 +160,7 @@ export default function MerchProducts() {
             (p.network ? ` · ${p.network}` : ''),
           detail: p.partnerName,
           priceCents: p.priceCents,
+          costCents: p.costCents ?? null,
           commissionPct: p.commissionPct,
           commission: p.commissionPct != null ? `${p.commissionPct}%` : null,
           active: p.active,
@@ -248,6 +253,12 @@ export default function MerchProducts() {
         network: '',
         ctaLabel: '',
         priceCents: row.priceCents != null ? (row.priceCents / 100).toFixed(2) : '',
+        costCents:
+          row.costCents != null
+            ? (row.costCents / 100).toFixed(2)
+            : row.supplierPriceCents != null
+              ? (row.supplierPriceCents / 100).toFixed(2)
+              : '',
         commissionPct: '',
       })
       return
@@ -266,6 +277,12 @@ export default function MerchProducts() {
       network: row.network || '',
       ctaLabel: row.ctaLabel || '',
       priceCents: row.priceCents != null ? (row.priceCents / 100).toFixed(2) : '',
+      costCents:
+        row.costCents != null
+          ? (row.costCents / 100).toFixed(2)
+          : row.supplierPriceCents != null
+            ? (row.supplierPriceCents / 100).toFixed(2)
+            : '',
       commissionPct: row.commissionPct != null ? String(row.commissionPct) : '',
     })
   }
@@ -306,6 +323,7 @@ export default function MerchProducts() {
             description: f.description || null,
             imageUrl: f.imageUrl || null,
             priceCents: f.priceCents === '' ? null : Math.round(parseFloat(f.priceCents) * 100),
+            costCents: f.costCents === '' ? null : Math.round(parseFloat(f.costCents) * 100),
           },
         })
       } else {
@@ -318,6 +336,7 @@ export default function MerchProducts() {
           network: f.network || null,
           ctaLabel: f.ctaLabel?.trim() || null,
           priceCents: f.priceCents === '' ? null : Math.round(parseFloat(f.priceCents) * 100),
+          costCents: f.costCents === '' ? null : Math.round(parseFloat(f.costCents) * 100),
           commissionPct: f.commissionPct === '' ? null : parseFloat(f.commissionPct),
         }
         if (f.mode === 'create') {
@@ -668,6 +687,16 @@ export default function MerchProducts() {
                 value={productForm.priceCents}
                 onChange={(e) => setProductForm({ ...productForm, priceCents: e.target.value })}
                 placeholder="e.g. 50.00"
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
+              />
+            </label>
+
+            <label className="block text-sm font-medium text-gray-700">
+              Cost / COGS (for ambassador 50% of net)
+              <input
+                value={productForm.costCents}
+                onChange={(e) => setProductForm({ ...productForm, costCents: e.target.value })}
+                placeholder="e.g. 18.00"
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
               />
             </label>

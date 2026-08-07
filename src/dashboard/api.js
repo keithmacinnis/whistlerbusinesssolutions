@@ -1,6 +1,7 @@
 // Fetch wrapper for the commerce-server API. Same base-URL convention as
 // src/shop.js; attaches the dashboard JWT and normalizes errors.
 import { clearViewAsTeacherStorage, getViewAsTeacherId } from './viewAsTeacher'
+import { clearViewAsAmbassadorStorage, getViewAsAmbassadorId } from './viewAsAmbassador'
 
 const RAW_BASE = import.meta.env.VITE_COMMERCE_API_URL || 'https://api.whistlerbusinesssolutions.com'
 // Tolerate a protocol-less env value ("api.example.com") — new URL() rejects it.
@@ -13,6 +14,7 @@ export const setToken = (token) => localStorage.setItem(TOKEN_KEY, token)
 export const clearToken = () => {
   localStorage.removeItem(TOKEN_KEY)
   clearViewAsTeacherStorage()
+  clearViewAsAmbassadorStorage()
 }
 
 export class ApiError extends Error {
@@ -34,6 +36,14 @@ export async function api(path, { method = 'GET', body, params } = {}) {
   if (path.startsWith('/api/education/teacher') && !url.searchParams.has('asTeacherId')) {
     const asTeacherId = getViewAsTeacherId()
     if (asTeacherId) url.searchParams.set('asTeacherId', asTeacherId)
+  }
+  // Super-admin god mode: ambassador self routes accept ?asAmbassadorId=
+  if (
+    (path.startsWith('/api/ambassadors/me') || path === '/api/ambassadors/leaderboard') &&
+    !url.searchParams.has('asAmbassadorId')
+  ) {
+    const asAmbassadorId = getViewAsAmbassadorId()
+    if (asAmbassadorId) url.searchParams.set('asAmbassadorId', asAmbassadorId)
   }
   const token = getToken()
   const res = await fetch(url, {

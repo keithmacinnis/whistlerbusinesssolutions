@@ -10,15 +10,21 @@ export default function Login() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  if (user) return <Navigate to="/" replace />
+  const homeFor = (u) => {
+    if (u?.role === 'ambassador') return '/ambassador'
+    if (u?.role === 'teacher') return '/education/my-courses'
+    return '/'
+  }
+
+  if (user) return <Navigate to={homeFor(user)} replace />
 
   const onSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setBusy(true)
     try {
-      await login(email, password)
-      navigate('/', { replace: true })
+      const u = await login(email, password)
+      navigate(homeFor(u), { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {

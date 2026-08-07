@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { api, getToken, setToken, clearToken } from './api'
 import { clearViewAsTeacherStorage } from './viewAsTeacher'
+import { clearViewAsAmbassadorStorage } from './viewAsAmbassador'
 
 const AuthContext = createContext(null)
 
@@ -18,6 +19,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     clearViewAsTeacherStorage()
+    clearViewAsAmbassadorStorage()
     const { token, user: loggedIn } = await api('/api/auth/login', { method: 'POST', body: { email, password } })
     setToken(token)
     // Refresh /me so teacherProfile (and businessIds) are present.
