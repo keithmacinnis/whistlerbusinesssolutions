@@ -93,9 +93,9 @@ export default function AmbassadorHub() {
               <div className="text-sm font-semibold text-gray-900">Leaderboard</div>
               <div className="mt-1 text-xs text-gray-500">This month&apos;s family rankings</div>
             </Link>
-            <Link to="/marketing/qr-codes" className="rounded-lg bg-white p-4 shadow-sm hover:bg-gray-50">
-              <div className="text-sm font-semibold text-gray-900">QR codes page</div>
-              <div className="mt-1 text-xs text-gray-500">Extra campaigns with UTMs</div>
+            <Link to="/ambassador/links" className="rounded-lg bg-white p-4 shadow-sm hover:bg-gray-50">
+              <div className="text-sm font-semibold text-gray-900">QR codes</div>
+              <div className="mt-1 text-xs text-gray-500">Download PNGs for your shop &amp; product links</div>
             </Link>
           </div>
         </>

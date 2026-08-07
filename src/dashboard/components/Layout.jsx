@@ -85,7 +85,6 @@ export default function Layout() {
               <NavLink to="/ambassador/links" className={navLinkClass}>Links &amp; QR</NavLink>
               <NavLink to="/ambassador/earnings" className={navLinkClass}>Earnings</NavLink>
               <NavLink to="/ambassador/leaderboard" className={navLinkClass}>Leaderboard</NavLink>
-              <NavLink to="/marketing/qr-codes" className={navLinkClass}>QR Codes</NavLink>
             </>
           )}
 

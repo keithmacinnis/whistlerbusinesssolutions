@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import QRCode from 'qrcode'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
+import { useViewAsAmbassador } from '../../viewAsAmbassador'
 
 const emptyAppStore = {
   type: 'app_store',
@@ -93,6 +95,7 @@ function typeLabel(type) {
 
 export default function QrCodes() {
   const { user } = useAuth()
+  const { viewAs: viewAsAmb } = useViewAsAmbassador()
   const [campaigns, setCampaigns] = useState(null)
   const [error, setError] = useState('')
   const [adding, setAdding] = useState(false)
@@ -100,13 +103,22 @@ export default function QrCodes() {
   const [copiedId, setCopiedId] = useState(null)
   const [saving, setSaving] = useState(false)
 
+  const isAmbassadorView =
+    user?.role === 'ambassador' || (user?.role === 'super_admin' && !!viewAsAmb)
+
   const reload = useCallback(() => {
+    if (isAmbassadorView) return
     api('/api/marketing/campaigns')
       .then(({ campaigns: list }) => setCampaigns(list))
       .catch((err) => setError(err.message))
-  }, [])
+  }, [isAmbassadorView])
 
   useEffect(reload, [reload])
+
+  // Family sellers use personal QRs on Links — not the admin MarketingCampaign tool.
+  if (isAmbassadorView) {
+    return <Navigate to="/ambassador/links" replace />
+  }
 
   const setType = (type) => {
     setForm(type === 'app_store' ? { ...emptyAppStore, name: form.name, notes: form.notes } : { ...emptyWebsite, name: form.name, notes: form.notes, utmCampaign: form.name })
