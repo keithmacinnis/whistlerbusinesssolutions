@@ -37,7 +37,13 @@ const AFFILIATE_NETWORKS = [
   },
 ]
 
-const VIRAL_TIERS = [
+/** Own-store BirdNest baby clothes — sale vs supplier cost from live catalog. */
+const OWN_STORE_EXAMPLES = [
+  { label: 'Palm Tree Bloomer Set ($17.99)', netUsd: 6 },
+  { label: 'AU Tiger Applique Set ($19.99)', netUsd: 6 },
+  { label: 'Lily Floral Bubble ($15.99)', netUsd: 5 },
+]
+
   {
     label: 'Modest hit',
     views: '25k views',
