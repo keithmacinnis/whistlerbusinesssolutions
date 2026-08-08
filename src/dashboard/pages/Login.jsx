@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { Link, useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { hasRole } from '../roles'
 
@@ -62,6 +62,11 @@ export default function Login() {
             className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-brand-500 focus:outline-none"
           />
         </label>
+        <div className="mt-2 text-right">
+          <Link to="/forgot-password" className="text-sm text-brand-600 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
         <button
           type="submit"
           disabled={busy}

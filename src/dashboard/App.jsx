@@ -4,6 +4,8 @@ import { ViewAsTeacherProvider } from './viewAsTeacher'
 import { ViewAsAmbassadorProvider } from './viewAsAmbassador'
 import Layout from './components/Layout'
 import Login from './pages/Login'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Overview from './pages/Overview'
 import BusinessList from './pages/BusinessList'
 import BusinessDetail from './pages/BusinessDetail'
@@ -68,6 +70,8 @@ export default function App() {
         <ViewAsAmbassadorProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/ambassador/accept" element={<AcceptInvite />} />
             <Route
               path="/*"
