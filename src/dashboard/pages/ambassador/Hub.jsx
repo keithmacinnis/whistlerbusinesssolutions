@@ -10,27 +10,57 @@ const money = (n) =>
 const BN_WEEKLY_USD = 2
 const BN_MONTHLY_USD = BN_WEEKLY_USD * 4
 const GOAL_USD = 1000
-/** Share of the $1k goal we paint as recurring BN vs shop padding. */
+/** Recurring BirdNest share of the $1k example month. */
 const BN_GOAL_SHARE = 0.8
 
-const RATE_CARDS = [
+/** Network programs — rates paid to WBS; sellers get networkSharePct of that. */
+const AFFILIATE_NETWORKS = [
   {
-    key: 'birdnestSharePct',
-    title: 'BirdNest app subscriptions',
-    blurb: 'Your cut of each BirdNest subscription payment attributed to you.',
-    accent: 'from-rose-50 to-white',
+    name: 'Bonheur Jewelry',
+    network: 'Awin',
+    rateLabel: '10% of sale',
+    ratePct: 10,
+    /** Example sale prices to show why jewelry $ commissions punch above % alone. */
+    examples: [
+      { label: '$180 earrings', saleUsd: 180 },
+      { label: '$420 necklace', saleUsd: 420 },
+      { label: '$890 bracelet', saleUsd: 890 },
+    ],
   },
   {
-    key: 'networkSharePct',
-    title: 'Affiliate sales',
-    blurb: 'Your share of network commissions (Awin, Booking.com, jewelry, and more).',
-    accent: 'from-amber-50 to-white',
+    name: 'Booking.com',
+    network: 'CJ',
+    rateLabel: '~4% of booking value',
+    ratePct: 4,
+    note: 'Base accommodation tier; scales with volume',
+    examples: [{ label: '$400 stay', saleUsd: 400 }],
+  },
+]
+
+const VIRAL_TIERS = [
+  {
+    label: 'Modest hit',
+    views: '25k views',
+    visits: '250–750 visits',
+    trials: '15–150 trials',
+    paid: '5–40 paid',
+    paidMid: 20,
   },
   {
-    key: 'ownStoreSharePct',
-    title: 'Own-store merch',
-    blurb: 'Your share of profit after cost on BirdNest / WBS shop orders you send.',
-    accent: 'from-sky-50 to-white',
+    label: 'Real viral',
+    views: '250k views',
+    visits: '1.5k–7.5k visits',
+    trials: '100–1,500 trials',
+    paid: '30–400 paid',
+    paidMid: 150,
+  },
+  {
+    label: 'Breakout',
+    views: '1M+ views',
+    visits: 'Wide range',
+    trials: 'Hundreds–thousands',
+    paid: 'Hundreds+ paid',
+    paidMid: 400,
   },
 ]
 
@@ -38,14 +68,14 @@ function pathToThousand(birdnestSharePct) {
   const share = Math.max(1, Number(birdnestSharePct) || 25) / 100
   const earnPerFamilyMo = BN_MONTHLY_USD * share
   const bnTargetUsd = Math.round(GOAL_USD * BN_GOAL_SHARE)
-  const shopPadUsd = GOAL_USD - bnTargetUsd
+  const extraUsd = GOAL_USD - bnTargetUsd
   const familiesForBn = Math.ceil(bnTargetUsd / earnPerFamilyMo)
   const familiesSolo = Math.ceil(GOAL_USD / earnPerFamilyMo)
   return {
     sharePct: Math.round(share * 100),
     earnPerFamilyMo,
     bnTargetUsd,
-    shopPadUsd,
+    extraUsd,
     familiesForBn,
     familiesSolo,
   }
@@ -63,33 +93,34 @@ function MotivationCard({ sharePct, monthCents }) {
           Path to {money(GOAL_USD)} / month
         </div>
         <h2 className="mt-2 max-w-2xl text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-          Build recurring income with BirdNest — shops pad the rest
+          Build recurring income with BirdNest
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600">
           Every family on the <span className="font-medium text-gray-800">$2/week</span> plan pays you about{' '}
           <span className="font-medium text-gray-800">{money(plan.earnPerFamilyMo)}/month</span> at your{' '}
-          {plan.sharePct}% rate — and it keeps paying while they stay subscribed.
+          {plan.sharePct}% rate — and it keeps paying while they stay subscribed. Shops and Booking.com add
+          on top.
         </p>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <div className="rounded-lg bg-white/80 p-4 shadow-sm ring-1 ring-rose-100 lg:col-span-1">
-            <div className="text-xs font-medium uppercase tracking-wide text-gray-500">The engine</div>
+          <div className="rounded-lg bg-white/80 p-4 shadow-sm ring-1 ring-rose-100">
+            <div className="text-xs font-medium uppercase tracking-wide text-gray-500">BirdNest recurring</div>
             <div className="mt-2 text-3xl font-bold text-gray-900">
               {plan.familiesForBn.toLocaleString()}
               <span className="ml-1 text-base font-semibold text-gray-500">families</span>
             </div>
             <p className="mt-1 text-sm text-gray-600">
-              → about {money(plan.bnTargetUsd)}/mo recurring from BirdNest
+              → about {money(plan.bnTargetUsd)}/mo from subscriptions
             </p>
           </div>
-          <div className="rounded-lg bg-white/80 p-4 shadow-sm ring-1 ring-amber-100 lg:col-span-1">
-            <div className="text-xs font-medium uppercase tracking-wide text-gray-500">The padding</div>
-            <div className="mt-2 text-3xl font-bold text-gray-900">{money(plan.shopPadUsd)}</div>
+          <div className="rounded-lg bg-white/80 p-4 shadow-sm ring-1 ring-amber-100">
+            <div className="text-xs font-medium uppercase tracking-wide text-gray-500">Shops &amp; travel</div>
+            <div className="mt-2 text-3xl font-bold text-gray-900">{money(plan.extraUsd)}</div>
             <p className="mt-1 text-sm text-gray-600">
-              Shops &amp; affiliates — baby clothes, Adorn jewelry, Booking.com
+              Adorn jewelry (big ticket = big $), baby clothes, Booking.com — on top of recurring
             </p>
           </div>
-          <div className="rounded-lg bg-white/80 p-4 shadow-sm ring-1 ring-gray-200 lg:col-span-1">
+          <div className="rounded-lg bg-white/80 p-4 shadow-sm ring-1 ring-gray-200">
             <div className="text-xs font-medium uppercase tracking-wide text-gray-500">This month</div>
             <div className="mt-2 text-3xl font-bold text-gray-900">{dollars(monthCents)}</div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100">
@@ -102,12 +133,45 @@ function MotivationCard({ sharePct, monthCents }) {
           </div>
         </div>
 
+        <div className="mt-6">
+          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            What one viral post can do
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Rough ranges — views → visits → trials → paid (after the free month). Strong CTAs beat vanity views.
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            {VIRAL_TIERS.map((tier) => {
+              const midRecurring = Math.round(tier.paidMid * plan.earnPerFamilyMo)
+              return (
+                <div
+                  key={tier.label}
+                  className="rounded-lg bg-white/90 p-4 shadow-sm ring-1 ring-gray-100"
+                >
+                  <div className="text-sm font-semibold text-gray-900">{tier.label}</div>
+                  <div className="mt-0.5 text-lg font-bold text-rose-700">{tier.views}</div>
+                  <ul className="mt-3 space-y-1 text-xs text-gray-600">
+                    <li>{tier.visits}</li>
+                    <li>{tier.trials}</li>
+                    <li className="font-medium text-gray-800">{tier.paid}</li>
+                  </ul>
+                  <p className="mt-3 text-xs text-gray-500">
+                    Mid-case ≈{' '}
+                    <span className="font-semibold text-gray-800">{money(midRecurring)}/mo</span> recurring
+                    if those paid stay subscribed
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
         <div className="mt-5 rounded-lg bg-white/70 px-4 py-3 text-sm text-gray-700 ring-1 ring-gray-100">
           <span className="font-semibold text-gray-900">Example month at goal:</span>{' '}
           {money(plan.bnTargetUsd)} BirdNest recurring ({plan.familiesForBn} active families) +{' '}
-          {money(plan.shopPadUsd)} from shops &amp; booking links ={' '}
-          <span className="font-semibold text-gray-900">{money(GOAL_USD)}</span>. All-recurring would take about{' '}
-          {plan.familiesSolo.toLocaleString()} families — shops just help you get there sooner.
+          {money(plan.extraUsd)} from shops &amp; Booking ={' '}
+          <span className="font-semibold text-gray-900">{money(GOAL_USD)}</span>. All from subscriptions would
+          take about {plan.familiesSolo.toLocaleString()} families.
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
@@ -129,6 +193,16 @@ function MotivationCard({ sharePct, monthCents }) {
   )
 }
 
+function RateCard({ title, pct, accent, children }) {
+  return (
+    <div className={`rounded-lg bg-gradient-to-b ${accent} p-5 shadow-sm ring-1 ring-gray-100`}>
+      <div className="text-4xl font-bold tracking-tight text-gray-900">{Number(pct ?? 0)}%</div>
+      <div className="mt-2 text-sm font-semibold text-gray-900">{title}</div>
+      {children}
+    </div>
+  )
+}
+
 export default function AmbassadorHub() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
@@ -142,6 +216,7 @@ export default function AmbassadorHub() {
   useEffect(reload, [reload])
 
   const rates = data?.rates || data?.ambassador || {}
+  const networkShare = Number(rates.networkSharePct ?? 50)
 
   return (
     <div>
@@ -170,18 +245,71 @@ export default function AmbassadorHub() {
             )}
           </div>
           <div className="mb-8 grid gap-4 sm:grid-cols-3">
-            {RATE_CARDS.map((card) => (
-              <div
-                key={card.key}
-                className={`rounded-lg bg-gradient-to-b ${card.accent} p-5 shadow-sm ring-1 ring-gray-100`}
-              >
-                <div className="text-4xl font-bold tracking-tight text-gray-900">
-                  {Number(rates[card.key] ?? 0)}%
-                </div>
-                <div className="mt-2 text-sm font-semibold text-gray-900">{card.title}</div>
-                <p className="mt-1 text-xs leading-relaxed text-gray-500">{card.blurb}</p>
-              </div>
-            ))}
+            <RateCard
+              title="BirdNest app subscriptions"
+              pct={rates.birdnestSharePct}
+              accent="from-rose-50 to-white"
+            >
+              <p className="mt-1 text-xs leading-relaxed text-gray-500">
+                Of each $2/week (or $89/year) payment attributed to you — about{' '}
+                {money((BN_MONTHLY_USD * Number(rates.birdnestSharePct || 25)) / 100)}/mo per active weekly
+                family.
+              </p>
+            </RateCard>
+
+            <RateCard
+              title="Affiliate sales"
+              pct={rates.networkSharePct}
+              accent="from-amber-50 to-white"
+            >
+              <p className="mt-1 text-xs leading-relaxed text-gray-500">
+                Of what each network pays us. Current programs:
+              </p>
+              <ul className="mt-2 space-y-2">
+                {AFFILIATE_NETWORKS.map((n) => {
+                  const youPct = (n.ratePct * networkShare) / 100
+                  const youLabel =
+                    youPct % 1 === 0 ? `${youPct}%` : `${youPct.toFixed(1)}%`
+                  return (
+                    <li key={n.name} className="rounded-md bg-white/70 px-2.5 py-2 ring-1 ring-amber-100/80">
+                      <div className="text-xs font-semibold text-gray-900">
+                        {n.name}{' '}
+                        <span className="font-normal text-gray-400">({n.network})</span>
+                      </div>
+                      <div className="mt-0.5 text-xs text-gray-600">
+                        Network: {n.rateLabel} → you: ~{youLabel} of sale
+                      </div>
+                      {n.examples?.length > 0 && (
+                        <ul className="mt-1.5 space-y-0.5 text-[11px] text-gray-500">
+                          {n.examples.map((ex) => {
+                            const youUsd = (ex.saleUsd * youPct) / 100
+                            return (
+                              <li key={ex.label}>
+                                {ex.label} →{' '}
+                                <span className="font-semibold text-gray-800">
+                                  ~${youUsd % 1 === 0 ? youUsd : youUsd.toFixed(0)} to you
+                                </span>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      )}
+                      {n.note && <div className="mt-1 text-[11px] text-gray-400">{n.note}</div>}
+                    </li>
+                  )
+                })}
+              </ul>
+            </RateCard>
+
+            <RateCard
+              title="Own-store merch"
+              pct={rates.ownStoreSharePct}
+              accent="from-sky-50 to-white"
+            >
+              <p className="mt-1 text-xs leading-relaxed text-gray-500">
+                Of profit after cost on BirdNest shop / WBS merch orders you send.
+              </p>
+            </RateCard>
           </div>
 
           <div className="mb-6 grid gap-3 sm:grid-cols-4">
