@@ -149,7 +149,7 @@ function MotivationCard({ sharePct, monthCents }) {
                   className="rounded-lg bg-white/90 p-4 shadow-sm ring-1 ring-gray-100"
                 >
                   <div className="text-sm font-semibold text-gray-900">{tier.label}</div>
-                  <div className="mt-0.5 text-lg font-bold text-rose-700">{tier.views}</div>
+                  <div className="mt-0.5 text-lg font-bold text-gray-900">{tier.views}</div>
                   <ul className="mt-3 space-y-1 text-xs text-gray-600">
                     <li>{tier.visits}</li>
                     <li>{tier.trials}</li>
