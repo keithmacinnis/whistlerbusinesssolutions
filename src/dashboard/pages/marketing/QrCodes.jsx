@@ -238,12 +238,12 @@ export default function QrCodes() {
     <div>
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">QR Codes</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Campaign tracking</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Create App Store or website campaign links, then download a QR code for print and ads.
+            Create App Store or website campaign links with downloadable QR codes for print, ads, and bios.
             {canAssignAmbassador
-              ? ' Assign App Store campaigns to family sellers when they request a print QR.'
-              : ' Personal seller QRs also live under Links & QR.'}
+              ? ' Assign App Store campaigns when a family seller requests install tracking.'
+              : ' Personal seller links and QRs also live under Links & QR.'}
           </p>
         </div>
         <button

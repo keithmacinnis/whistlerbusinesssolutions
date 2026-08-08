@@ -3,7 +3,7 @@ import QRCode from 'qrcode'
 import { api } from '../../api'
 
 function channelBadge(channel) {
-  if (channel === 'birdnest_appstore') return 'App Store'
+  if (channel === 'birdnest_appstore') return 'iOS App Store'
   if (channel === 'birdnest') return 'Get page'
   if (channel === 'birdnest_shop') return 'BirdNest shop'
   if (channel === 'birdnest_product') return 'BirdNest product'
@@ -195,14 +195,6 @@ export default function AmbassadorLinks() {
   )
   const unusedPresets = destinations.filter((d) => !existingBookingDests.has(d.pageUrl.replace(/\/$/, '')))
 
-  const ctFromTarget = (() => {
-    try {
-      return appStore?.targetUrl ? new URL(appStore.targetUrl).searchParams.get('ct') : null
-    } catch {
-      return null
-    }
-  })()
-
   return (
     <div>
       <div className="mb-6">
@@ -213,6 +205,44 @@ export default function AmbassadorLinks() {
       </div>
 
       {error && <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>}
+
+      <Section
+        title="BirdNest iOS App Store Landing Page"
+        hint="Primary install link for TikTok, Instagram, and bios. Opens BirdNest: Baby Tracker on the App Store — installs are attributed to you."
+      >
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          {appStore && (
+            <LinkCard
+              link={{ ...appStore, label: 'BirdNest iOS App Store Landing Page' }}
+              copied={copied}
+              onCopy={copy}
+              hint="Share this link or download the QR below. Use the same QR for posts and for printed cards."
+            >
+              {qrRequest?.status === 'pending' ? (
+                <span className="rounded-md bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-800">
+                  Tracking setup requested
+                </span>
+              ) : qrRequest?.status === 'fulfilled' ? (
+                <span className="rounded-md bg-green-50 px-3 py-1.5 text-sm font-medium text-green-800">
+                  Install tracking active
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  disabled={requestingQr}
+                  onClick={requestQr}
+                  className="rounded-md bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+                >
+                  {requestingQr ? 'Requesting…' : 'Request install tracking'}
+                </button>
+              )}
+            </LinkCard>
+          )}
+        </div>
+        {!appStore && !error && (
+          <div className="text-sm text-gray-400">Loading App Store landing page link…</div>
+        )}
+      </Section>
 
       <Section
         title="Shops"
@@ -234,46 +264,6 @@ export default function AmbassadorLinks() {
           ))}
         </div>
         {!shops.length && !error && <div className="text-sm text-gray-400">Loading shop links…</div>}
-      </Section>
-
-      <Section
-        title="BirdNest App Store"
-        hint="One clear install link. Apple tracks downloads by campaign token (ct=) in App Store Connect — pull those numbers for accounting."
-      >
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-          {appStore && (
-            <LinkCard
-              link={{ ...appStore, label: 'App Store install link' }}
-              copied={copied}
-              onCopy={copy}
-              hint={
-                ctFromTarget
-                  ? `Campaign token ct=${ctFromTarget}. Check performance in App Store Connect → Campaigns.`
-                  : 'Opens the BirdNest: Baby Tracker App Store page with your campaign token.'
-              }
-            >
-              {qrRequest?.status === 'pending' ? (
-                <span className="rounded-md bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-800">
-                  Print QR requested
-                </span>
-              ) : qrRequest?.status === 'fulfilled' ? (
-                <span className="rounded-md bg-green-50 px-3 py-1.5 text-sm font-medium text-green-800">
-                  Print QR ready (ct={qrRequest.campaignToken || ctFromTarget})
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  disabled={requestingQr}
-                  onClick={requestQr}
-                  className="rounded-md bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
-                >
-                  {requestingQr ? 'Requesting…' : 'Request print QR'}
-                </button>
-              )}
-            </LinkCard>
-          )}
-        </div>
-        {!appStore && !error && <div className="text-sm text-gray-400">Loading App Store link…</div>}
       </Section>
 
       <Section

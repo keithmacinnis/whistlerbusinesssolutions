@@ -299,7 +299,7 @@ export default function CreativeIdeas() {
                     <div className="flex flex-col items-end gap-1">
                       <StatusChip status={t.status} />
                       <AuthorTag
-                        tag={(t.author || '?').slice(0, 1)}
+                        tag={(t.author || '?').slice(0, 6)}
                         title={t.author || 'Unknown author'}
                       />
                     </div>

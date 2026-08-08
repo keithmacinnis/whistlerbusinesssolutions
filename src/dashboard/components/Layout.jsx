@@ -106,7 +106,7 @@ export default function Layout() {
               <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Marketing
               </div>
-              <NavLink to="/marketing/qr-codes" className={navLinkClass}>QR Codes</NavLink>
+              <NavLink to="/marketing/qr-codes" className={navLinkClass}>Campaign tracking</NavLink>
               <NavLink to="/marketing/creative" className={navLinkClass}>Creative Studio</NavLink>
             </>
           )}

@@ -237,7 +237,7 @@ export default function CreativeIdeaDetail() {
             {idea?.number != null ? `${String(idea.number).padStart(2, '0')}. ` : ''}
             {form.title}
           </h1>
-          <AuthorTag tag={(form.author || '?').slice(0, 1)} title={form.author || 'Unknown'} />
+          <AuthorTag tag={(form.author || '?').slice(0, 6)} title={form.author || 'Unknown'} />
         </div>
         <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500">
           <span>{seriesMeta ? seriesMeta.name : 'Ungrouped idea'}</span>
