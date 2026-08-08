@@ -12,6 +12,7 @@ export default function Login() {
   const [busy, setBusy] = useState(false)
 
   const homeFor = (u) => {
+    if (u?.mustChangePassword) return '/choose-password'
     if (hasRole(u, 'super_admin', 'account_manager')) return '/'
     if (hasRole(u, 'teacher')) return '/education/my-courses'
     if (hasRole(u, 'ambassador')) return '/ambassador'

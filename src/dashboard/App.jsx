@@ -6,6 +6,7 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import ChoosePassword from './pages/ChoosePassword'
 import Overview from './pages/Overview'
 import BusinessList from './pages/BusinessList'
 import BusinessDetail from './pages/BusinessDetail'
@@ -50,8 +51,16 @@ function RequireAuth({ children }) {
   return children
 }
 
+/** Block the rest of the app until first-login password choice is done. */
+function RequirePasswordSettled({ children }) {
+  const { user } = useAuth()
+  if (user?.mustChangePassword) return <Navigate to="/choose-password" replace />
+  return children
+}
+
 function HomeRedirect() {
   const { user } = useAuth()
+  if (user?.mustChangePassword) return <Navigate to="/choose-password" replace />
   if (hasRole(user, 'super_admin', 'account_manager')) return <Overview />
   if (hasRole(user, 'teacher')) return <Navigate to="/education/my-courses" replace />
   if (hasRole(user, 'ambassador')) return <Navigate to="/ambassador" replace />
@@ -74,10 +83,20 @@ export default function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/ambassador/accept" element={<AcceptInvite />} />
             <Route
+              path="/choose-password"
+              element={
+                <RequireAuth>
+                  <ChoosePassword />
+                </RequireAuth>
+              }
+            />
+            <Route
               path="/*"
               element={
                 <RequireAuth>
-                  <Layout />
+                  <RequirePasswordSettled>
+                    <Layout />
+                  </RequirePasswordSettled>
                 </RequireAuth>
               }
             >
