@@ -313,8 +313,21 @@ export default function AmbassadorHub() {
               accent="from-sky-50 to-white"
             >
               <p className="mt-1 text-xs leading-relaxed text-gray-500">
-                Of profit after cost on BirdNest shop / WBS merch orders you send.
+                Of profit after cost on BirdNest shop clothes you send (sale − supplier).
               </p>
+              <ul className="mt-2 space-y-0.5 rounded-md bg-white/70 px-2.5 py-2 text-[11px] text-gray-500 ring-1 ring-sky-100/80">
+                {OWN_STORE_EXAMPLES.map((ex) => {
+                  const youUsd = (ex.netUsd * Number(rates.ownStoreSharePct ?? 50)) / 100
+                  return (
+                    <li key={ex.label}>
+                      {ex.label} →{' '}
+                      <span className="font-semibold text-gray-800">
+                        ~${youUsd % 1 === 0 ? youUsd : youUsd.toFixed(2)} to you
+                      </span>
+                    </li>
+                  )
+                })}
+              </ul>
             </RateCard>
           </div>
 
