@@ -6,9 +6,10 @@ function channelBadge(channel) {
   if (channel === 'birdnest_appstore') return 'App Store'
   if (channel === 'birdnest') return 'Get page'
   if (channel === 'birdnest_shop') return 'BirdNest shop'
+  if (channel === 'birdnest_product') return 'BirdNest product'
   if (channel === 'shop') return 'Adorn shop'
   if (channel === 'booking') return 'Booking.com'
-  if (channel === 'product') return 'Product'
+  if (channel === 'product') return 'Adorn product'
   return channel || 'Link'
 }
 
@@ -56,11 +57,20 @@ function LinkCard({ link, copied, onCopy, children, hint }) {
   return (
     <div className="rounded-lg bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-2">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">{link.label || link.channel}</h2>
-          <span className="mt-1 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-            {channelBadge(link.channel)}
-          </span>
+        <div className="flex min-w-0 items-start gap-3">
+          {link.product?.imageUrl && (
+            <img
+              src={link.product.imageUrl}
+              alt=""
+              className="h-14 w-14 shrink-0 rounded-md object-cover ring-1 ring-gray-100"
+            />
+          )}
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-gray-900">{link.label || link.channel}</h2>
+            <span className="mt-1 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+              {channelBadge(link.channel)}
+            </span>
+          </div>
         </div>
         <span className="shrink-0 text-xs text-gray-400">{link.clicks} clicks</span>
       </div>
@@ -170,7 +180,13 @@ export default function AmbassadorLinks() {
   const appStore = links.find((l) => l.channel === 'birdnest_appstore')
   const getPage = links.find((l) => l.channel === 'birdnest')
   const booking = links.filter((l) => l.channel === 'booking')
-  const products = links.filter((l) => l.channel === 'product')
+  const adornProducts = links.filter((l) => l.channel === 'product')
+  const birdnestProducts = links.filter((l) => l.channel === 'birdnest_product')
+
+  const formatPrice = (cents) =>
+    cents != null
+      ? `$${(Number(cents) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : null
 
   const existingBookingDests = new Set(
     booking
@@ -321,20 +337,54 @@ export default function AmbassadorLinks() {
         </div>
       </Section>
 
-      <Section title="Product links" hint="Direct Buy links for Adorn catalog picks — hard-sell posts.">
+      <Section
+        title="BirdNest shop products"
+        hint="Baby clothes from the BirdNest shop — each link opens the shop with your referral attached."
+      >
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-          {products.map((l) => (
+          {birdnestProducts.map((l) => (
+            <LinkCard
+              key={l.id}
+              link={{
+                ...l,
+                label: l.product?.name || l.label || l.code,
+              }}
+              copied={copied}
+              onCopy={copy}
+              hint={
+                l.product?.priceCents != null
+                  ? formatPrice(l.product.priceCents)
+                  : undefined
+              }
+            />
+          ))}
+        </div>
+        {!birdnestProducts.length && (
+          <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-500">
+            No BirdNest shop products yet — catalog may be empty.
+          </div>
+        )}
+      </Section>
+
+      <Section title="Adorn product links" hint="Direct Buy links for Adorn jewelry picks — hard-sell posts.">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          {adornProducts.map((l) => (
             <LinkCard
               key={l.id}
               link={{ ...l, label: l.product?.name || l.label || l.code }}
               copied={copied}
               onCopy={copy}
+              hint={
+                l.product?.priceCents != null
+                  ? formatPrice(l.product.priceCents)
+                  : undefined
+              }
             />
           ))}
         </div>
-        {!products.length && (
+        {!adornProducts.length && (
           <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-500">
-            No product links yet — catalog may be empty.
+            No Adorn product links yet — catalog may be empty.
           </div>
         )}
       </Section>
