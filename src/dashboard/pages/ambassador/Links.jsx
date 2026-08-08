@@ -178,7 +178,6 @@ export default function AmbassadorLinks() {
 
   const shops = links.filter((l) => l.channel === 'shop' || l.channel === 'birdnest_shop')
   const appStore = links.find((l) => l.channel === 'birdnest_appstore')
-  const getPage = links.find((l) => l.channel === 'birdnest')
   const booking = links.filter((l) => l.channel === 'booking')
   const adornProducts = links.filter((l) => l.channel === 'product')
   const birdnestProducts = links.filter((l) => l.channel === 'birdnest_product')
@@ -239,7 +238,7 @@ export default function AmbassadorLinks() {
 
       <Section
         title="BirdNest App Store"
-        hint="One clear install link. Apple tracks downloads by campaign token (ct=) in App Store Connect — same style as business-card campaigns."
+        hint="One clear install link. Apple tracks downloads by campaign token (ct=) in App Store Connect — pull those numbers for accounting."
       >
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
           {appStore && (
@@ -272,14 +271,6 @@ export default function AmbassadorLinks() {
                 </button>
               )}
             </LinkCard>
-          )}
-          {getPage && (
-            <LinkCard
-              link={{ ...getPage, label: 'Get / signup page' }}
-              copied={copied}
-              onCopy={copy}
-              hint="Optional soft landing before install — sets a cookie so BirdNest subscription commissions can attribute to you."
-            />
           )}
         </div>
         {!appStore && !error && <div className="text-sm text-gray-400">Loading App Store link…</div>}

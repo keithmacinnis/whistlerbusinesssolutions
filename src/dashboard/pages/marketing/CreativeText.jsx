@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
+import { hasRole } from '../../roles'
+import AuthorTag from './AuthorTag'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
 import { ToneChip } from './ToneBanner'
@@ -188,8 +190,8 @@ export default function CreativeText() {
     }
   }
 
-  if (user?.role !== 'super_admin') {
-    return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
+  if (!hasRole(user, 'super_admin', 'ambassador')) {
+    return <div className="text-gray-500">Marketing tools are limited to admins and ambassadors.</div>
   }
 
   const loading = stills === null && !error
@@ -246,6 +248,7 @@ export default function CreativeText() {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="truncate text-base font-semibold text-gray-900">{s.title}</h3>
+                  <AuthorTag tag={s.authorTag} />
                   <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold uppercase text-amber-900">
                     {formatLabel(s.format)}
                   </span>

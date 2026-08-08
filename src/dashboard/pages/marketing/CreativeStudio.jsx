@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
+import { hasRole } from '../../roles'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
 import FormatSelect from './FormatSelect'
 import { ToneChip } from './ToneBanner'
+import AuthorTag from './AuthorTag'
 
 const STATUS_STYLES = {
   idea: 'bg-gray-100 text-gray-700',
@@ -143,8 +145,8 @@ export default function CreativeStudio() {
     }
   }
 
-  if (user?.role !== 'super_admin') {
-    return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
+  if (!hasRole(user, 'super_admin', 'ambassador')) {
+    return <div className="text-gray-500">Marketing tools are limited to admins and ambassadors.</div>
   }
 
   return (
@@ -200,6 +202,7 @@ export default function CreativeStudio() {
             <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
               <tr>
                 <th className="px-4 py-3">Title</th>
+                <th className="px-4 py-3">By</th>
                 <th className="px-4 py-3">Angle</th>
                 <th className="px-4 py-3">Format</th>
                 <th className="px-4 py-3">Status</th>
@@ -219,6 +222,13 @@ export default function CreativeStudio() {
                       {b.title}
                     </Link>
                     <div className="mt-0.5 text-xs text-gray-400">{b.offerSlug}</div>
+                  </td>
+                  <td className="px-4 py-3">
+                    {b.authorTag ? (
+                      <AuthorTag tag={b.authorTag} />
+                    ) : (
+                      <span className="text-xs text-gray-300">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs">{b.angle}</td>
                   <td className="px-4 py-3 text-gray-600">{formatLabel(b.format)}</td>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../auth'
+import { hasRole } from '../roles'
 
 export default function Login() {
   const { user, login } = useAuth()
@@ -11,8 +12,9 @@ export default function Login() {
   const [busy, setBusy] = useState(false)
 
   const homeFor = (u) => {
-    if (u?.role === 'ambassador') return '/ambassador'
-    if (u?.role === 'teacher') return '/education/my-courses'
+    if (hasRole(u, 'super_admin', 'account_manager')) return '/'
+    if (hasRole(u, 'teacher')) return '/education/my-courses'
+    if (hasRole(u, 'ambassador')) return '/ambassador'
     return '/'
   }
 

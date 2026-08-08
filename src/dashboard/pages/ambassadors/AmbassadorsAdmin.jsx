@@ -76,10 +76,16 @@ export default function AmbassadorsAdmin() {
 
       {created && (
         <div className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-900">
-          <div className="font-semibold">Invite created for {created.ambassador?.user?.email}</div>
+          <div className="font-semibold">
+            {created.existingUser ? 'Ambassador role added for' : 'Invite created for'}{' '}
+            {created.ambassador?.user?.email}
+          </div>
           <div className="mt-1 break-all">Invite URL: {created.inviteUrl}</div>
           {created.temporaryPassword && (
             <div className="mt-1">Temp password: <code>{created.temporaryPassword}</code></div>
+          )}
+          {created.existingUser && (
+            <div className="mt-1 text-green-800">Existing account kept its password; ambassador access was added.</div>
           )}
           <button type="button" className="mt-2 text-xs underline" onClick={() => setCreated(null)}>
             Dismiss
@@ -143,7 +149,9 @@ export default function AmbassadorsAdmin() {
           <div className="space-y-3">
             {['email', 'name', 'displayName', 'code', 'password'].map((k) => (
               <label key={k} className="block text-sm text-gray-700">
-                {k === 'password' ? 'Password (optional — random if blank)' : k}
+                {k === 'password'
+                  ? 'Password (optional — random if blank; ignored for existing users)'
+                  : k}
                 <input
                   className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
                   type={k === 'password' ? 'password' : 'text'}
@@ -153,6 +161,9 @@ export default function AmbassadorsAdmin() {
                 />
               </label>
             ))}
+            <p className="text-xs text-gray-500">
+              If the email already belongs to a teacher (or other user), ambassador is added as an extra role.
+            </p>
             <button
               type="button"
               onClick={submitInvite}

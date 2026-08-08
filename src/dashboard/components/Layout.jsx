@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { useViewAsTeacher } from '../viewAsTeacher'
 import { useViewAsAmbassador } from '../viewAsAmbassador'
+import { formatRoles, hasRole } from '../roles'
 
 const navLinkClass = ({ isActive }) =>
   `block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
@@ -13,12 +14,13 @@ export default function Layout() {
   const { viewAs, clearViewAs } = useViewAsTeacher()
   const { viewAs: viewAsAmb, clearViewAs: clearViewAsAmb } = useViewAsAmbassador()
   const navigate = useNavigate()
-  const isTeacher = user?.role === 'teacher'
-  const isAmbassador = user?.role === 'ambassador'
-  const isSuper = user?.role === 'super_admin'
+  const isTeacher = hasRole(user, 'teacher')
+  const isAmbassador = hasRole(user, 'ambassador')
+  const isSuper = hasRole(user, 'super_admin')
   const viewingAsTeacher = isSuper && !!viewAs
   const viewingAsAmbassador = isSuper && !!viewAsAmb
   // When god-mode is on, show the teacher/ambassador portal nav as they would see it.
+  // Real dual-role users see both Education + Selling sections.
   const showTeacherNav = isTeacher || viewingAsTeacher
   const showAmbassadorNav = (isAmbassador || viewingAsAmbassador) && !viewingAsTeacher
   const showAdminNav = isSuper && !viewingAsTeacher && !viewingAsAmbassador
@@ -96,11 +98,21 @@ export default function Layout() {
               <NavLink to="/ambassadors" end className={navLinkClass}>Family sellers</NavLink>
               <NavLink to="/ambassadors/settlements" className={navLinkClass}>Seller payouts</NavLink>
               <NavLink to="/ambassadors/leaderboard" className={navLinkClass}>Leaderboard</NavLink>
+            </>
+          )}
+
+          {(showAdminNav || showAmbassadorNav) && (
+            <>
               <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Marketing
               </div>
               <NavLink to="/marketing/qr-codes" className={navLinkClass}>QR Codes</NavLink>
               <NavLink to="/marketing/creative" className={navLinkClass}>Creative Studio</NavLink>
+            </>
+          )}
+
+          {showAdminNav && (
+            <>
               <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Finance
               </div>
@@ -109,12 +121,13 @@ export default function Layout() {
                 Admin
               </div>
               <NavLink to="/users" className={navLinkClass}>Users</NavLink>
+              <NavLink to="/onboarding-emails" className={navLinkClass}>Onboarding emails</NavLink>
             </>
           )}
         </nav>
         <div className="border-t border-gray-800 pt-3">
           <div className="truncate px-3 text-sm text-gray-300">{user?.email || user?.name}</div>
-          <div className="truncate px-3 text-xs text-gray-500">{user?.role?.replace(/_/g, ' ')}</div>
+          <div className="truncate px-3 text-xs text-gray-500">{formatRoles(user)}</div>
           <button
             onClick={logout}
             className="mt-1 w-full rounded-md px-3 py-2 text-left text-sm text-gray-400 hover:bg-gray-800 hover:text-white"

@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
+import { hasRole } from '../../roles'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
+import AuthorTag from './AuthorTag'
 
 const PLATFORMS = [
   { id: 'tiktok', label: 'TikTok' },
@@ -123,8 +125,8 @@ export default function CreativePosts() {
     }
   }
 
-  if (user?.role !== 'super_admin') {
-    return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
+  if (!hasRole(user, 'super_admin', 'ambassador')) {
+    return <div className="text-gray-500">Marketing tools are limited to admins and ambassadors.</div>
   }
 
   const loading = ready === null && !error
@@ -178,6 +180,7 @@ export default function CreativePosts() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="truncate text-base font-semibold text-gray-900">{v.title}</h3>
+                  <AuthorTag tag={v.authorTag} />
                   <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold uppercase text-gray-600">
                     {v.assetType === 'still' ? 'text/still' : 'video'}
                   </span>
@@ -250,6 +253,7 @@ export default function CreativePosts() {
                   <h3 className="truncate text-base font-semibold text-gray-900">
                     {p.video?.title || p.still?.title || 'Asset'}
                   </h3>
+                  <AuthorTag tag={p.authorTag} />
                   <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold uppercase text-sky-800">
                     {platformLabel(p.platform)}
                   </span>

@@ -2,9 +2,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api'
 import { useAuth } from '../../auth'
+import { hasRole } from '../../roles'
 import ToneBanner from './ToneBanner'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import QualityBanner from './QualityBanner'
+import AuthorTag from './AuthorTag'
 
 const STATUSES = ['idea', 'briefed', 'prompted', 'ready_to_post', 'posted', 'archived']
 
@@ -197,8 +199,8 @@ export default function CreativeBriefDetail() {
     }
   }
 
-  if (user?.role !== 'super_admin') {
-    return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
+  if (!hasRole(user, 'super_admin', 'ambassador')) {
+    return <div className="text-gray-500">Marketing tools are limited to admins and ambassadors.</div>
   }
 
   if (!form && !error) return <div className="text-gray-500">Loading…</div>
@@ -224,7 +226,10 @@ export default function CreativeBriefDetail() {
           <Link to="/marketing/creative" className="text-sm text-brand-700 hover:underline">
             ← Creative Studio
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-gray-900">{form.title || 'Brief'}</h1>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-900">{form.title || 'Brief'}</h1>
+            <AuthorTag tag={brief?.authorTag} />
+          </div>
           <p className="mt-1 text-sm text-gray-500">
             {brief?.offerSlug} · {brief?.angle} · {brief?.format}
             {brief?.themeSlug && (

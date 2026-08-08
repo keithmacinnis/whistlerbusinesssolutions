@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate } from 'react-router-dom'
 import QRCode from 'qrcode'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
 import { useViewAsAmbassador } from '../../viewAsAmbassador'
+import { hasRole } from '../../roles'
 
 const emptyAppStore = {
   type: 'app_store',
@@ -107,30 +107,30 @@ export default function QrCodes() {
   const [saving, setSaving] = useState(false)
   const [fulfillingId, setFulfillingId] = useState(null)
 
-  const isAmbassadorView =
-    user?.role === 'ambassador' || (user?.role === 'super_admin' && !!viewAsAmb)
+  const isSuper = hasRole(user, 'super_admin')
+  const canAccessMarketing = isSuper || hasRole(user, 'ambassador')
+  // Assigning campaigns to sellers is admin-only (disabled for ambassadors / god-mode).
+  const canAssignAmbassador = isSuper && !viewAsAmb
 
   const reload = useCallback(() => {
-    if (isAmbassadorView) return
-    Promise.all([
-      api('/api/marketing/campaigns'),
-      api('/api/ambassadors/admin/qr-requests?status=pending'),
-      api('/api/ambassadors'),
-    ])
+    if (!canAccessMarketing) return
+    const tasks = [api('/api/marketing/campaigns')]
+    if (canAssignAmbassador) {
+      tasks.push(
+        api('/api/ambassadors/admin/qr-requests?status=pending'),
+        api('/api/ambassadors')
+      )
+    }
+    Promise.all(tasks)
       .then(([camp, reqs, ambs]) => {
         setCampaigns(camp.campaigns || [])
-        setQrRequests(reqs.requests || [])
-        setAmbassadors(ambs.ambassadors || [])
+        setQrRequests(canAssignAmbassador ? reqs?.requests || [] : [])
+        setAmbassadors(canAssignAmbassador ? ambs?.ambassadors || [] : [])
       })
       .catch((err) => setError(err.message))
-  }, [isAmbassadorView])
+  }, [canAccessMarketing, canAssignAmbassador])
 
   useEffect(reload, [reload])
-
-  // Family sellers use personal QRs on Links — not the admin MarketingCampaign tool.
-  if (isAmbassadorView) {
-    return <Navigate to="/ambassador/links" replace />
-  }
 
   const setType = (type) => {
     setForm(type === 'app_store' ? { ...emptyAppStore, name: form.name, notes: form.notes } : { ...emptyWebsite, name: form.name, notes: form.notes, utmCampaign: form.name })
@@ -150,7 +150,9 @@ export default function QrCodes() {
               campaignToken: form.name.trim(),
               mediaType: form.mediaType,
               notes: form.notes,
-              ambassadorId: form.ambassadorId || undefined,
+              ...(canAssignAmbassador && form.ambassadorId
+                ? { ambassadorId: form.ambassadorId }
+                : {}),
             }
           : {
               type: 'website',
@@ -223,8 +225,8 @@ export default function QrCodes() {
     }
   }
 
-  if (user?.role !== 'super_admin') {
-    return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
+  if (!canAccessMarketing) {
+    return <div className="text-gray-500">Marketing tools are limited to admins and ambassadors.</div>
   }
 
   const livePreview = previewUrl(form)
@@ -239,7 +241,9 @@ export default function QrCodes() {
           <h1 className="text-2xl font-bold text-gray-900">QR Codes</h1>
           <p className="mt-1 text-sm text-gray-500">
             Create App Store or website campaign links, then download a QR code for print and ads.
-            Assign App Store campaigns to family sellers when they request a print QR.
+            {canAssignAmbassador
+              ? ' Assign App Store campaigns to family sellers when they request a print QR.'
+              : ' Personal seller QRs also live under Links & QR.'}
           </p>
         </div>
         <button
@@ -338,8 +342,9 @@ export default function QrCodes() {
               <label className="mt-3 block text-xs font-medium text-gray-500">
                 Assign to ambassador
                 <select
-                  className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800"
+                  className="mt-1 w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-800 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
                   value={c.ambassadorId || ''}
+                  disabled={!canAssignAmbassador}
                   onChange={(e) => assignCampaign(c.id, e.target.value)}
                 >
                   <option value="">— Unassigned —</option>
@@ -438,8 +443,9 @@ export default function QrCodes() {
                   Assign to ambassador (optional)
                   <select
                     value={form.ambassadorId || ''}
+                    disabled={!canAssignAmbassador}
                     onChange={(e) => setForm({ ...form, ambassadorId: e.target.value })}
-                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
                   >
                     <option value="">— None —</option>
                     {ambassadors.map((a) => (

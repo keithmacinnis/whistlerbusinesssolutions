@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
+import { hasRole } from '../../roles'
+import AuthorTag from './AuthorTag'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import AngleHintPicker from './AngleHintPicker'
 import SeriesSelect from './SeriesSelect'
@@ -206,8 +208,8 @@ export default function CreativeIdeaDetail() {
     }
   }
 
-  if (user?.role !== 'super_admin') {
-    return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
+  if (!hasRole(user, 'super_admin', 'ambassador')) {
+    return <div className="text-gray-500">Marketing tools are limited to admins and ambassadors.</div>
   }
 
   if (!form && !error) return <div className="text-gray-500">Loading…</div>
@@ -230,16 +232,21 @@ export default function CreativeIdeaDetail() {
         <Link to="/marketing/creative/ideas" className="text-sm text-brand-700 hover:underline">
           ← Ideas
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900">
-          {idea?.number != null ? `${String(idea.number).padStart(2, '0')}. ` : ''}
-          {form.title}
-        </h1>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900">
+            {idea?.number != null ? `${String(idea.number).padStart(2, '0')}. ` : ''}
+            {form.title}
+          </h1>
+          <AuthorTag tag={(form.author || '?').slice(0, 1)} title={form.author || 'Unknown'} />
+        </div>
         <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500">
           <span>{seriesMeta ? seriesMeta.name : 'Ungrouped idea'}</span>
-          <span className="text-gray-300">·</span>
-          <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-700">
-            by {form.author || 'Mom'}
-          </span>
+          {form.author ? (
+            <>
+              <span className="text-gray-300">·</span>
+              <span className="text-xs font-medium text-gray-600">by {form.author}</span>
+            </>
+          ) : null}
           {idea?.parentSlug ? (
             <>
               <span className="text-gray-300">·</span>
@@ -337,7 +344,7 @@ export default function CreativeIdeaDetail() {
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
             />
             <p className="mt-1 text-xs text-gray-400">
-              Seed ideas are Mom. AI derivatives use the model name as author.
+              Humans default to email initial; AI derivatives use the model name.
             </p>
           </label>
           <label className="block text-sm font-medium text-gray-700">
@@ -450,12 +457,15 @@ export default function CreativeIdeaDetail() {
                 <ul className="space-y-2 text-sm">
                   {briefs.map((b) => (
                     <li key={b.id} className="rounded-md bg-gray-50 px-2.5 py-2">
-                      <Link
-                        to={`/marketing/creative/${b.id}`}
-                        className="font-medium text-brand-700 hover:underline"
-                      >
-                        {b.title}
-                      </Link>
+                      <div className="flex items-start justify-between gap-2">
+                        <Link
+                          to={`/marketing/creative/${b.id}`}
+                          className="font-medium text-brand-700 hover:underline"
+                        >
+                          {b.title}
+                        </Link>
+                        <AuthorTag tag={b.authorTag} />
+                      </div>
                       <div className="mt-0.5 text-xs text-gray-400">
                         {b.format} · {b.angle} · {b.status}
                         {b.meta?.model ? ` · ${b.meta.model}` : ''}

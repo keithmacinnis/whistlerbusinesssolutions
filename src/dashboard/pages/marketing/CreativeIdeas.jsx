@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../api'
 import Modal from '../../components/Modal'
 import { useAuth } from '../../auth'
+import { hasRole } from '../../roles'
 import CreativeStudioTabs from './CreativeStudioTabs'
 import CreativeStudioGuide from './CreativeStudioGuide'
 import AngleHintPicker from './AngleHintPicker'
 import SeriesSelect, { CreateSeriesPlus } from './SeriesSelect'
+import AuthorTag from './AuthorTag'
 
 const STATUS_STYLES = {
   idea: 'bg-amber-50 text-amber-800 ring-amber-200',
@@ -37,7 +39,7 @@ const emptyForm = {
   angleHints: 'NEST',
   status: 'idea',
   notes: '',
-  author: 'Mom',
+  author: '',
 }
 
 function StatusChip({ status }) {
@@ -153,7 +155,7 @@ export default function CreativeIdeas() {
           angleHints: form.angleHints,
           status: form.status,
           notes: form.notes.trim() || undefined,
-          author: form.author.trim() || 'Mom',
+          ...(form.author.trim() ? { author: form.author.trim() } : {}),
         },
       })
       const created = res.idea || res.theme
@@ -176,8 +178,8 @@ export default function CreativeIdeas() {
     !form.videoOutline.trim() && 'video outline',
   ].filter(Boolean)
 
-  if (user?.role !== 'super_admin') {
-    return <div className="text-gray-500">Marketing tools are limited to super admins.</div>
+  if (!hasRole(user, 'super_admin', 'ambassador')) {
+    return <div className="text-gray-500">Marketing tools are limited to admins and ambassadors.</div>
   }
 
   return (
@@ -296,9 +298,10 @@ export default function CreativeIdeas() {
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       <StatusChip status={t.status} />
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
-                        {t.author || 'Mom'}
-                      </span>
+                      <AuthorTag
+                        tag={(t.author || '?').slice(0, 1)}
+                        title={t.author || 'Unknown author'}
+                      />
                     </div>
                   </div>
                   <h3 className="mt-3 text-base font-semibold text-gray-900 group-hover:text-brand-800">
@@ -383,7 +386,7 @@ export default function CreativeIdeas() {
                 <input
                   value={form.author}
                   onChange={(e) => setForm({ ...form, author: e.target.value })}
-                  placeholder="Mom"
+                  placeholder="Blank = your email initial"
                   className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
                 />
               </label>

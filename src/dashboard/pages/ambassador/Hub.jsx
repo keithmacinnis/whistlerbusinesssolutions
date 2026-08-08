@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api'
+import BarChart from '../../components/BarChart'
 
 const dollars = (cents) => `$${((cents || 0) / 100).toFixed(2)}`
 const money = (n) =>
@@ -44,6 +45,7 @@ const OWN_STORE_EXAMPLES = [
   { label: 'Lily Floral Bubble ($15.99)', netUsd: 5 },
 ]
 
+const VIRAL_TIERS = [
   {
     label: 'Modest hit',
     views: '25k views',
@@ -209,9 +211,127 @@ function RateCard({ title, pct, accent, children }) {
   )
 }
 
+function PlatformPulse({ pulse, loading, error }) {
+  if (loading && !pulse) {
+    return (
+      <div className="mt-10 rounded-lg bg-white p-6 text-sm text-gray-400 shadow-sm ring-1 ring-gray-100">
+        Loading platform pulse…
+      </div>
+    )
+  }
+  if (error && !pulse) {
+    return (
+      <div className="mt-10 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+    )
+  }
+  if (!pulse) return null
+
+  const days = pulse.rangeDays || 30
+  const trials = pulse.subscriptions?.activeTrials
+  const subs = pulse.subscriptions?.activeSubscriptions
+  const webTotal = pulse.website?.totalVisitors
+  const appTotal = (pulse.appStore?.pageViews || []).reduce((s, p) => s + (p.count || 0), 0)
+
+  return (
+    <section className="mt-10 overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-100">
+      <div className="border-b border-gray-100 bg-gradient-to-r from-sky-50 via-white to-rose-50 px-5 py-5 sm:px-7">
+        <div className="text-xs font-semibold uppercase tracking-wide text-sky-800/80">
+          BirdNest platform · last {days} days
+        </div>
+        <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-900">Where the attention is</h2>
+        <p className="mt-1 max-w-2xl text-sm text-gray-600">
+          Live product pulse — website humans (PostHog), App Store page views, and who&apos;s on a trial or
+          paid plan. Your shares of this pie show up in earnings when families convert through your links.
+        </p>
+      </div>
+
+      <div className="grid gap-4 border-b border-gray-100 p-5 sm:grid-cols-2 sm:px-7 lg:grid-cols-4">
+        <div className="rounded-lg bg-rose-50/80 p-4 ring-1 ring-rose-100">
+          <div className="text-xs font-medium uppercase tracking-wide text-rose-800/70">Active trials</div>
+          <div className="mt-1 text-3xl font-bold text-gray-900">
+            {pulse.subscriptions?.configured && trials != null ? Number(trials).toLocaleString() : '—'}
+          </div>
+          <p className="mt-1 text-xs text-gray-500">Free month in progress</p>
+        </div>
+        <div className="rounded-lg bg-amber-50/80 p-4 ring-1 ring-amber-100">
+          <div className="text-xs font-medium uppercase tracking-wide text-amber-800/70">
+            Active subscriptions
+          </div>
+          <div className="mt-1 text-3xl font-bold text-gray-900">
+            {pulse.subscriptions?.configured && subs != null ? Number(subs).toLocaleString() : '—'}
+          </div>
+          <p className="mt-1 text-xs text-gray-500">Paying families right now</p>
+        </div>
+        <div className="rounded-lg bg-sky-50/80 p-4 ring-1 ring-sky-100">
+          <div className="text-xs font-medium uppercase tracking-wide text-sky-800/70">
+            Website humans
+          </div>
+          <div className="mt-1 text-3xl font-bold text-gray-900">
+            {pulse.website?.configured && webTotal != null ? Number(webTotal).toLocaleString() : '—'}
+          </div>
+          <p className="mt-1 text-xs text-gray-500">birdnestfamilies.com · {days}d</p>
+        </div>
+        <div className="rounded-lg bg-violet-50/80 p-4 ring-1 ring-violet-100">
+          <div className="text-xs font-medium uppercase tracking-wide text-violet-800/70">
+            App Store views
+          </div>
+          <div className="mt-1 text-3xl font-bold text-gray-900">
+            {pulse.appStore?.configured ? appTotal.toLocaleString() : '—'}
+          </div>
+          <p className="mt-1 text-xs text-gray-500">Product page · {days}d</p>
+        </div>
+      </div>
+
+      {pulse.subscriptions?.error && (
+        <div className="mx-5 mt-4 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800 sm:mx-7">
+          Subscriptions: {pulse.subscriptions.error}
+        </div>
+      )}
+
+      <div className="grid gap-6 p-5 sm:px-7 lg:grid-cols-2">
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900">Daily human visitors</h3>
+          <p className="mt-0.5 text-xs text-gray-500">birdnestfamilies.com · PostHog (bots excluded)</p>
+          <div className="mt-3">
+            {!pulse.website?.configured ? (
+              <p className="text-sm text-gray-400">Website analytics not connected.</p>
+            ) : pulse.website.error ? (
+              <p className="text-sm text-red-600">{pulse.website.error}</p>
+            ) : (
+              <BarChart
+                points={pulse.website.dailyVisitors}
+                label="visitors"
+                barClassName="fill-sky-500"
+              />
+            )}
+          </div>
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900">App Store page views</h3>
+          <p className="mt-0.5 text-xs text-gray-500">BirdNest Baby Tracker listing · Apple Analytics</p>
+          <div className="mt-3">
+            {!pulse.appStore?.configured ? (
+              <p className="text-sm text-gray-400">App Store Connect not connected.</p>
+            ) : (
+              <BarChart
+                points={pulse.appStore.pageViews}
+                label="page views"
+                barClassName="fill-violet-500"
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function AmbassadorHub() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const [pulse, setPulse] = useState(null)
+  const [pulseError, setPulseError] = useState('')
+  const [pulseLoading, setPulseLoading] = useState(true)
 
   const reload = useCallback(() => {
     api('/api/ambassadors/me')
@@ -220,6 +340,14 @@ export default function AmbassadorHub() {
   }, [])
 
   useEffect(reload, [reload])
+
+  useEffect(() => {
+    setPulseLoading(true)
+    api('/api/ambassadors/me/platform-pulse', { params: { days: 30 } })
+      .then(setPulse)
+      .catch((err) => setPulseError(err.message))
+      .finally(() => setPulseLoading(false))
+  }, [])
 
   const rates = data?.rates || data?.ambassador || {}
   const networkShare = Number(rates.networkSharePct ?? 50)
@@ -236,6 +364,44 @@ export default function AmbassadorHub() {
 
       {data && (
         <>
+          {data.month?.rank != null && (
+            <p className="mb-3 text-sm text-gray-600">
+              Ranked <span className="font-semibold">#{data.month.rank}</span> this month
+              {data.month.rank === 1 ? ' — nice!' : ''}
+            </p>
+          )}
+
+          <div className="mb-3 grid gap-3 sm:grid-cols-4">
+            {[
+              ['This month', dollars(data.month?.amountCents)],
+              ['Clicks', data.month?.clicks ?? 0],
+              ['Orders', data.month?.orders ?? 0],
+              ['Pending', dollars(data.totals?.pending)],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-lg bg-white p-4 shadow-sm">
+                <div className="text-xs uppercase tracking-wide text-gray-500">{label}</div>
+                <div className="mt-1 text-xl font-semibold text-gray-900">{value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mb-8 grid gap-3 sm:grid-cols-3">
+            <Link to="/ambassador/earnings" className="rounded-lg bg-white p-4 shadow-sm hover:bg-gray-50">
+              <div className="text-sm font-semibold text-gray-900">Earnings</div>
+              <div className="mt-1 text-xs text-gray-500">
+                Settleable {dollars(data.totals?.settleable)} · Paid {dollars(data.totals?.settled)}
+              </div>
+            </Link>
+            <Link to="/ambassador/leaderboard" className="rounded-lg bg-white p-4 shadow-sm hover:bg-gray-50">
+              <div className="text-sm font-semibold text-gray-900">Leaderboard</div>
+              <div className="mt-1 text-xs text-gray-500">This month&apos;s family rankings</div>
+            </Link>
+            <Link to="/ambassador/links" className="rounded-lg bg-white p-4 shadow-sm hover:bg-gray-50">
+              <div className="text-sm font-semibold text-gray-900">Links &amp; QR codes</div>
+              <div className="mt-1 text-xs text-gray-500">Shops, App Store, Booking &amp; products</div>
+            </Link>
+          </div>
+
           <MotivationCard
             sharePct={rates.birdnestSharePct}
             monthCents={data.month?.amountCents}
@@ -243,12 +409,6 @@ export default function AmbassadorHub() {
 
           <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Your commission rates</h2>
-            {data.month?.rank != null && (
-              <p className="text-sm text-gray-600">
-                Ranked <span className="font-semibold">#{data.month.rank}</span> this month
-                {data.month.rank === 1 ? ' — nice!' : ''}
-              </p>
-            )}
           </div>
           <div className="mb-8 grid gap-4 sm:grid-cols-3">
             <RateCard
@@ -331,36 +491,7 @@ export default function AmbassadorHub() {
             </RateCard>
           </div>
 
-          <div className="mb-6 grid gap-3 sm:grid-cols-4">
-            {[
-              ['This month', dollars(data.month?.amountCents)],
-              ['Clicks', data.month?.clicks ?? 0],
-              ['Orders', data.month?.orders ?? 0],
-              ['Pending', dollars(data.totals?.pending)],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-lg bg-white p-4 shadow-sm">
-                <div className="text-xs uppercase tracking-wide text-gray-500">{label}</div>
-                <div className="mt-1 text-xl font-semibold text-gray-900">{value}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link to="/ambassador/earnings" className="rounded-lg bg-white p-4 shadow-sm hover:bg-gray-50">
-              <div className="text-sm font-semibold text-gray-900">Earnings</div>
-              <div className="mt-1 text-xs text-gray-500">
-                Settleable {dollars(data.totals?.settleable)} · Paid {dollars(data.totals?.settled)}
-              </div>
-            </Link>
-            <Link to="/ambassador/leaderboard" className="rounded-lg bg-white p-4 shadow-sm hover:bg-gray-50">
-              <div className="text-sm font-semibold text-gray-900">Leaderboard</div>
-              <div className="mt-1 text-xs text-gray-500">This month&apos;s family rankings</div>
-            </Link>
-            <Link to="/ambassador/links" className="rounded-lg bg-white p-4 shadow-sm hover:bg-gray-50">
-              <div className="text-sm font-semibold text-gray-900">Links &amp; QR codes</div>
-              <div className="mt-1 text-xs text-gray-500">Shops, App Store, Booking &amp; products</div>
-            </Link>
-          </div>
+          <PlatformPulse pulse={pulse} loading={pulseLoading} error={pulseError} />
         </>
       )}
     </div>

@@ -132,6 +132,9 @@ export default function EducationTeachers() {
             <label className="block">
               <span className="text-gray-600">Temporary password</span>
               <input type="password" className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+              <span className="mt-1 block text-xs text-gray-400">
+                Required for new accounts. Leave blank if this email already has a dashboard login — teacher role will be added.
+              </span>
             </label>
             <label className="block">
               <span className="text-gray-600">Teacher share %</span>

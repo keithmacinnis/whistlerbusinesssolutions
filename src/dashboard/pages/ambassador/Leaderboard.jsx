@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../api'
 import { useAuth } from '../../auth'
+import { hasRole } from '../../roles'
 
 const dollars = (cents) => `$${((cents || 0) / 100).toFixed(2)}`
 
@@ -8,16 +9,14 @@ export default function AmbassadorLeaderboard() {
   const { user } = useAuth()
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const isSuper = hasRole(user, 'super_admin')
 
   const reload = useCallback(() => {
-    const path =
-      user?.role === 'super_admin'
-        ? '/api/ambassadors/admin/leaderboard'
-        : '/api/ambassadors/leaderboard'
+    const path = isSuper ? '/api/ambassadors/admin/leaderboard' : '/api/ambassadors/leaderboard'
     api(path)
       .then(setData)
       .catch((err) => setError(err.message))
-  }, [user?.role])
+  }, [isSuper])
 
   useEffect(reload, [reload])
 

@@ -9,6 +9,7 @@ import BusinessList from './pages/BusinessList'
 import BusinessDetail from './pages/BusinessDetail'
 import NewBusinessWizard from './pages/NewBusinessWizard'
 import Users from './pages/Users'
+import OnboardingEmails from './pages/OnboardingEmails'
 import MerchProducts from './pages/merch/MerchProducts'
 import MerchOrders from './pages/merch/MerchOrders'
 import OnlineStores from './pages/merch/OnlineStores'
@@ -36,6 +37,7 @@ import AmbassadorLeaderboard from './pages/ambassador/Leaderboard'
 import AcceptInvite from './pages/ambassador/AcceptInvite'
 import AmbassadorsAdmin from './pages/ambassadors/AmbassadorsAdmin'
 import AmbassadorSettlements from './pages/ambassadors/Settlements'
+import { hasRole } from './roles'
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
@@ -48,8 +50,9 @@ function RequireAuth({ children }) {
 
 function HomeRedirect() {
   const { user } = useAuth()
-  if (user?.role === 'teacher') return <Navigate to="/education/my-courses" replace />
-  if (user?.role === 'ambassador') return <Navigate to="/ambassador" replace />
+  if (hasRole(user, 'super_admin', 'account_manager')) return <Overview />
+  if (hasRole(user, 'teacher')) return <Navigate to="/education/my-courses" replace />
+  if (hasRole(user, 'ambassador')) return <Navigate to="/ambassador" replace />
   return <Overview />
 }
 
@@ -93,6 +96,7 @@ export default function App() {
               <Route path="marketing/creative" element={<CreativeStudio />} />
               <Route path="marketing/creative/:id" element={<CreativeBriefDetail />} />
               <Route path="users" element={<Users />} />
+              <Route path="onboarding-emails" element={<OnboardingEmails />} />
               <Route path="education/resources" element={<EducationResources />} />
               <Route path="education/teachers" element={<EducationTeachers />} />
               <Route path="education/sessions" element={<EducationSessions />} />
